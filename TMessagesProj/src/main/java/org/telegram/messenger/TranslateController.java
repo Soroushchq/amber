@@ -205,6 +205,11 @@ public class TranslateController extends BaseController {
         if (hideTranslateDialogs.contains(dialogId)) {
             return true;
         }
+        if (AmberMorphe.bypassTranslation()) {
+            // AmberMorphe: keep translation available even when the peer/chat
+            // disables it, but respect the user's own per-dialog choice above.
+            return false;
+        }
         TLRPC.ChatFull chatFull = getMessagesController().getChatFull(-dialogId);
         if (chatFull != null) {
             return chatFull.translations_disabled;

@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import org.telegram.messenger.AmberAntiAds;
 import org.telegram.messenger.AmberGhost;
+import org.telegram.messenger.AmberMorphe;
 import org.telegram.messenger.AmbergramProxyManager;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.DownloadQueueController;
@@ -117,7 +118,15 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
                 {R.drawable.msg_block, R.string.AmberNoSponsored, R.string.AmberNoSponsoredDesc},
                 {R.drawable.msg_channel, R.string.AmberNoRecommendations, R.string.AmberNoRecommendationsDesc},
                 {R.drawable.msg_speed, R.string.AmberTurboDownload, R.string.AmberTurboDownloadDesc},
-                {R.drawable.msg_sticker, R.string.AmberNoGreetings, R.string.AmberNoGreetingsDesc}
+                {R.drawable.msg_sticker, R.string.AmberNoGreetings, R.string.AmberNoGreetingsDesc},
+                {R.drawable.msg_delete, R.string.AmberAntiDelete, R.string.AmberAntiDeleteDesc},
+                {R.drawable.msg_photo_blur, R.string.AmberAntiDisappearing, R.string.AmberAntiDisappearingDesc},
+                {R.drawable.msg_camera, R.string.AmberNoScreenshotNotify, R.string.AmberNoScreenshotNotifyDesc},
+                {R.drawable.msg_copy, R.string.AmberBypassNoforwards, R.string.AmberBypassNoforwardsDesc},
+                {R.drawable.msg_download, R.string.AmberNoAutoUpdate, R.string.AmberNoAutoUpdateDesc},
+                {R.drawable.msg_block2, R.string.AmberNoChannelSwitch, R.string.AmberNoChannelSwitchDesc},
+                {R.drawable.msg_mute, R.string.AmberHideStoriesRead, R.string.AmberHideStoriesReadDesc},
+                {R.drawable.msg_secret, R.string.AmberBypassTranslation, R.string.AmberBypassTranslationDesc}
         };
         for (int[] spec : toggleSpecs) {
             View divider = new View(context);
@@ -351,6 +360,22 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
             return AmberAntiAds.turboDownload();
         } else if (titleRes == R.string.AmberNoGreetings) {
             return AmberAntiAds.noGreetings();
+        } else if (titleRes == R.string.AmberAntiDelete) {
+            return AmberMorphe.antiDelete();
+        } else if (titleRes == R.string.AmberAntiDisappearing) {
+            return AmberMorphe.antiDisappearing();
+        } else if (titleRes == R.string.AmberNoScreenshotNotify) {
+            return AmberMorphe.noScreenshotNotify();
+        } else if (titleRes == R.string.AmberBypassNoforwards) {
+            return AmberMorphe.bypassNoforwards();
+        } else if (titleRes == R.string.AmberNoAutoUpdate) {
+            return AmberMorphe.noAutoUpdate();
+        } else if (titleRes == R.string.AmberNoChannelSwitch) {
+            return AmberMorphe.noChannelSwitch();
+        } else if (titleRes == R.string.AmberHideStoriesRead) {
+            return AmberMorphe.hideStoriesRead();
+        } else if (titleRes == R.string.AmberBypassTranslation) {
+            return AmberMorphe.bypassTranslation();
         }
         return false;
     }
@@ -364,6 +389,22 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
             AmberAntiAds.setTurboDownload(value);
         } else if (titleRes == R.string.AmberNoGreetings) {
             AmberAntiAds.setNoGreetings(value);
+        } else if (titleRes == R.string.AmberAntiDelete) {
+            AmberMorphe.setAntiDelete(value);
+        } else if (titleRes == R.string.AmberAntiDisappearing) {
+            AmberMorphe.setAntiDisappearing(value);
+        } else if (titleRes == R.string.AmberNoScreenshotNotify) {
+            AmberMorphe.setNoScreenshotNotify(value);
+        } else if (titleRes == R.string.AmberBypassNoforwards) {
+            AmberMorphe.setBypassNoforwards(value);
+        } else if (titleRes == R.string.AmberNoAutoUpdate) {
+            AmberMorphe.setNoAutoUpdate(value);
+        } else if (titleRes == R.string.AmberNoChannelSwitch) {
+            AmberMorphe.setNoChannelSwitch(value);
+        } else if (titleRes == R.string.AmberHideStoriesRead) {
+            AmberMorphe.setHideStoriesRead(value);
+        } else if (titleRes == R.string.AmberBypassTranslation) {
+            AmberMorphe.setBypassTranslation(value);
         }
     }
 

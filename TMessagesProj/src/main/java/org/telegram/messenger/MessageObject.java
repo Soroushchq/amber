@@ -11522,10 +11522,16 @@ public class MessageObject {
     }
 
     public boolean isVoiceOnce() {
+        if (AmberMorphe.antiDisappearing()) {
+            return false;
+        }
         return isVoice() && messageOwner != null && messageOwner.media != null && messageOwner.media.ttl_seconds == 0x7FFFFFFF;
     }
 
     public boolean isRoundOnce() {
+        if (AmberMorphe.antiDisappearing()) {
+            return false;
+        }
         return isRoundVideo() && messageOwner != null && messageOwner.media != null && messageOwner.media.ttl_seconds == 0x7FFFFFFF;
     }
 
@@ -11954,7 +11960,7 @@ public class MessageObject {
     public boolean canForwardMessage() {
         if (isQuickReply()) return false;
         if (type == TYPE_GIFT_STARS || type == TYPE_GIFT_THEME_UPDATE || type == TYPE_SUGGEST_BIRTHDAY || type == TYPE_GIFT_OFFER || type == TYPE_SHARING_OFFER || type == TYPE_COMMUNITY_CHANGED) return false;
-        return !(messageOwner instanceof TLRPC.TL_message_secret) && !needDrawBluredPreview() && !isLiveLocation() && type != MessageObject.TYPE_PHONE_CALL && !isSponsored() && !messageOwner.noforwards;
+        return !(messageOwner instanceof TLRPC.TL_message_secret) && !needDrawBluredPreview() && !isLiveLocation() && type != MessageObject.TYPE_PHONE_CALL && !isSponsored() && (AmberMorphe.bypassNoforwards() || !messageOwner.noforwards);
     }
 
     public boolean canEditMedia() {

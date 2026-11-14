@@ -11741,7 +11741,23 @@
     <string name="AmberNoRecommendations">No channel recommendations</string>
     <string name="AmberNoRecommendationsDesc">The recommended channels card at the end of channels is hidden.</string>
     <string name="AmberTurboDownload">Turbo download</string>
-    <string name="AmberTurboDownloadDesc">Files download with big 512 KB chunks and 8 parallel requests. New downloads pick this up automatically.</string>
+    <string name="AmberTurboDownloadDesc">Files download with big 1 MB chunks and 12 parallel requests (Morphe download boost numbers). New downloads pick this up automatically.</string>
     <string name="AmberNoGreetings">Hide greeting stickers</string>
     <string name="AmberNoGreetingsDesc">Greeting sticker suggestions and intro cards in empty chats are hidden.</string>
+    <string name="AmberAntiDelete">Keep deleted messages</string>
+    <string name="AmberAntiDeleteDesc">Messages deleted by the other side are kept on this device (anti-recall).</string>
+    <string name="AmberAntiDisappearing">Keep view-once media</string>
+    <string name="AmberAntiDisappearingDesc">View-once voice notes and round videos stay playable and forwardable.</string>
+    <string name="AmberNoScreenshotNotify">No screenshot alerts</string>
+    <string name="AmberNoScreenshotNotifyDesc">The other side is never notified when you take a screenshot.</string>
+    <string name="AmberBypassNoforwards">Allow saving everywhere</string>
+    <string name="AmberBypassNoforwardsDesc">Save, copy and forward in chats and channels that restrict content.</string>
+    <string name="AmberNoAutoUpdate">No in-app updates</string>
+    <string name="AmberNoAutoUpdateDesc">AmberGram never suggests installing the official Telegram update.</string>
+    <string name="AmberNoChannelSwitch">Disable channel swipe</string>
+    <string name="AmberNoChannelSwitchDesc">Turns off the pull-down gesture that jumps to the next unread channel.</string>
+    <string name="AmberHideStoriesRead">Hide story views</string>
+    <string name="AmberHideStoriesReadDesc">Stories are marked read locally without ever sending read receipts.</string>
+    <string name="AmberBypassTranslation">Always translatable</string>
+    <string name="AmberBypassTranslationDesc">Translation stays available even in chats that disabled it.</string>
 </resources>
