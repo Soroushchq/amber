@@ -180,6 +180,7 @@ import org.telegram.messenger.MessagePreviewParams;
 import org.telegram.messenger.MessageSuggestionParams;
 import org.telegram.messenger.AmberAntiAds;
 import org.telegram.messenger.AmberGhost;
+import org.telegram.messenger.AmberMorphe;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.MessagesStorage;
 import org.telegram.messenger.NotificationCenter;
@@ -11714,7 +11715,8 @@ public class ChatActivity extends BaseFragment implements
 
     private ArrayList<TLRPC.Chat> nextChannels;
     public void setNextChannels(ArrayList<TLRPC.Chat> channels) {
-        nextChannels = channels;
+        // AmberMorphe: optionally disable the pull-down "next unread channel" gesture.
+        nextChannels = AmberMorphe.noChannelSwitch() ? null : channels;
     }
 
     private void addToPulledDialogsMyself() {
