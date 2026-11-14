@@ -27,3 +27,6 @@
 - برندینگ: پک‌های زبان ریموت می‌توانند رشته‌ها را بازنویسی کنند → کلیدهای برند باید محافظت/بازنویسی runtime شوند (`d52ca265`).
 - آیکون‌های جایگزین اندروید: چند `<activity-alias>` در AndroidManifest + `PackageManager.setComponentEnabledSetting` + انتخابگر در تنظیمات + رشته‌های `AppIcon*`.
 - کلیدهای مهم تم: `Theme.java` (مثل `key_windowBackgroundWhiteBlackText`)؛ رنگ نام چت‌ها در `DialogCell`.
+7. **قبل از تشخیص «دانلود خراب»، خود artifact را باز کن**: دانلود APK منتشرشده + sha256sum + `apksigner verify --verbose` + `aapt2 dump badging` + چک STORED بودن resources.arsc با `unzip -v` — همه در سندباکس ممکن است (build-tools r34 از dl.google.com؛ apksigner با جاوا ۲۱ کار می‌کند). این‌بار نتیجه: artifact سالم، مشکل سمت دانلود/دستگاه بود؛ ولی بدون این بازرسی ادعا نمی‌شد.
+8. **تورفتگی خط‌های غیرانگلیسی در بلوک `run: |`**: هر خطی که در اول ستون (بدون تورفتگی) بنویسی از literal block scalar بیرون می‌زند و YAML می‌شکند (مثلاً `**عنوان**` → alias error). همیشه همه خط‌های متن changelog را هم‌تراز بقیه (۱۰ فاصله) بنویس؛ اعتبارسنجی pyyaml قبل از push.
+9. **جای خالی در versionCode فلاورها**: فلاورهای جدید باید abiVersionCode زیر فلاور universal (9) بگیرند تا ارتقا از APK سبک به universal همیشه مجاز باشد (قاعده تلگرام: universal=9).
