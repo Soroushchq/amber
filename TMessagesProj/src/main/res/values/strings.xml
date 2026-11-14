@@ -11736,4 +11736,12 @@
     <string name="AmberGhostOn">On</string>
     <string name="AmberGhostOff">Off</string>
     <string name="AmberGhostDesc">Ghost mode: chats you open are not marked as read until you leave them, and your typing indicator is never sent.</string>
+    <string name="AmberNoSponsored">No sponsored messages</string>
+    <string name="AmberNoSponsoredDesc">Sponsored messages in channels and bots are never fetched or shown.</string>
+    <string name="AmberNoRecommendations">No channel recommendations</string>
+    <string name="AmberNoRecommendationsDesc">The recommended channels card at the end of channels is hidden.</string>
+    <string name="AmberTurboDownload">Turbo download</string>
+    <string name="AmberTurboDownloadDesc">Files download with big 512 KB chunks and 8 parallel requests. New downloads pick this up automatically.</string>
+    <string name="AmberNoGreetings">Hide greeting stickers</string>
+    <string name="AmberNoGreetingsDesc">Greeting sticker suggestions and intro cards in empty chats are hidden.</string>
 </resources>

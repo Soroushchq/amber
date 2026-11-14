@@ -12,6 +12,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.telegram.messenger.AmberAntiAds;
 import org.telegram.messenger.AmberGhost;
 import org.telegram.messenger.AmbergramProxyManager;
 import org.telegram.messenger.AndroidUtilities;
@@ -27,6 +28,7 @@ import org.telegram.ui.Cells.TextInfoPrivacyCell;
 import org.telegram.ui.Components.LayoutHelper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * AmberGram fork: settings hub for AmberGram features.
@@ -40,8 +42,15 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
     private TextView queueValueView;
     private TextView proxyValueView;
     private TextView ghostValueView;
+    private final HashMap<Integer, TextView> toggleValueViews = new HashMap<>();
+    private final HashMap<Integer, AmberToggle> toggles = new HashMap<>();
     private boolean updateScheduled;
     private boolean proxyUpdateScheduled;
+
+    private interface AmberToggle {
+        boolean get();
+        void set(boolean value);
+    }
 
     @Override
     public boolean onFragmentCreate() {
@@ -104,6 +113,20 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
         LinearLayout ghostRow = makeGhostRow(context);
         card.addView(ghostRow, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
+        int[][] toggleSpecs = {
+                {R.drawable.msg_block, R.string.AmberNoSponsored, R.string.AmberNoSponsoredDesc},
+                {R.drawable.msg_channel, R.string.AmberNoRecommendations, R.string.AmberNoRecommendationsDesc},
+                {R.drawable.msg_speed, R.string.AmberTurboDownload, R.string.AmberTurboDownloadDesc},
+                {R.drawable.msg_sticker, R.string.AmberNoGreetings, R.string.AmberNoGreetingsDesc}
+        };
+        for (int[] spec : toggleSpecs) {
+            View divider = new View(context);
+            divider.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundGray));
+            card.addView(divider, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1));
+            LinearLayout toggleRow = makeToggleRow(context, spec[0], spec[1], spec[2]);
+            card.addView(toggleRow, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        }
+
         TextInfoPrivacyCell footerCell = new TextInfoPrivacyCell(context, 24, null);
         footerCell.setText(LocaleController.getString(R.string.AmbergramQueueComingSoon));
         contentWrapper.addView(footerCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
@@ -111,6 +134,7 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
         refreshQueueValue();
         refreshProxyValue();
         refreshGhostValue();
+        refreshAllToggles();
         return fragmentView;
     }
 
@@ -262,6 +286,105 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
         textCol.addView(ghostValueView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
 
         return row;
+    }
+
+    private LinearLayout makeToggleRow(Context context, int iconRes, int titleRes, int descRes) {
+        toggles.put(titleRes, new AmberToggle() {
+            @Override
+            public boolean get() {
+                return getToggleValue(titleRes);
+            }
+
+            @Override
+            public void set(boolean value) {
+                setToggleValue(titleRes, value);
+            }
+        });
+        LinearLayout row = new LinearLayout(context);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(10), AndroidUtilities.dp(16), AndroidUtilities.dp(10));
+        row.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector)));
+        row.setOnClickListener(v -> {
+            AmberToggle toggle = toggles.get(titleRes);
+            boolean newValue = !toggle.get();
+            toggle.set(newValue);
+            refreshToggle(titleRes);
+            if (getParentActivity() != null) {
+                Toast.makeText(getParentActivity(), LocaleController.getString(descRes), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        ImageView iconView = new ImageView(context);
+        iconView.setImageResource(iconRes);
+        iconView.setColorFilter(BRAND_ORANGE, PorterDuff.Mode.SRC_IN);
+        row.addView(iconView, LayoutHelper.createLinear(AndroidUtilities.dp(26), AndroidUtilities.dp(26), 0, Gravity.CENTER_VERTICAL, 0, 0, AndroidUtilities.dp(14), 0));
+
+        LinearLayout textCol = new LinearLayout(context);
+        textCol.setOrientation(LinearLayout.VERTICAL);
+        row.addView(textCol, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
+
+        TextView titleView = new TextView(context);
+        titleView.setTypeface(AndroidUtilities.bold());
+        titleView.setTextSize(16);
+        ThemeBind.textColor(titleView, Theme.key_windowBackgroundWhiteBlackText, null);
+        titleView.setText(LocaleController.getString(titleRes));
+        titleView.setSingleLine(true);
+        textCol.addView(titleView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+
+        TextView valueView = new TextView(context);
+        valueView.setTypeface(AndroidUtilities.bold());
+        valueView.setTextSize(13);
+        valueView.setSingleLine(true);
+        toggleValueViews.put(titleRes, valueView);
+        textCol.addView(valueView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+
+        return row;
+    }
+
+    private boolean getToggleValue(int titleRes) {
+        if (titleRes == R.string.AmberNoSponsored) {
+            return AmberAntiAds.noSponsored();
+        } else if (titleRes == R.string.AmberNoRecommendations) {
+            return AmberAntiAds.noRecommendations();
+        } else if (titleRes == R.string.AmberTurboDownload) {
+            return AmberAntiAds.turboDownload();
+        } else if (titleRes == R.string.AmberNoGreetings) {
+            return AmberAntiAds.noGreetings();
+        }
+        return false;
+    }
+
+    private void setToggleValue(int titleRes, boolean value) {
+        if (titleRes == R.string.AmberNoSponsored) {
+            AmberAntiAds.setNoSponsored(value);
+        } else if (titleRes == R.string.AmberNoRecommendations) {
+            AmberAntiAds.setNoRecommendations(value);
+        } else if (titleRes == R.string.AmberTurboDownload) {
+            AmberAntiAds.setTurboDownload(value);
+        } else if (titleRes == R.string.AmberNoGreetings) {
+            AmberAntiAds.setNoGreetings(value);
+        }
+    }
+
+    private void refreshAllToggles() {
+        for (int titleRes : toggleValueViews.keySet()) {
+            refreshToggle(titleRes);
+        }
+    }
+
+    private void refreshToggle(int titleRes) {
+        TextView valueView = toggleValueViews.get(titleRes);
+        if (valueView == null || getContext() == null) {
+            return;
+        }
+        if (toggles.get(titleRes).get()) {
+            valueView.setText(LocaleController.getString(R.string.AmberGhostOn));
+            valueView.setTextColor(BRAND_ORANGE);
+        } else {
+            valueView.setText(LocaleController.getString(R.string.AmberGhostOff));
+            valueView.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteGrayText2));
+        }
     }
 
     private void refreshGhostValue() {

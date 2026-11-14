@@ -103,6 +103,7 @@ import androidx.core.math.MathUtils;
 
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AccountInstance;
+import org.telegram.messenger.AmberAntiAds;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.AppGlobalConfig;
 import org.telegram.messenger.ApplicationLoader;
@@ -6847,10 +6848,16 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 forwardedNameLayout[0] = null;
                 forwardedNameLayout[1] = null;
                 drawName = false;
-                if (channelRecommendationsCell == null) {
-                    channelRecommendationsCell = new ChannelRecommendationsCell(this);
+                if (AmberAntiAds.noRecommendations()) {
+                    if (channelRecommendationsCell != null) {
+                        channelRecommendationsCell = null;
+                    }
+                } else {
+                    if (channelRecommendationsCell == null) {
+                        channelRecommendationsCell = new ChannelRecommendationsCell(this);
+                    }
+                    channelRecommendationsCell.setMessageObject(messageObject);
                 }
-                channelRecommendationsCell.setMessageObject(messageObject);
             } else if (messageObject.isExpiredStory()) {
                 if (!messageIdChanged) {
                     requestLayout();
