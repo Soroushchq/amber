@@ -313,6 +313,13 @@ public class FileLoadOperation {
             downloadChunkSizeBig = 1024 * 128;
             maxDownloadRequestsBig = 8;
         }
+        if (AmberAntiAds.turboDownload()) {
+            // AmberGram turbo download: always use the big 512 KB chunks with 8 parallel
+            // requests (params official Telegram reserves for experimental builds).
+            downloadChunkSizeBig = 1024 * 512;
+            maxDownloadRequests = 8;
+            maxDownloadRequestsBig = 8;
+        }
         maxCdnParts = (int) (FileLoader.DEFAULT_MAX_FILE_SIZE / downloadChunkSizeBig);
     }
 
