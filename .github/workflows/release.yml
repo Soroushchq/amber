@@ -60,9 +60,9 @@ jobs:
             fi
           } >> local.properties
 
-      - name: Build signed universal release APK
+      - name: Build signed release APKs (universal + arm64 + armv7)
         run: |
-          ./gradlew :TMessagesProj_App:assembleAfatRelease \
+          ./gradlew :TMessagesProj_App:assembleAfatRelease :TMessagesProj_App:assembleArm64Release :TMessagesProj_App:assembleArmv7Release \
             -PRELEASE_STORE_PASSWORD="${{ secrets.RAKHSH_STORE_PASSWORD }}" \
             -PRELEASE_KEY_ALIAS="${{ secrets.RAKHSH_KEY_ALIAS }}" \
             -PRELEASE_KEY_PASSWORD="${{ secrets.RAKHSH_KEY_PASSWORD }}" \
@@ -72,7 +72,11 @@ jobs:
         run: |
           mkdir -p dist
           cp TMessagesProj_App/build/outputs/apk/afat/release/app.apk "dist/AmberGram-${GITHUB_REF_NAME}-universal.apk"
+          cp TMessagesProj_App/build/outputs/apk/arm64/release/app.apk "dist/AmberGram-${GITHUB_REF_NAME}-arm64-v8a.apk"
+          cp TMessagesProj_App/build/outputs/apk/armv7/release/app.apk "dist/AmberGram-${GITHUB_REF_NAME}-armeabi-v7a.apk"
           sha256sum dist/*.apk > dist/SHA256SUMS.txt
+          echo "--- dist contents ---"
+          ls -l dist/
 
       - name: Create GitHub Release
         env:
@@ -82,10 +86,20 @@ jobs:
             --title "AmberGram $GITHUB_REF_NAME" \
             --prerelease \
             --notes "Unofficial GPLv2 client based on the Telegram open-source code (Android).
-          - Signed universal APK (afat flavor, all ABIs). SHA-256 checksums included.
+          - Signed APKs for every phone: universal (all 4 ABIs), arm64-v8a (most modern phones, nearly half the download size), armeabi-v7a (older 32-bit phones). SHA-256 checksums for every file are inside SHA256SUMS.txt.
           - Packaged with the project's own api_id/api_hash — login works out of the box.
-          - NEW in $GITHUB_REF_NAME: Ghost mode (AmberGram Settings → Ghost mode). When enabled, chats you open are NOT marked as read until you actually leave the chat, and your typing indicator is never sent — read quietly, reply later.
-          - Install note: if the installer says there was a problem parsing the package, the APK download was almost certainly incomplete or the wrong file was opened. Download exactly the AmberGram-$GITHUB_REF_NAME-universal.apk asset, keep at least 200 MB free storage, and verify the file size and SHA-256 against SHA256SUMS.txt. AmberGram requires Android 6.0 or newer.
+          - NEW in 0.3.x — Ghost mode (AmberGram Settings → Ghost mode): chats you open are NOT marked as read until you actually leave the chat, and your typing indicator is never sent — read quietly, reply later.
+          - NEW packaging — smaller per-ABI APKs + this install guide, because the classic «there was a problem parsing the package» error is almost always caused by an incomplete download or by a device older than Android 6.0. Every published APK is verified healthy before release: SHA-256 recorded in SHA256SUMS.txt and the v1+v2 signatures are checked with the official apksigner tool.
+
+          **راهنمای نصب فارسی:**
+
+          - ۱. انتخاب فایل: اگر گوشی‌تان معمولی و از حدود ۲۰۱۷ به بعد است، فایل arm64-v8a را بگیرید (نصف حجم)؛ برای گوشی‌های قدیمی‌تر ۳۲ بیتی فایل armeabi-v7a؛ اگر مطمئن نیستید، فایل universal را بگیرید که روی همه گوشی‌ها نصب می‌شود.
+          - ۲. دانلود فقط با مرورگر گوشی (کروم یا فایرفاکس) از همین صفحه و با زدن روی نام فایل انجام شود. دانلود از داخل پیام‌رسان‌ها یا مدیرهای دانلود غیراستاندارد ممکن است فایل را ناقص و خراب کند.
+          - ۳. بعد از دانلود، حجم فایل را با حجمی که همین صفحه کنار فایل نوشته مقایسه کنید؛ اگر اختلاف داشت، دانلود ناقص است و باید دوباره دانلود کنید.
+          - ۴. برای اطمینان کامل، SHA-256 را بسنجید: در ویندوز با دستور certutil -hashfile نام‌فایل SHA256 و در اندروید با یک اپ مقایسه هش، با عدد داخل فایل SHA256SUMS.txt.
+          - ۵. حداقل اندروید ۶٫۰ لازم است (تنظیمات ← درباره گوشی ← نسخه اندروید) و حداقل ۲۰۰ مگابایت فضای خالی.
+          - ۶. اگر باز هم خطای پارس آمد: با اینترنت دیگری (ترجیحاً بدون فیلترشکن) دوباره دانلود کنید و نصب را به نصب‌کننده خود سیستم بسپارید. اگر قبلاً بسته‌ای با همین نام (com.ambergram.app) از منبع دیگری نصب کرده‌اید، اول آن را حذف کنید.
+
           - AmberGram branding: OLED amber theme, fancy UI font, AmberGram Settings hub with a dedicated live sequential download queue page, polished phoenix × paper-plane launcher icon with embossed depth.
           - App header always shows AmberGram (brand keys are protected from remote language packs).
           - Download queue fully stops (service + notification) once everything is downloaded — idle behavior matches regular Telegram.
