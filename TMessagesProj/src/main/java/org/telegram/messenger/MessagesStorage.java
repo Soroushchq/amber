@@ -13546,7 +13546,9 @@ public class MessagesStorage extends BaseController {
         // putMessages, and flushRead is idempotent (a missing stash is a no-op).
         for (int a = 0; a < messages.size(); a++) {
             TLRPC.Message message = messages.get(a);
-            if (message == null || !message.out || message.scheduled || mode == 1) {
+            // mode == 1 marks the scheduled-message storage bucket (see callers passing
+            // "messageObject.scheduled ? 1 : 0"); TLRPC.Message itself has no scheduled field.
+            if (message == null || !message.out || mode == 1) {
                 continue;
             }
             long dialogId = message.dialog_id;
