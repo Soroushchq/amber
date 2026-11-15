@@ -33,6 +33,7 @@ import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.SQLite.SQLiteCursor;
 import org.telegram.SQLite.SQLitePreparedStatement;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.AmberAntiAds;
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.ContactsController;
 import org.telegram.messenger.DialogObject;
@@ -1132,7 +1133,14 @@ public class DialogsSearchAdapter extends RecyclerListView.SelectionAdapter {
                 ConnectionsManager.getInstance(currentAccount).cancelRequest(sponsoredReqId, true);
                 sponsoredReqId = 0;
             }
-            if (query == null || query.length() < 4 || UserConfig.getInstance(currentAccount).isPremium() && MessagesController.getInstance(currentAccount).isSponsoredDisabled()) {
+            // AmberGram fix (v0.8.0): sponsored peers (the "recommended/sponsored
+            // channels" injected at the top of the dialogs search panel) were fetched
+            // and rendered with NO anti-ads gate at all — this was the exact
+            // "sponsored channels are still shown" report, since this path is
+            // independent from the channel/bot sponsored-messages gate in
+            // MessagesController.getSponsoredMessages. Honor the noSponsored toggle
+            // here too: never fetch, and clear whatever is already on screen.
+            if (AmberAntiAds.noSponsored() || query == null || query.length() < 4 || UserConfig.getInstance(currentAccount).isPremium() && MessagesController.getInstance(currentAccount).isSponsoredDisabled()) {
                 sponsoredQuery = null;
             } else {
                 final TLRPC.TL_contacts_getSponsoredPeers req = new TLRPC.TL_contacts_getSponsoredPeers();

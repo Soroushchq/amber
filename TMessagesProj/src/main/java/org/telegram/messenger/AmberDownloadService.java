@@ -64,14 +64,14 @@ public class AmberDownloadService extends Service {
         account = intent != null ? intent.getIntExtra(EXTRA_ACCOUNT, UserConfig.selectedAccount) : UserConfig.selectedAccount;
         if (intent != null && ACTION_CANCEL.equals(intent.getAction())) {
             try {
-                startForeground(NOTIFICATION_ID, buildNotification(0, 0, "", 0, 0));
+                startForeground(NOTIFICATION_ID, buildNotification(0, 0, 0, "", 0, 0));
             } catch (Throwable ignore) {
             }
             DownloadQueueController.getInstance(account).cancelAll();
             stopSelf();
             return START_NOT_STICKY;
         }
-        startForeground(NOTIFICATION_ID, buildNotification(0, 0, "", 0, 0));
+        startForeground(NOTIFICATION_ID, buildNotification(0, 0, 0, "", 0, 0));
         DownloadQueueController controller = DownloadQueueController.getInstance(account);
         controller.attachService(this);
         if (controller.isIdle()) {
@@ -98,14 +98,14 @@ public class AmberDownloadService extends Service {
     }
 
     /** Called by the controller whenever queue progress changes. */
-    public void update(int finished, int total, String name, long loadedBytes, long totalBytes) {
+    public void update(int finished, int total, int failed, String name, long loadedBytes, long totalBytes) {
         try {
-            notificationManager.notify(NOTIFICATION_ID, buildNotification(finished, total, name, loadedBytes, totalBytes));
+            notificationManager.notify(NOTIFICATION_ID, buildNotification(finished, total, failed, name, loadedBytes, totalBytes));
         } catch (Throwable ignore) {
         }
     }
 
-    private Notification buildNotification(int finished, int total, String name, long loadedBytes, long totalBytes) {
+    private Notification buildNotification(int finished, int total, int failed, String name, long loadedBytes, long totalBytes) {
         Intent launchIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
         PendingIntent contentIntent = null;
         if (launchIntent != null) {
@@ -133,6 +133,14 @@ public class AmberDownloadService extends Service {
         StringBuilder text = new StringBuilder();
         if (total > 0) {
             text.append(LocaleController.formatString("AmberQueueProgressLine", R.string.AmberQueueProgressLine, finished, total));
+        }
+        // AmberGram v0.8.0: failed items are now visible right in the progress
+        // notification instead of being silently invisible.
+        if (failed > 0) {
+            if (text.length() > 0) {
+                text.append(" • ");
+            }
+            text.append(LocaleController.formatString("AmberQueueFailedCount", R.string.AmberQueueFailedCount, failed));
         }
         if (!TextUtils.isEmpty(name)) {
             if (text.length() > 0) {

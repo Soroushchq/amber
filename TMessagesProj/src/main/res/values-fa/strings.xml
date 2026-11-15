@@ -8,8 +8,12 @@
     <string name="AmberQueueCancelAll">لغو همه</string>
     <string name="AmberQueueProgressLine">%1$d از %2$d</string>
     <string name="AmberQueueAlreadyQueued">فایل‌های انتخابی از قبل در صف دانلود هستند</string>
+    <string name="AmberQueueFailedCount">%1$d ناموفق</string>
+    <string name="AmberQueueFinishedTitle">صف دانلود تمام شد</string>
+    <string name="AmberQueueFinishedAll">%1$d فایل در Downloads/AmberGram ذخیره شد</string>
+    <string name="AmberQueueFinishedFailed">%1$d فایل ذخیره شد، %2$d ناموفق — برای مرور صف لمس کنید</string>
     <string name="AmbergramQueueSection">دانلودهای ترتیبی</string>
-    <string name="AmbergramQueueEmpty">صف خالی است. در یک گفتگو ویدیو یا فایل‌ها را انتخاب کنید، سپس از منوی سه‌نقطه گزینه «دانلود ترتیبی» را بزنید.</string>
+    <string name="AmbergramQueueEmpty">صف خالی است. در یک گفتگو ویدیو یا فایل‌ها را انتخاب کنید، سپس دکمه گرد دانلود (دانلود ترتیبی) در ابتدای نوار انتخاب را بزنید.</string>
     <string name="AmbergramQueueStatePending">در انتظار</string>
     <string name="AmbergramQueueStateDownloading">در حال دانلود</string>
     <string name="AmbergramQueueStateDone">انجام شد</string>
