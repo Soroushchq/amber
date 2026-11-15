@@ -89,6 +89,12 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
         /** Earliest time (System.currentTimeMillis()) this item may be started again. */
         public long retryAt;
         String documentBase64;
+        /** AmberGram v0.7.0: the FULL message owner, Base64 — passed to FileLoader as
+         * parentObject so FileRefController can refresh an expired file_reference
+         * (with a bare document the download fails instantly for channel files). */
+        String messageBase64;
+        /** In-memory only reference to the originating message object (not persisted). */
+        transient MessageObject messageObject;
 
         QueueItem(long dialogId, int messageId, String fileName, String displayName, long size, TLRPC.Document document) {
             this.dialogId = dialogId;
@@ -271,7 +277,10 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
             if (TextUtils.isEmpty(displayName)) {
                 displayName = fileName;
             }
-            queue.add(new QueueItem(messageObject.getDialogId(), messageObject.getId(), fileName, displayName, document.size, document));
+            QueueItem item = new QueueItem(messageObject.getDialogId(), messageObject.getId(), fileName, displayName, document.size, document);
+            item.messageBase64 = messageToString(messageObject.messageOwner);
+            item.messageObject = messageObject;
+            queue.add(item);
             added++;
         }
         if (added > 0) {
@@ -332,7 +341,13 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
 
     private boolean isNetworkConnected() {
         try {
-            return ConnectionsManager.getInstance(currentAccount).getConnectionState() == ConnectionsManager.ConnectionStateConnected;
+            // AmberGram fix (v0.7.0): only treat the connection as DOWN when MTProto is
+            // genuinely waiting for a network. Telegram regularly sits in
+            // ConnectionStateUpdating (syncing) or ConnectionStateConnecting
+            // (background) while downloads still work — requiring ConnectionStateConnected
+            // here froze the queue forever during those perfectly healthy states.
+            int state = ConnectionsManager.getInstance(currentAccount).getConnectionState();
+            return state != ConnectionsManager.ConnectionStateWaitingForNetwork;
         } catch (Throwable e) {
             return true;
         }
@@ -435,7 +450,16 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
             finishCurrentWithFile(cached);
             return;
         }
-        FileLoader.getInstance(currentAccount).loadFile(document, null, FileLoader.PRIORITY_NORMAL, 0);
+        // AmberGram fix (v0.7.0): pass the original MessageObject as parentObject.
+        // loadFile(document, null, ...) left FileRefController without a parent, so an
+        // expired file_reference (very common for channel files after some hours)
+        // could not be refreshed and the download failed instantly. Rebuild the
+        // MessageObject from the persisted message bytes after a process restart.
+        if (current.messageObject == null && !TextUtils.isEmpty(current.messageBase64)) {
+            current.messageObject = messageFromString(current.messageBase64);
+        }
+        MessageObject parentObject = current.messageObject;
+        FileLoader.getInstance(currentAccount).loadFile(document, parentObject, FileLoader.PRIORITY_NORMAL, 0);
         updateNotification(true);
     }
 
@@ -577,7 +601,9 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
         ContentValues values = new ContentValues();
         values.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
         values.put(MediaStore.MediaColumns.MIME_TYPE, mimeForName(name));
-        values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/Telegram");
+        // AmberGram fix (v0.7.0): the strings promised Downloads/AmberGram but the code
+        // still wrote into Downloads/Telegram — the folder is now consistent everywhere.
+        values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/AmberGram");
         Uri uri = ApplicationLoader.applicationContext.getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
         if (uri == null) {
             return false;
@@ -598,7 +624,8 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
 
     /** Legacy direct-file path for Android 9 and below. */
     private boolean copyToPublicDownloadsLegacy(String name, File sourceFile) throws Throwable {
-        File destDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Telegram");
+        // AmberGram fix (v0.7.0): same folder unification as the scoped-storage path.
+        File destDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "AmberGram");
         destDir.mkdirs();
         File destFile = new File(destDir, name);
         if (destFile.exists()) {
@@ -710,6 +737,9 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
                 object.put("attempts", item.attempts);
                 object.put("retryAt", item.retryAt);
                 object.put("doc", item.documentBase64);
+                if (!TextUtils.isEmpty(item.messageBase64)) {
+                    object.put("msg", item.messageBase64);
+                }
                 array.put(object);
             }
             preferences.edit().putString("queue", array.toString()).apply();
@@ -740,6 +770,8 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
                         stringToDocument(object.getString("doc"))
                 );
                 item.documentBase64 = object.getString("doc");
+                String msgBase64 = object.optString("msg", "");
+                item.messageBase64 = TextUtils.isEmpty(msgBase64) ? null : msgBase64;
                 item.state = object.optInt("state", STATE_PENDING);
                 item.loadedBytes = object.optLong("loaded", 0);
                 item.attempts = object.optInt("attempts", 0);
@@ -781,6 +813,40 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
             byte[] bytes = Base64.decode(base64, Base64.NO_WRAP);
             SerializedData serializedData = new SerializedData(bytes);
             return TLRPC.Document.TLdeserialize(serializedData, serializedData.readInt32(false), false);
+        } catch (Throwable e) {
+            FileLog.e(e);
+            return null;
+        }
+    }
+
+    /** AmberGram v0.7.0: persists the full message so the queue can rebuild a MessageObject as FileLoader parent. */
+    private static String messageToString(TLRPC.Message message) {
+        if (message == null) {
+            return null;
+        }
+        try {
+            SerializedData serializedData = new SerializedData();
+            message.serializeToStream(serializedData);
+            return Base64.encodeToString(serializedData.toByteArray(), Base64.NO_WRAP);
+        } catch (Throwable e) {
+            FileLog.e(e);
+            return null;
+        }
+    }
+
+    /** AmberGram v0.7.0: rebuilds the persisted message (and a MessageObject around it) after process death. */
+    private static MessageObject messageFromString(String base64) {
+        if (TextUtils.isEmpty(base64)) {
+            return null;
+        }
+        try {
+            byte[] bytes = Base64.decode(base64, Base64.NO_WRAP);
+            SerializedData serializedData = new SerializedData(bytes);
+            TLRPC.Message message = TLRPC.Message.TLdeserialize(serializedData, serializedData.readInt32(false), false);
+            if (message == null) {
+                return null;
+            }
+            return new MessageObject(UserConfig.selectedAccount, message, false, false);
         } catch (Throwable e) {
             FileLog.e(e);
             return null;

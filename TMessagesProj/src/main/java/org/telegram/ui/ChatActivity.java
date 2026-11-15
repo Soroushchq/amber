@@ -6760,7 +6760,7 @@ public class ChatActivity extends BaseFragment implements
                 if (!foundTopView) {
                     scrolled = super.scrollVerticallyBy(dy, recycler, state);
                 }
-                final boolean allowPullingDownScroll = !isInPollAddOptionMode() && !hasSelectedMessages();
+                final boolean allowPullingDownScroll = !isInPollAddOptionMode() && !hasSelectedMessages() && !AmberMorphe.noChannelSwitch();
                 if (allowPullingDownScroll && dy > 0 && scrolled == 0 && (ChatObject.isChannel(currentChat) && !currentChat.megagroup || isTopic && !UserObject.isBotForum(currentUser)) && chatMode != MODE_SAVED && chatMode != MODE_WELCOME_MESSAGES && chatMode != MODE_SCHEDULED && chatListView.getScrollState() == RecyclerView.SCROLL_STATE_DRAGGING && !chatListView.isFastScrollAnimationRunning() && !chatListView.isMultiselect() && !isReport()) {
                     if (pullingDownOffset == 0 && pullingDownDrawable != null) {
                         if (nextChannels != null && !nextChannels.isEmpty()) {
@@ -10844,7 +10844,16 @@ public class ChatActivity extends BaseFragment implements
         if (currentEncryptedChat == null) {
             final boolean isSavedMessages = getDialogId() == getUserConfig().getClientUserId() && (chatMode == 0 || chatMode == MODE_SAVED);
             actionModeViews.add(actionMode.addItemWithWidth(save_to, R.drawable.msg_download, dp(48), LocaleController.getString(R.string.SaveToMusic)));
-            actionModeViews.add(actionMode.addItemWithWidth(amber_queue, R.drawable.msg_list, dp(48), LocaleController.getString(R.string.AmberQueueMenu)));
+            // AmberGram fix (v0.7.0): the direct top-bar amber_queue button got squeezed
+            // off-screen on narrow displays (the action mode holds too many 48dp items),
+            // making the sequential download feature undiscoverable. It now lives in a
+            // three-dot overflow item (ActionBarMenuItem sub menu, same pattern as
+            // TopicsFragment "other"): the popup click still routes to the exact same
+            // amber_queue handler below, and the sub item is always visible whenever
+            // the action mode is open.
+            ActionBarMenuItem amberQueueOtherItem = actionMode.addItemWithWidth(0, R.drawable.ic_ab_other, dp(48), LocaleController.getString(R.string.AccDescrMoreOptions));
+            amberQueueOtherItem.addSubItem(amber_queue, R.drawable.msg_list, LocaleController.getString(R.string.AmberQueueMenu));
+            actionModeViews.add(amberQueueOtherItem);
             actionModeViews.add(actionMode.addItemWithWidth(edit, R.drawable.msg_edit, dp(48), LocaleController.getString(R.string.Edit)));
             if (isSavedMessages) {
                 actionModeViews.add(actionMode.addItemWithWidth(tag_message, R.drawable.menu_tag_edit, dp(48), LocaleController.getString(R.string.AccDescrTagMessage)));
@@ -30902,9 +30911,13 @@ public class ChatActivity extends BaseFragment implements
     public void onPause() {
         super.onPause();
         scrolling = false;
-        // AmberGram ghost mode: chat closed — replay any deferred read receipts now
+        // AmberGram ghost mode: leaving the chat (or locking the screen) must NOT
+        // replay the stashed read receipts anymore — that was flashing the second
+        // read tick the moment the user exited. Reads stay stashed while ghost is
+        // enabled and are only flushed when the user sends a message in this chat
+        // (MessagesStorage.putMessages hook) or turns ghost mode off
+        // (AmberGhost.setEnabled(false)).
         AmberGhost.chatClosed(dialog_id);
-        AmberGhost.flushRead(dialog_id, currentAccount);
         if (scrimPopupWindow != null) {
             scrimPopupWindow.setPauseNotifications(false);
             closeMenu();

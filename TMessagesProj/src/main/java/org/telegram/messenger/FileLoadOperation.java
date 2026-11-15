@@ -313,12 +313,17 @@ public class FileLoadOperation {
             downloadChunkSizeBig = 1024 * 128;
             maxDownloadRequestsBig = 8;
         }
-        if (AmberAntiAds.turboDownload()) {
-            // AmberGram turbo download with Morphe "Download speed boost" numbers:
-            // 1 MB chunks with 12 parallel requests (Morphe patch defaults).
-            downloadChunkSizeBig = 1024 * 1024;
-            maxDownloadRequests = 12;
-            maxDownloadRequestsBig = 12;
+        if (AmberAntiAds.turboDownload() && state == stateIdle) {
+            // AmberGram turbo download (v0.7.0 rework): the MTProto protocol caps a single
+            // upload.getFile chunk at 512 KB — asking for 1 MB chunks makes the server/CDN
+            // answer LIMIT_INVALID, and switching chunk size while a download is already
+            // running makes it answer OFFSET_INVALID. 512 KB x 8 parallel requests keeps
+            // aggressive parallelism within protocol limits, and the state==stateIdle
+            // guard guarantees an in-flight download never changes its chunk size mid-way
+            // (updateParams() is also called from start() on already-active operations).
+            downloadChunkSizeBig = 1024 * 512;
+            maxDownloadRequests = 8;
+            maxDownloadRequestsBig = 8;
         }
         maxCdnParts = (int) (FileLoader.DEFAULT_MAX_FILE_SIZE / downloadChunkSizeBig);
     }

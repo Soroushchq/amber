@@ -150,6 +150,10 @@ public class AmbergramQueueActivity extends BaseFragment implements DownloadQueu
         nameView.setTypeface(AndroidUtilities.bold());
         nameView.setTextSize(16);
         ThemeBind.textColor(nameView, Theme.key_windowBackgroundWhiteBlackText, null);
+        // AmberGram fix (v0.7.0): the row was built but the file name was never set,
+        // so every row showed a blank title. Show the human-readable display name
+        // (original file name) and fall back to the internal attach name.
+        nameView.setText(!android.text.TextUtils.isEmpty(item.displayName) ? item.displayName : item.fileName);
         nameView.setLines(1);
         nameView.setMaxLines(1);
         nameView.setSingleLine(true);
