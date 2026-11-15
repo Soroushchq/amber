@@ -191,3 +191,11 @@
 - **بسته ۶ — انتشار**: gradle.properties → 7303 / «0.7.0 (7303)»؛ changelog کامل 0.7.0 در release.yml (بدون `"`, هم‌تراز ۱۰ فاصله، طبق LESSONS 8)؛ strings فقط فا نیاز داشت.
 - **سینتکس‌چک محلی**: javalang (پارسر جاوا در پایتون، چون JDK در سندباکس نصب نشد) — ۹ فایل Java تغییر یافته: ۸ تا OK کامل؛ MessagesController فقط در خط 1814 SYN-ERR دارد که با پارس نسخه HEAD همان فایل هم دقیقاً همان خطاست (محدودیت پارسر با `int[][]::new`) → false-positive؛ توازن برانس MessagesController/ChatActivity با HEAD یکسان. قبل از پوش، چک نهایی کامپایل را CI می‌کند.
 - **نسخه:** 0.7.0-alpha (7303).
+- **نتیجه CI (پایش کامل شد):**
+  - ci/master push اول (43685122486): FAILURE — `MessagesStorage.java:13549 cannot find symbol scheduled`؛ TLRPC.Message فیلد scheduled ندارد؛ در putMessages معیار همان `mode == 1` است (صدا زنندگان `scheduled ? 1 : 0` می‌فرستند). فیکس → push دوم.
+  - درس: شمارش regex برانس/پارانتر و پارسر javalang خطای symbol را نمی‌گیرند — تنها مرجع واقعی کامپایل CI است (LESSONS 15 تکمیل شد).
+  - ci/master push دوم (43687727750): SUCCESS.
+  - release/v0.7.0-alpha (43691834882): SUCCESS — انتشار با ۴ asset.
+  - راستی‌آزمایی artifact: هر ۳ APK دانلود شد؛ sha256 با SHA256SUMS مطابق (۳×OK)؛ apksigner همه v1+v2 Verified؛ badging: universal=73039 (۴ ABI)، arm64=73032، armv7=73033، همه versionName «0.7.0 (7303)».
+  - حجم‌ها: universal=83.1MB، arm64=44.9MB، armv7=43.7MB.
+- **نتیجه:** نسخه 0.7.0-alpha (7303) منتشر شد؛ هر ۶ بسته مشخصات کاربر به‌طور کامل اعمال شد.
