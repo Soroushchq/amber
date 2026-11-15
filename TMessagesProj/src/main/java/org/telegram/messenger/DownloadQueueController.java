@@ -1,8 +1,13 @@
 package org.telegram.messenger;
 
 import android.app.DownloadManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
@@ -404,14 +409,33 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
                 return;
             }
             // Queue drained: drop DONE items, keep FAILED ones visible for the user.
+            // AmberGram fix (v0.8.0): this used to be completely silent — the progress
+            // notification vanished the moment the last item finished, and failed items
+            // were only visible inside the queue page nobody knew existed. That exact
+            // silence read as "one download happened and then everything ended". Now
+            // the run always ends with an explicit completion notification (done count
+            // + failed count) that opens the queue page when tapped. It only fires when
+            // at least one item actually completed during THIS run, so a restart with
+            // only leftover FAILED items never re-posts it.
+            int done = 0;
             for (int a = queue.size() - 1; a >= 0; a--) {
                 if (queue.get(a).state == STATE_DONE) {
                     queue.remove(a);
+                    done++;
+                }
+            }
+            int failed = 0;
+            for (int a = 0; a < queue.size(); a++) {
+                if (queue.get(a).state == STATE_FAILED) {
+                    failed++;
                 }
             }
             persist();
             AmberDownloadService.stop(ApplicationLoader.applicationContext);
             updateNotification(true);
+            if (done > 0) {
+                postCompletionNotification(done, failed);
+            }
             return;
         }
         if (!isNetworkConnected()) {
@@ -456,7 +480,16 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
         // could not be refreshed and the download failed instantly. Rebuild the
         // MessageObject from the persisted message bytes after a process restart.
         if (current.messageObject == null && !TextUtils.isEmpty(current.messageBase64)) {
-            current.messageObject = messageFromString(current.messageBase64);
+            current.messageObject = messageFromString(currentAccount, current.messageBase64);
+        }
+        // AmberGram fix (v0.8.0): dialog_id is a RUNTIME field of TLRPC.Message and is
+        // NOT serialized — a message rebuilt from the persisted bytes had dialog_id == 0,
+        // so FileRefController called getInputPeer(0) and the file_reference refresh
+        // could never succeed. Every attempt then failed the same way and the whole
+        // queue ended as FAILED right after the first item. Stamp the real dialogId
+        // (always persisted on the QueueItem) onto the rebuilt owner.
+        if (current.messageObject != null) {
+            current.messageObject.messageOwner.dialog_id = current.dialogId;
         }
         MessageObject parentObject = current.messageObject;
         FileLoader.getInstance(currentAccount).loadFile(document, parentObject, FileLoader.PRIORITY_NORMAL, 0);
@@ -680,7 +713,65 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
         String name = current != null && !TextUtils.isEmpty(current.displayName) ? current.displayName : "";
         long loaded = current != null ? current.loadedBytes : 0;
         long size = current != null ? current.size : 0;
-        service.update(finished, total, name, loaded, size);
+        service.update(finished, total, failed, name, loaded, size);
+    }
+
+    /** AmberGram v0.8.0: id of the one-shot completion notification. */
+    private static final int COMPLETION_NOTIFICATION_ID = 91232;
+    private static final String COMPLETION_CHANNEL_ID = "amber_queue";
+
+    /**
+     * AmberGram v0.8.0: explicit end-of-run notification. Fired once when the queue
+     * drains after at least one completed item: tells the user how many files were
+     * saved (and how many failed) and opens the queue page on tap, so failed items
+     * are impossible to miss.
+     */
+    private void postCompletionNotification(int done, int failed) {
+        try {
+            NotificationManager notificationManager = (NotificationManager) ApplicationLoader.applicationContext.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (notificationManager == null) {
+                return;
+            }
+            if (Build.VERSION.SDK_INT >= 26) {
+                NotificationChannel channel = new NotificationChannel(COMPLETION_CHANNEL_ID, LocaleController.getString(R.string.AmberQueueNotificationTitle), NotificationManager.IMPORTANCE_DEFAULT);
+                channel.setShowBadge(false);
+                notificationManager.createNotificationChannel(channel);
+            }
+            PendingIntent contentIntent = null;
+            try {
+                Intent launchIntent = ApplicationLoader.applicationContext.getPackageManager().getLaunchIntentForPackage(ApplicationLoader.applicationContext.getPackageName());
+                if (launchIntent != null) {
+                    launchIntent.setAction("com.tmessages.openchat");
+                    launchIntent.putExtra("amber_open_queue", true);
+                    contentIntent = PendingIntent.getActivity(ApplicationLoader.applicationContext, 91233, launchIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+                }
+            } catch (Throwable ignore) {
+            }
+            String text;
+            if (failed > 0) {
+                text = LocaleController.formatString(R.string.AmberQueueFinishedFailed, done, failed);
+            } else {
+                text = LocaleController.formatString(R.string.AmberQueueFinishedAll, done);
+            }
+            Notification.Builder builder;
+            if (Build.VERSION.SDK_INT >= 26) {
+                builder = new Notification.Builder(ApplicationLoader.applicationContext, COMPLETION_CHANNEL_ID);
+            } else {
+                builder = new Notification.Builder(ApplicationLoader.applicationContext);
+            }
+            builder.setSmallIcon(R.drawable.notification)
+                    .setColor(0xFFF97316)
+                    .setContentTitle(LocaleController.getString(R.string.AmberQueueFinishedTitle))
+                    .setContentText(text)
+                    .setStyle(new Notification.BigTextStyle().bigText(text))
+                    .setAutoCancel(true)
+                    .setOngoing(false)
+                    .setOnlyAlertOnce(false)
+                    .setContentIntent(contentIntent);
+            notificationManager.notify(COMPLETION_NOTIFICATION_ID, builder.build());
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
     }
 
     @Override
@@ -835,7 +926,7 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
     }
 
     /** AmberGram v0.7.0: rebuilds the persisted message (and a MessageObject around it) after process death. */
-    private static MessageObject messageFromString(String base64) {
+    private static MessageObject messageFromString(int account, String base64) {
         if (TextUtils.isEmpty(base64)) {
             return null;
         }
@@ -846,7 +937,7 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
             if (message == null) {
                 return null;
             }
-            return new MessageObject(UserConfig.selectedAccount, message, false, false);
+            return new MessageObject(account, message, false, false);
         } catch (Throwable e) {
             FileLog.e(e);
             return null;

@@ -1591,6 +1591,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         int open_new_dialog = 0;
         long dialogId = 0;
         boolean showDialogsList = false;
+        // AmberGram v0.8.0: completion-notification tap opens the download queue page.
+        boolean openAmberQueue = intent.getBooleanExtra("amber_open_queue", false);
         boolean showPlayer = false;
         boolean showLocations = false;
         boolean showGroupVoip = false;
@@ -3102,6 +3104,15 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     pushOpened = true;
                     LaunchActivity.dismissAllWeb();
                 }
+            } else if (openAmberQueue) {
+                if (!AndroidUtilities.isTablet()) {
+                    actionBarLayout.removeAllFragments();
+                }
+                if (getActionBarLayout().presentFragment(new INavigationLayout.NavigationParams(new AmbergramQueueActivity()).setNoAnimation(true))) {
+                    pushOpened = true;
+                    LaunchActivity.dismissAllWeb();
+                }
+                isNew = false;
             } else if (showDialogsList) {
                 if (!AndroidUtilities.isTablet()) {
                     actionBarLayout.removeAllFragments();

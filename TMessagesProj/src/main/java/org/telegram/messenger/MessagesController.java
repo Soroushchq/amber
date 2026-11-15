@@ -23946,6 +23946,13 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public ChannelRecommendations getChannelRecommendations(long dialogId) {
+        // AmberGram fix (v0.8.0): the similar-channels fetch itself was ungated — the
+        // cell renderer was gated but profile/SharedMedia/SearchView callers still
+        // requested recommendations from the server and rendered them as a separate
+        // tab / empty-state feed. Never fetch when the noRecommendations toggle is on.
+        if (AmberAntiAds.noRecommendations()) {
+            return null;
+        }
         if (cachedChannelRecommendations == null) {
             cachedChannelRecommendations = new HashMap<>();
         }

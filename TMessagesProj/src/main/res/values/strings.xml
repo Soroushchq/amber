@@ -11692,9 +11692,13 @@
     <string name="AmberQueueCancelAll">Cancel all</string>
     <string name="AmberQueueProgressLine">%1$d of %2$d</string>
     <string name="AmberQueueAlreadyQueued">Selected files are already in the download queue</string>
+    <string name="AmberQueueFailedCount">%1$d failed</string>
+    <string name="AmberQueueFinishedTitle">Download queue finished</string>
+    <string name="AmberQueueFinishedAll">%1$d files saved to Downloads/AmberGram</string>
+    <string name="AmberQueueFinishedFailed">%1$d saved, %2$d failed — tap to review the queue</string>
     <string name="AmbergramSettings" translatable="false">AmberGram Settings</string>
     <string name="AmbergramQueueSection">Sequential Downloads</string>
-    <string name="AmbergramQueueEmpty">The queue is empty. Open a chat, long-press to select videos and files, then tap the three-dot menu and choose \"Sequential download\".</string>
+    <string name="AmbergramQueueEmpty">The queue is empty. Open a chat, long-press to select videos and files, then tap the round download button at the start of the selection bar for &quot;Sequential download&quot;.</string>
     <string name="AmbergramQueueStatePending">Waiting</string>
     <string name="AmbergramQueueStateDownloading">Downloading</string>
     <string name="AmbergramQueueStateDone">Done</string>

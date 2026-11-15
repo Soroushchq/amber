@@ -10843,17 +10843,15 @@ public class ChatActivity extends BaseFragment implements
 
         if (currentEncryptedChat == null) {
             final boolean isSavedMessages = getDialogId() == getUserConfig().getClientUserId() && (chatMode == 0 || chatMode == MODE_SAVED);
+            // AmberGram fix (v0.8.0): the v0.7.0 three-dot overflow entry was technically
+            // reachable but practically undiscoverable — real device feedback was
+            // "files don't go into the download queue" because the entry was invisible.
+            // The sequential download now sits as the FIRST, directly-tappable button of
+            // the selection bar with a distinctive download icon (same click id as the
+            // old direct button, so routing is unchanged), while the always-GONE share
+            // slot keeps the bar from overflowing on narrow screens.
+            actionModeViews.add(actionMode.addItemWithWidth(amber_queue, R.drawable.menu_download_round, dp(48), LocaleController.getString(R.string.AmberQueueMenu)));
             actionModeViews.add(actionMode.addItemWithWidth(save_to, R.drawable.msg_download, dp(48), LocaleController.getString(R.string.SaveToMusic)));
-            // AmberGram fix (v0.7.0): the direct top-bar amber_queue button got squeezed
-            // off-screen on narrow displays (the action mode holds too many 48dp items),
-            // making the sequential download feature undiscoverable. It now lives in a
-            // three-dot overflow item (ActionBarMenuItem sub menu, same pattern as
-            // TopicsFragment "other"): the popup click still routes to the exact same
-            // amber_queue handler below, and the sub item is always visible whenever
-            // the action mode is open.
-            ActionBarMenuItem amberQueueOtherItem = actionMode.addItemWithWidth(0, R.drawable.ic_ab_other, dp(48), LocaleController.getString(R.string.AccDescrMoreOptions));
-            amberQueueOtherItem.addSubItem(amber_queue, R.drawable.msg_list, LocaleController.getString(R.string.AmberQueueMenu));
-            actionModeViews.add(amberQueueOtherItem);
             actionModeViews.add(actionMode.addItemWithWidth(edit, R.drawable.msg_edit, dp(48), LocaleController.getString(R.string.Edit)));
             if (isSavedMessages) {
                 actionModeViews.add(actionMode.addItemWithWidth(tag_message, R.drawable.menu_tag_edit, dp(48), LocaleController.getString(R.string.AccDescrTagMessage)));
