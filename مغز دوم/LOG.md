@@ -199,3 +199,28 @@
   - راستی‌آزمایی artifact: هر ۳ APK دانلود شد؛ sha256 با SHA256SUMS مطابق (۳×OK)؛ apksigner همه v1+v2 Verified؛ badging: universal=73039 (۴ ABI)، arm64=73032، armv7=73033، همه versionName «0.7.0 (7303)».
   - حجم‌ها: universal=83.1MB، arm64=44.9MB، armv7=43.7MB.
 - **نتیجه:** نسخه 0.7.0-alpha (7303) منتشر شد؛ هر ۶ بسته مشخصات کاربر به‌طور کامل اعمال شد.
+
+## نوبت ۱۰ — v0.8.0-alpha (کد 7304): پasse شفافیت، کنتراست و صادق‌سازی صف
+- **ورودی کاربر:** «هیچ‌کدام از فیچرها درست کار نمی‌کنند: اسپانسری کانال‌ها نمایش داده می‌شود، فایل‌ها وارد صف دانلود نمی‌شوند و بعد از یک دانلود همه‌چیز تمام می‌شود، تم بشدت تیره است و مرزهای UI مشخص نیست، لوگو زشت است؛ تنها پروکسی و ذخیره در کانال خصوصی کار می‌کند.»
+- **ریشه‌یابی‌ها (همه با خواندن کد واقعی):**
+  1. **اسپانسری که هنوز دیده می‌شد**: مسیر «sponsored peers» در `DialogsSearchAdapter` (`TL_contacts_getSponsoredPeers`) هیچ گیت ضدتبلیغی نداشت — مستقل از مسیر گیت‌شده `MessagesController.getSponsoredMessages` است؛ + مسیر fetch «کانال‌های مشابه» (`getChannelRecommendations`) هم فقط در سلول رندر گیت شده بود نه در خود fetch (پروفایل/مدیا/سرچ).
+  2. **«یک دانلود و تمام»**: `dialog_id` فیلد ران‌تایم `TLRPC.Message` است و در سریالایز نمی‌شود؛ پیام بازسازی‌شده از bytes (مسیر v0.7.0 برای parentObject) با dialog_id=0 ساخته می‌شد → `FileRefController.requestReferenceFromServer` با `getInputPeer(0)` هرگز نمی‌توانست file_reference را رفرش کند → همه تلاش‌ها به FAILED می‌رسید و در شاخه drain صف، اعلان بی‌صدا محو می‌شد. ترکیب دو نقطه = روایت دقیق کاربر.
+  3. **«فایل‌ها وارد صف نمی‌شوند»**: ورودی تنهاِ صف در v0.7.0 زیر منوی سه‌نقطه اکشن‌مود بود (کشف‌ناپذیر در عمل) + پایان هر اجرا کاملاً بی‌صدا بود.
+- **پچ‌ها:**
+  - `DownloadQueueController`: مهر `dialogId` واقعی روی messageOwner بازسازی‌شده در هر attempt؛ اعلان پایان اجرا (`postCompletionNotification` — تعداد موفق/ناموفق + تاپ → صف) فقط وقتی ≥۱ آیتم در همین اجرا DONE شده؛ شمارش ناموفق در متن اعلان جاری؛ `messageFromString` حالا اکانت درست می‌گیرد.
+  - `AmberDownloadService`: امضای update با failed + متن «X ناموفق».
+  - `LaunchActivity`: extra `amber_open_queue` → presentFragment(AmbergramQueueActivity) (الگوی شاخه showDialogsList).
+  - `ChatActivity`: دکمه مستقیم دانلود ترتیبی برگشت — **اولین** دکمه نوار انتخاب با آیکون `menu_download_round` (همان id=amber_queue=500)؛ جایگاه slot مخفی‌شده share فضا را حفظ می‌کند.
+  - `DialogsSearchAdapter`: گیت `AmberAntiAds.noSponsored()` روی fetch sponsored peers؛ `MessagesController.getChannelRecommendations`: return null زودهنگام با toggle noRecommendations.
+  - تم `amber.attheme` — ۱۴ کلید: windowBackgroundWhite 0xFF000000→0xFF141418، windowBackgroundGray→0xFF0B0B0D، divider 0x95000000→0x1FF0F0F0 (بالاخره مرئی!)، dialogBackground→0xFF18191D، actionBarDefault→0xF2141418، chat_wallpaper→0xFF0E0E11، inBubble→0xFF1E1F25، outBubble→0xFF3D2814، submenu bg/separator، switchTrack؛ + رنگ‌های preview در Theme.java.
+  - **لوگوی جدید**: هواپیمای کاغذی تاخورده با گرادیان آمبر — تولید کامل با PIL (بدون AI-gen): foreground ۵ density، background clip (مربع/گرد، گرادیان زغالتی + glow گرم)، legacy ۴۸..۱۹۲ (مربع/گرد)، مونوکروم سفید؛ بال پایینی با گرادیان روشن‌تر تا افکت تاخوردگی روی پس‌زمینه تیره خوانا باشد.
+  - رشته‌ها: `AmberQueueFailedCount`، `AmberQueueFinishedTitle`، `AmberQueueFinishedAll`، `AmberQueueFinishedFailed` (دوزبانه) + متن راهنمای صف به‌روز شد (سه‌نقطه → دکمه گرد)؛ `"` خام در XML با &quot;.
+- **درس‌های جدید (→LESSONS 18، 19):** فیلدهای runtime MessageObject پس از هر دی‌سریالایز باید مهر مجدد شوند؛ پایان هر پردازش باید اعلان صریح داشته باشد — بی‌صدایی توسط کاربر «خرابی» تفسیر می‌شود.
+- **سینتکس‌چک محلی:** javalang روی ۷ فایل ویرایش‌شده: ۶ OK + MessagesController false-positive معروف (خط 1814 `int[][]::new` — همان خطا روی HEAD).
+- **نسخه:** 0.8.0-alpha (7304) — gradle.properties؛ changelog تک‌خط 0.8.0 در release.yml (بدون `"`، هم‌تراز ۱۰ فاصله، pyyaml VALID).
+- **نتیجه CI (پایش کامل):**
+  - ci/master push اول (43767167057): SUCCESS — ~۴۸ دقیقه.
+  - release/v0.8.0-alpha (43770950080): SUCCESS — ~۴۸ دقیقه، ۴ asset.
+  - راستی‌آزمایی: هر ۳ APK دانلود شد؛ sha256 با SHA256SUMS مطابق (۳×OK)؛ apksigner همه v1+v2 Verified؛ badging: universal=73049، arm64=73042، armv7=73043، همه versionName «0.8.0 (7304)».
+  - حجم‌ها: universal=82.4MB، arm64=44.2MB، armv7=43.0MB.
+- **نتیجه:** v0.8.0-alpha منتشر شد؛ چهار شکایت کاربر (اسپانسری، صف، تم، لوگو) هر کدام با پچ مشخص و ریشه مستند شده.
