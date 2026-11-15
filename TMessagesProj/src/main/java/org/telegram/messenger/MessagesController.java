@@ -6672,6 +6672,14 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public boolean isChatNoForwards(TLRPC.Chat chat) {
+        // AmberMorphe bypassNoforwards (v0.7.0): PhotoViewer, SharedMediaLayout and the
+        // FLAG_SECURE logic in ChatActivity call these methods DIRECTLY (they never go
+        // through isPeerNoForwards), so every entry point of the noforwards family must
+        // report false while the toggle is on — save/copy/screenshot stay possible in
+        // all protected channels.
+        if (AmberMorphe.bypassNoforwards()) {
+            return false;
+        }
         if (chat == null) {
             return false;
         }
@@ -6685,6 +6693,9 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public boolean isChatNoForwards(long chatId) {
+        if (AmberMorphe.bypassNoforwards()) {
+            return false;
+        }
         return isChatNoForwards(getChat(chatId));
     }
 
@@ -6696,6 +6707,9 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public boolean isUserNoForwards(long userId) {
+        if (AmberMorphe.bypassNoforwards()) {
+            return false;
+        }
         return isUserNoForwards(getUserFull(userId));
     }
 
@@ -10566,7 +10580,10 @@ public class MessagesController extends BaseController implements NotificationCe
                         }
 
                         TL_account.updateStatus req = new TL_account.updateStatus();
-                        req.offline = false;
+                        // AmberGram ghost mode (v0.7.0): never show the account as Online
+                        // while ghost is enabled — the keep-online request is sent with
+                        // offline=true so the presence stays hidden.
+                        req.offline = AmberGhost.isEnabled();
                         statusRequest = getConnectionsManager().sendRequest(req, (response, error) -> {
                             if (error == null) {
                                 lastStatusUpdateTime = System.currentTimeMillis();
@@ -14450,6 +14467,13 @@ public class MessagesController extends BaseController implements NotificationCe
         if (messageObject.getId() < 0) {
             markMessageAsRead(messageObject.getDialogId(), messageObject.messageOwner.random_id, Integer.MIN_VALUE);
         } else {
+            // AmberMorphe antiDisappearing (v0.7.0): never tell the server this view-once
+            // media was opened — the readMessageContents call is exactly what makes the
+            // server destroy single-view photos/videos. The local unlock above already
+            // made the media playable and savable.
+            if (AmberMorphe.antiDisappearing()) {
+                return;
+            }
             if (messageObject.messageOwner.peer_id.channel_id != 0) {
                 TLRPC.TL_channels_readMessageContents req = new TLRPC.TL_channels_readMessageContents();
                 req.channel = getInputChannel(messageObject.messageOwner.peer_id.channel_id);
@@ -14715,15 +14739,26 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public void markDialogAsRead(long dialogId, int maxPositiveId, int maxNegativeId, int maxDate, boolean popup, long threadId, int countDiff, boolean readNow, int scheduledCount) {
-        // AmberGram ghost mode: defer read receipts while the chat is open, replay on leave
-        if (AmberGhost.shouldDeferRead(dialogId)) {
-            AmberGhost.deferRead(dialogId, maxPositiveId, maxNegativeId, maxDate, threadId, scheduledCount);
+        // AmberGram ghost mode v0.7.0 rework: while ghost is enabled, reads are applied
+        // LOCALLY for every dialog (unread counters clear in the UI, exactly like a real
+        // read) but the network read receipt is STASHED in AmberGhost. It is replayed to
+        // the server only when the user sends a message in that dialog (MessagesStorage
+        // putMessages hook) or turns ghost mode off (AmberGhost.setEnabled(false)).
+        // The old behavior (flush on onPause) flashed the second read tick the moment
+        // the user left the chat or locked the screen.
+        if (AmberGhost.isEnabled()) {
+            AmberGhost.stashRead(dialogId, maxPositiveId, maxNegativeId, maxDate, threadId, scheduledCount);
+            amberGhostMarkDialogAsRead(dialogId, maxPositiveId, maxNegativeId, maxDate, popup, threadId, countDiff, readNow, scheduledCount, false);
             return;
         }
         amberGhostMarkDialogAsRead(dialogId, maxPositiveId, maxNegativeId, maxDate, popup, threadId, countDiff, readNow, scheduledCount);
     }
 
     public void amberGhostMarkDialogAsRead(long dialogId, int maxPositiveId, int maxNegativeId, int maxDate, boolean popup, long threadId, int countDiff, boolean readNow, int scheduledCount) {
+        amberGhostMarkDialogAsRead(dialogId, maxPositiveId, maxNegativeId, maxDate, popup, threadId, countDiff, readNow, scheduledCount, !AmberGhost.isEnabled());
+    }
+
+    public void amberGhostMarkDialogAsRead(long dialogId, int maxPositiveId, int maxNegativeId, int maxDate, boolean popup, long threadId, int countDiff, boolean readNow, int scheduledCount, boolean allowNetworkReadTask) {
         boolean createReadTask;
 
         if (threadId != 0) {
@@ -14846,7 +14881,7 @@ public class MessagesController extends BaseController implements NotificationCe
             monoForumPeerId = 0;
         }
 
-        if (createReadTask) {
+        if (createReadTask && (allowNetworkReadTask || !AmberGhost.isEnabled())) {
             Utilities.stageQueue.postRunnable(() -> {
                 ReadTask currentReadTask;
                 if (threadId != 0) {
@@ -17649,6 +17684,12 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     protected void deleteMessagesByPush(long dialogId, ArrayList<Integer> ids, long channelId) {
+        // AmberMorphe anti-delete (v0.7.0): FCM/push-delivered deletion notifications
+        // are ignored as well, otherwise a deletion arriving through the push channel
+        // would still wipe the UI cache while update-driven deletions are blocked.
+        if (AmberMorphe.antiDelete()) {
+            return;
+        }
         getMessagesStorage().getStorageQueue().postRunnable(() -> {
             AndroidUtilities.runOnUIThread(() -> {
                 getNotificationCenter().postNotificationName(NotificationCenter.messagesDeleted, ids, channelId, false);
@@ -21216,7 +21257,12 @@ public class MessagesController extends BaseController implements NotificationCe
                     getNotificationCenter().postNotificationName(NotificationCenter.messagesReadContent, key, value);
                 }
             }
-            if (deletedMessagesFinal != null) {
+            if (deletedMessagesFinal != null && !AmberMorphe.antiDelete()) {
+                // AmberMorphe anti-delete (v0.7.0): when the toggle is on the UI cache is
+                // left untouched — no messagesDeleted broadcast and no obj.deleted flag,
+                // covering BOTH TL_updateDeleteMessages and TL_updateDeleteChannelMessages
+                // (both funnel into deletedMessages). pts/pts_count handling above is
+                // deliberately NOT gated so getDifference keeps working normally.
                 for (int a = 0, size = deletedMessagesFinal.size(); a < size; a++) {
                     long dialogId = deletedMessagesFinal.keyAt(a);
                     ArrayList<Integer> arrayList = deletedMessagesFinal.valueAt(a);

@@ -10308,6 +10308,13 @@ public class MessageObject {
     }
 
     public static boolean isSecretPhotoOrVideo(TLRPC.Message message) {
+        // AmberMorphe antiDisappearing (v0.7.0): in NON-secret (cloud) chats a ttl_seconds
+        // media is a view-once photo/video — with the toggle on it must behave like a
+        // regular media (open, save, forward). Real EncryptedChat messages keep the
+        // original behavior. (Also see isVoiceOnce/isRoundOnce.)
+        if (!(message instanceof TLRPC.TL_message_secret) && AmberMorphe.antiDisappearing()) {
+            return false;
+        }
         if (message instanceof TLRPC.TL_message_secret) {
             return (getMedia(message) instanceof TLRPC.TL_messageMediaPhoto || isRoundVideoMessage(message) || isVideoMessage(message)) && message.ttl > 0 && message.ttl <= 60;
         } else if (message instanceof TLRPC.TL_message) {
@@ -10317,6 +10324,9 @@ public class MessageObject {
     }
 
     public static boolean isSecretMedia(TLRPC.Message message) {
+        if (!(message instanceof TLRPC.TL_message_secret) && AmberMorphe.antiDisappearing()) {
+            return false;
+        }
         if (message instanceof TLRPC.TL_message_secret) {
             return (getMedia(message) instanceof TLRPC.TL_messageMediaPhoto || isRoundVideoMessage(message) || isVideoMessage(message)) && getMedia(message).ttl_seconds != 0;
         } else if (message instanceof TLRPC.TL_message) {
@@ -10345,6 +10355,11 @@ public class MessageObject {
     }
 
     public boolean isSecretMedia() {
+        // AmberMorphe antiDisappearing (v0.7.0): same guard for the instance variant
+        // (cloud chat view-once media behaves like normal media while the toggle is on).
+        if (!(messageOwner instanceof TLRPC.TL_message_secret) && AmberMorphe.antiDisappearing()) {
+            return false;
+        }
         if (messageOwner instanceof TLRPC.TL_message_secret) {
             return (((getMedia(messageOwner) instanceof TLRPC.TL_messageMediaPhoto) || isGif()) && messageOwner.ttl > 0 && messageOwner.ttl <= 60 || isVoice() || isRoundVideo() || isVideo());
         } else if (messageOwner instanceof TLRPC.TL_message) {

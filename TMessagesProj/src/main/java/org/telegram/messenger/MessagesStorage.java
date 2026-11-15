@@ -13540,6 +13540,30 @@ public class MessagesStorage extends BaseController {
         if (messages == null || messages.isEmpty()) {
             return;
         }
+        // AmberGram ghost mode v0.7.0: sending a message in a dialog reveals that its
+        // history was read — replay the stashed read receipt for that dialog now.
+        // Every outgoing transport (text, media, forward, sticker) funnels through
+        // putMessages, and flushRead is idempotent (a missing stash is a no-op).
+        for (int a = 0; a < messages.size(); a++) {
+            TLRPC.Message message = messages.get(a);
+            if (message == null || !message.out || message.scheduled || mode == 1) {
+                continue;
+            }
+            long dialogId = message.dialog_id;
+            if (dialogId == 0 && message.peer_id != null) {
+                dialogId = DialogObject.getPeerDialogId(message.peer_id);
+            }
+            if (dialogId == 0) {
+                continue;
+            }
+            final int account = currentAccount;
+            final long flushedDialogId = dialogId;
+            AndroidUtilities.runOnUIThread(() -> {
+                if (AmberGhost.isEnabled()) {
+                    AmberGhost.flushRead(flushedDialogId, account);
+                }
+            });
+        }
         if (useQueue) {
             storageQueue.postRunnable(() -> putMessagesInternal(messages, withTransaction, doNotUpdateDialogDate, downloadMask, ifNoLastMessage, mode, threadMessageId));
         } else {
@@ -15496,6 +15520,14 @@ public class MessagesStorage extends BaseController {
     }
 
     public ArrayList<Long> markMessagesAsDeleted(long dialogId, ArrayList<Integer> messages, boolean useQueue, boolean deleteFiles, int mode, int topicId) {
+        // AmberMorphe anti-delete (v0.7.0): when the toggle is on, rows are never removed
+        // from the database — covers every caller (update processing, getDifference sync,
+        // channels), not only the processUpdateArray gate.
+        // NOTE: pts/pts_count bookkeeping is intentionally untouched so the client never
+        // falls into an endless getDifference loop.
+        if (AmberMorphe.antiDelete()) {
+            return null;
+        }
         if (messages.isEmpty()) {
             return null;
         }
@@ -15635,6 +15667,11 @@ public class MessagesStorage extends BaseController {
     }
 
     public ArrayList<Long> markMessagesAsDeleted(long channelId, int mid, boolean useQueue, boolean deleteFiles) {
+        // AmberMorphe anti-delete (v0.7.0): same database guard for the channel overload
+        // (TL_updateDeleteChannelMessages / channel history deletion paths).
+        if (AmberMorphe.antiDelete()) {
+            return null;
+        }
         if (useQueue) {
             storageQueue.postRunnable(() -> markMessagesAsDeletedInternal(channelId, mid, deleteFiles));
         } else {

@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.SystemClock;
+import android.text.TextUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -54,11 +55,13 @@ public class AmbergramProxyManager {
     private static final int TEST_BATCH = 20;
     private static final int RECHECK_MIN_INTERVAL = 2 * 60 * 1000;
 
-    // Auto-cleanup: a proxy that fails a real MTProto handshake is removed from
-    // the list right away. A whole cycle where EVERY tested proxy failed (and at
-    // least OFFLINE_GUARD_MIN_TESTED were tested) is treated as a likely device
-    // network outage, so nothing is removed in that case.
-    private static final int REMOVE_AFTER_FAILS = 1;
+    // Auto-cleanup: a proxy that fails a REAL MTProto handshake repeatedly is removed
+    // from the list. A whole cycle where EVERY tested proxy failed (and at least
+    // OFFLINE_GUARD_MIN_TESTED were tested) is treated as a likely device network
+    // outage, so nothing is removed in that case. v0.7.0: the threshold was raised
+    // from 1 to 3 consecutive failures so a single momentary network blip never
+    // deletes a healthy proxy forever.
+    private static final int REMOVE_AFTER_FAILS = 3;
     private static final int OFFLINE_GUARD_MIN_TESTED = 10;
 
     public static final int EVENT_FETCH_STARTED = 0;
@@ -124,6 +127,38 @@ public class AmbergramProxyManager {
             new Source("Argh94", "https://raw.githubusercontent.com/Argh94/Proxy-List/main/MTProto.txt", FORMAT_LINKS),
             new Source("0xRadikal", "https://raw.githubusercontent.com/0xRadikal/Free-Telegram-Proxy/main/all/tg.txt", FORMAT_LINKS),
     };
+
+    /**
+     * AmberGram v0.7.0: anti-sanction mirror. raw.githubusercontent.com is disrupted on
+     * Iranian ISPs without a VPN; the jsDelivr CDN serves the same GitHub content and is
+     * reachable. Every source therefore gets an automatic fallback:
+     * https://raw.githubusercontent.com/USER/REPO/BRANCH/PATH
+     *   -> https://cdn.jsdelivr.net/gh/USER/REPO@BRANCH/PATH
+     */
+    private static String mirrorUrl(String rawUrl) {
+        final String prefix = "https://raw.githubusercontent.com/";
+        if (rawUrl == null || !rawUrl.startsWith(prefix)) {
+            return null;
+        }
+        String rest = rawUrl.substring(prefix.length()); // USER/REPO/BRANCH/PATH
+        int slash1 = rest.indexOf('/');
+        int slash2 = slash1 >= 0 ? rest.indexOf('/', slash1 + 1) : -1;
+        if (slash1 <= 0 || slash2 <= slash1 + 1) {
+            return null;
+        }
+        String userRepo = rest.substring(0, slash1) + "/" + rest.substring(slash1 + 1, slash2);
+        String branchAndPath = rest.substring(slash2 + 1); // BRANCH/PATH
+        int slash3 = branchAndPath.indexOf('/');
+        if (slash3 <= 0) {
+            return null;
+        }
+        String branch = branchAndPath.substring(0, slash3);
+        String path = branchAndPath.substring(slash3 + 1);
+        if (TextUtils.isEmpty(path)) {
+            return null;
+        }
+        return "https://cdn.jsdelivr.net/gh/" + userRepo + "@" + branch + "/" + path;
+    }
 
     private static volatile AmbergramProxyManager Instance;
 
@@ -246,7 +281,19 @@ public class AmbergramProxyManager {
             for (Source source : SOURCES) {
                 pool.execute(() -> {
                     try {
-                        String text = httpGet(source.url);
+                        String text;
+                        try {
+                            text = httpGet(source.url);
+                        } catch (Throwable primaryError) {
+                            // AmberGram v0.7.0: raw.githubusercontent.com is unreliable on
+                            // Iranian ISPs — automatically retry through the jsDelivr mirror.
+                            String mirror = mirrorUrl(source.url);
+                            if (TextUtils.isEmpty(mirror)) {
+                                throw primaryError;
+                            }
+                            FileLog.d(TAG + ": source " + source.name + " failed (" + primaryError.getMessage() + "), retrying via jsDelivr mirror");
+                            text = httpGet(mirror);
+                        }
                         int parsed = parseInto(source, text, merged);
                         if (parsed > 0) {
                             workingSources.incrementAndGet();

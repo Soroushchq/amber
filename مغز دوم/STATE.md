@@ -17,7 +17,7 @@
 - فلاورها: `afat`=9 (universal) | `arm64`=2 | `armv7`=3 | `bundleAfat`=1 (فقط AAB)؛ versionCode هر فلاور = APP_VERSION_CODE×10 + abiVersionCode
 
 ## تاریخچه تگ‌ها
-v0.2.0 → v0.2.1 → v0.2.3 → v0.2.4 → v0.2.5 (صف دانلود اختصاصی + هدر برند-امن) → v0.2.6 → v0.2.7 (حذف خودکار پروکسی مرده) → v0.2.8 (پروکسی‌های رایگان درون‌برنامه‌ای + پاکسازی مرده‌ها) → v0.2.9 → v0.3.0 (حالت شبح) → v0.3.1 (APK سبک هر ABI + راهنمای نصب فارسی) → v0.4.0 (ضدتبلیغ + توربو) → v0.5.0 (بسته کامل Morphe: ۸ پچ) → **v0.6.0 (صف دانلود مقاوم)**
+v0.2.0 → v0.2.1 → v0.2.3 → v0.2.4 → v0.2.5 (صف دانلود اختصاصی + هدر برند-امن) → v0.2.6 → v0.2.7 (حذف خودکار پروکسی مرده) → v0.2.8 (پروکسی‌های رایگان درون‌برنامه‌ای + پاکسازی مرده‌ها) → v0.2.9 → v0.3.0 (حالت شبح) → v0.3.1 (APK سبک هر ABI + راهنمای نصب فارسی) → v0.4.0 (ضدتبلیغ + توربو) → v0.5.0 (بسته کامل Morphe: ۸ پچ) → v0.6.0 (صف دانلود مقاوم) → **v0.7.0 (بسته اصلاحی عمیق — در حال انتشار)**
 
 > هشدار قدیمی (changelog کپی v0.2.9) برطرف شد — از v0.3.0 به بعد changelog واقعی است.
 
@@ -31,8 +31,9 @@ v0.2.0 → v0.2.1 → v0.2.3 → v0.2.4 → v0.2.5 (صف دانلود اختصا
 7. بخش تنظیمات AmberGram (`AmbergramSettingsActivity`) با صف دانلود زنده (`AmbergramQueueActivity`)
 8. صف دانلود پس‌زمینه ترتیبی (`AmberDownloadService`) — بعد از اتمام همه دانلودها سرویس و نوتیف کامل خاموش می‌شود
 9. پروکسی‌های رایگان درون‌برنامه‌ای (`AmbergramProxyManager` + `AmbergramProxyActivity` + `AmbergramProxyReceiver`): 6 کلکتور GitHub، رفرش 6 ساعته + جبران موقع باز شدن برنامه، ادغام/حذف تکراری، تست واقعی MTProto handshake بدون قطع اتصال فعال، تپ=اتصال، لانگ‌پرس=کپی لینک t.me
-10. پاکسازی خودکار پروکسی مرده: `REMOVE_AFTER_FAILS=1`، نگهبان آفلاین `OFFLINE_GUARD_MIN_TESTED=10`، سوییچ خودکار به بهترین پروکسی زنده، رویداد `EVENT_LIST_CLEANED` → Toast با رشته `AmbergramProxyRemoved`
+10. پاکسازی خودکار پروکسی مرده: `REMOVE_AFTER_FAILS=3` (از v0.7.0؛ قبل از آن ۱)، نگهبان آفلاین `OFFLINE_GUARD_MIN_TESTED=10`، سوییچ خودکار به بهترین پروکسی زنده، رویداد `EVENT_LIST_CLEANED` → Toast با رشته `AmbergramProxyRemoved`
 11. **حالت شبح (v0.3.0)**: کلاس `AmberGhost` — پیام‌ها تا خروج از چت خوانده‌شده ثبت نمی‌شوند، نشانگر تایپ هرگز ارسال نمی‌شود؛ کلید در تنظیمات AmberGram (آیکون ghost نارنجی)؛ رشته‌های دوزبانه `AmberGhost*`
+15. **بسته اصلاحی عمیق (v0.7.0)**: صف دانلود — نام فایل در UI، سه‌نقطه اکشن‌مود (ActionBarMenuItem.addSubItem)، parentObject پیام کامل برای رفرش file_reference، گیت شبکه فقط WaitingForNetwork، ذخیره در Downloads/AmberGram؛ Morphe — ضدحذف واقعی (Storage دو overload + UI cache + push)، bypassNoforwards در سر ۳ متد isChatNoForwards/isUserNoForwards، ضدتک‌بار در isSecretMedia/isSecretPhotoOrVideo + عدم ارسال readMessageContents، قطع کامل ژست کشیدن‌به‌پایین؛ شبح — حذف flush از onPause، stashRead + flush فقط در ارسال پیام (قیف putMessages) یا خاموش‌کردن شبح، offline=true همیشگی در updateStatus؛ توربو — چانک 512KB×8 با گارد stateIdle (سقف پروتکل MTProto)؛ پروکسی — میرور خودکار jsDelivr برای هر ۶ منبع + REMOVE_AFTER_FAILS=3.
 14. **صف دانلود مقاوم (v0.6.0)**: بازنویسی DownloadQueueController — retry خودکار با backoff نمایی (۸ تلاش)، آگاهی از شبکه (poll ۵s)، watchdog رکود ۹۰s، FAILED ماندگار با دکمه تلاش دوباره (باقی بعد از ری‌استارت)، صف حین backoff جریان دارد، رفع تکرار current در persist؛ تأیید با شبیه‌ساز ۸ سناریو/۲۰ اظهار (`/home/z/queuesim/queue_sim.py`)
 12. **بسته ضدتبلیغ + توربو (v0.4.0)**: کلاس `AmberAntiAds` — بدون اسپانسری (no fetch!)، بدون کانال پیشنهادی، دانلود توربو (۱MB×۱۲ — اعداد Morphe)، بدون استیکر خوش‌آمدگویی؛ ۴ toggle در تنظیمات AmberGram؛ الهام از پچ‌های Morphe (HushTelegram)
 13. **بسته کامل Morphe (v0.5.0)**: کلاس `AmberMorphe.java` — ۸ پچ بومی: ضدحذف (anti-delete)، ماندگاری رسانه تک‌بار (صدا/دایره‌ای)، بدون اعلان اسکرین‌شات، ذخیره‌پذیری همه‌جا (bypass noforwards)، بدون به‌روزرسانی درون‌برنامه‌ای، بدون رسید بازدید استوری، ترجمه همیشه فعال، قطع اختیاری ژست سوییچ کانال؛ توربو ارتقا به ۱MB×۱۲؛ ۱۲ toggle در تنظیمات AmberGram
@@ -45,7 +46,7 @@ v0.2.0 → v0.2.1 → v0.2.3 → v0.2.4 → v0.2.5 (صف دانلود اختصا
 - تصاویر/آیکون‌های تولیدی: `/home/z/my-project` (`pp-min-1..8.png`) — ممکن است با ریست سندباکس پاک شده باشند
 - لاگ‌های CI قبلی: `/home/z/ci18`
 
-## چک‌لیست انتشار نسخه بعد (0.7.0 — کد 7303)
+## چک‌لیست انتشار نسخه جاری (0.7.0 — کد 7303)
 1. `gradle.properties` (ریشه): bump کد به 7303 و نام به 0.7.0
 2. changelog واقعی در `.github/workflows/release.yml` — بدون `"` داخلی؛ **همه خط‌ها هم‌تراز ۱۰ فاصله** (خط بدون تورفتگی YAML را می‌شکند!)؛ اعتبارسنجی pyyaml قبل از پوش
 3. commit + push به master
