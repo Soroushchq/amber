@@ -11699,6 +11699,7 @@
     <string name="AmbergramQueueStateDownloading">Downloading</string>
     <string name="AmbergramQueueStateDone">Done</string>
     <string name="AmbergramQueueStateFailed">Failed</string>
+    <string name="AmbergramQueueRetry">Retry</string>
     <string name="AmbergramQueueClearFinished">Clear finished</string>
     <string name="AmbergramQueueRemove">Remove</string>
     <string name="AmbergramQueueRemoved">Removed from the queue</string>
