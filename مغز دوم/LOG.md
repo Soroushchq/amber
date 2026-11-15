@@ -99,3 +99,30 @@
   - release/v0.4.0-alpha (43631281316): SUCCESS — انتشار با ۴ asset.
   - راستی‌آزمایی: هر سه APK هش OK، امضا v1+v2 Verified، badging: universal=73009 (۴ ABI)، arm64=73002، armv7=73003، همه «0.4.0 (7300)»؛ متن Release شامل خط Morphe + راهنمای نصب فارسی.
   - حجم‌ها: universal=83.1MB، arm64=44.9MB، armv7=43.7MB.
+
+---
+
+## نوبت ۶ — بسته کامل پچ‌های Morphe (نسخه 0.5.0)
+- **درخواست کاربر:** «تمامی پچ‌ها اعمال بشن، یک کلام ختم کلام» — بدون پرسش، همه پچ‌های قابل‌پیاده‌سازی.
+- **کاتالوگ کامل از GitHub API:** دو مخزن با patches-list.json: rahul9999xda (۲۱ پچ) و newuser7171 (۲۰ پچ)؛ HushTelegram فقط مرجع توضیح.
+- **نقشه ۲۰ پچ → اقدام:** ۸ پچ جدید پورت بومی شد + ۴ قبلاً انجام شده بود + توربو ارتقا یافت + ۷ مورد غیرقابل‌پورت (مستندشده):
+  1. **antiDelete** — مصرف بلوک `deletedMessages` در MessagesController (بعد از جمع‌آوری از TL_updateDeleteMessages/کانال) گیت شد؛ حذف‌های ورودی دیگر از کش/دیتابیس پاک نمی‌شوند. حذف‌های خودمان از مسیر deleteMessages() مستقل‌اند و دست نمی‌خورند.
+  2. **antiDisappearing** — گیت اول `isVoiceOnce()` و `isRoundOnce()` در MessageObject؛ چون ۳۰+ نقطه در ChatActivity/MediaController از همین دو متد استفاده می‌کنند، همه‌جا رسانه تک‌بار مثل رسانه معمولی رفتار می‌کند (پخش/فوروارد/ذخیره). عکس/ویدیوی once ساختار TL_messageExtendedMediaPreview دارد و برای جلوگیری از ریسک رندر دست نخورد (حذف آن‌ها بعد از بازدید سرور-محور است و toggle antiDelete هم پوشش می‌دهد).
+  3. **noScreenshotNotify** — گیت بلوک ارسال در MediaController (هر دو مسیر secret و عادی).
+  4. **bypassNoforwards** — گیت اول `isPeerNoForwards` در MessagesController (همه UI از همین می‌آید) + گیت `!messageOwner.noforwards` در `canForwardMessage`.
+  5. **noAutoUpdate** — گیت اول `checkAppUpdate` در LaunchActivity.
+  6. **noChannelSwitch** — `setNextChannels` در ChatActivity با toggle به null می‌رود (ژست کشیدن به پایین بی‌اثر می‌شود؛ پیش‌فرض خاموش).
+  7. **hideStoriesRead** — فقط `sendRequest(TL_stories_readStories)` گیت شد؛ وضعیت خوانده‌شده محلی (max_read_id/storage/notification) سر جایش است.
+  8. **bypassTranslation** — گیت `chatFull/userFull.translations_disabled` در `isTranslateDialogHidden`؛ انتخاب دستی خود کاربر (hideTranslateDialogs) محترم مانده.
+  9. **توربو ارتقا** — پارامترهای پچ Morphe: پارچه ۱MB × ۱۲ درخواست موازی (قبلاً ۵۱۲KB × ۸).
+- **غیرقابل‌پورت (مستند در کامنت AmberMorphe.java):** Unlock Premium (سرور-محور)، Bypass channel restrictions (گیت کلاینت در ۱۳.۲.۱ وجود ندارد — سرور محتوا را نمی‌فرستد)، Spoof signature/cert/install-source + Fix Firebase + Bypass integrity (زیرساخت Morphe برای APK ریمپ‌شده؛ فورک از سورس بیلد می‌شود و لاگین از قبل سالم است)، Rich clipboard paste (در این نسخه سورس وجود ندارد)، تلمتری (اصلاً Firebase Analytics/Crashlytics در سورس نیست)، Voice-to-music (خط لوله صوتی کل برنامه را می‌لرزاند — ریسک بالا).
+- **UI:** ۸ ردیف toggle جدید در AmbergramSettingsActivity با همان الگوی spec array + get/set mapping؛ آیکون‌ها: msg_delete/msg_photo_blur/msg_camera/msg_copy/msg_download/msg_block2/msg_mute/msg_secret (همه موجود در res).
+- **رشته‌ها:** ۱۶ کلید جدید دوزبانه (۸ نام + ۸ توضیح)؛ توضیح توربو هم برای اعداد جدید به‌روز شد.
+- **نسخه:** 0.5.0 (7301)؛ چنج‌لاگ «NEW in 0.5.0 — full Morphe patch bundle» با ۸ آیتم + یادداشت ارتقای توربو.
+- **اعتبارسنجی پیش از پوش:** توازن نسبی آکولاد هر ۱۰ فایل نسبت به HEAD = صفر؛ XML هر دو پک سالم؛ pyyaml سبز؛ ۰ دابل‌کوتیشن داخل notes.
+- **نتیجه CI (پایش کامل شد):**
+  - ci/master (43649039790): SUCCESS — هر ۱۰ فایل ویرایش‌شده و کلاس جدید کامپایل سالم.
+  - release/v0.5.0-alpha (43653672487): SUCCESS — انتشار با ۴ asset.
+  - راستی‌آزمایی: هر سه APK دانلود شد؛ sha256 با SHA256SUMS مطابقت کامل (۳×OK)؛ apksigner همه v1+v2 Verified؛ badging: universal=73019 (۴ ABI)، arm64=73012، armv7=73013، همه versionName «0.5.0 (7301)».
+  - حجم‌ها: universal=83.1MB، arm64=44.9MB، armv7=43.7MB.
+- **درس فنی این نوبت:** `rg -r` یعنی --replace و خروجی را خراب نمایش می‌دهد (دو بار متن گمراه‌کننده دیدم: «lnMessage» به‌جای sendScreenshotMessage و «lnListener» به‌جای AnalyticsListener)؛ پرچم -r را فقط عمدی بزن.
