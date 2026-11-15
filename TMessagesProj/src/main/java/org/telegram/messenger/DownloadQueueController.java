@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.webkit.MimeTypeMap;
 
+import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.SerializedData;
 import org.telegram.tgnet.TLRPC;
 
@@ -23,13 +24,30 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
 /**
- * Amber fork: strictly sequential download queue.
+ * Amber fork: strictly sequential download queue, hardened edition.
  *
  * The user selects multiple files in a chat (multi-select -> "sequential download")
  * and they are downloaded ONE AT A TIME, in order, backed by a foreground
  * dataSync service so the queue keeps running while the screen is locked.
  * The queue is persisted to SharedPreferences (the TLRPC.Document itself is
  * serialized) so it survives process death and resumes on next app start.
+ *
+ * Robustness rules (v0.6.0 rework — fixes the "small attempt then gives up"
+ * and "queue ends after the first file" complaints):
+ *  - Transient failures are RETRIED automatically: each item gets up to
+ *    MAX_ATTEMPTS attempts with exponential backoff (2s .. 120s cap). While an
+ *    item waits for its next attempt, the rest of the queue keeps flowing.
+ *  - The queue is network-aware: items only start when the MTProto connection
+ *    is actually established; otherwise the controller polls every 5 seconds
+ *    instead of starting downloads that are doomed to fail immediately.
+ *  - A stall watchdog cancels and re-queues the current item when no bytes
+ *    arrive for 90 seconds (frozen proxy connections), counting as an attempt.
+ *  - Failed items are NEVER silently erased: they stay in the queue marked
+ *    FAILED (with a manual Retry button), also after an app restart, until the
+ *    user clears them. Only DONE items are removed when the queue drains.
+ *  - The currently downloading item is kept OUT of the waiting list, so the
+ *    persisted queue never contains duplicates of the active item (the old
+ *    build persisted it twice, which re-queued the same file after restart).
  */
 public class DownloadQueueController implements NotificationCenter.NotificationCenterDelegate {
 
@@ -66,6 +84,10 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
         public long size;
         public long loadedBytes;
         public int state = STATE_PENDING;
+        /** How many download attempts this item already used (resets on manual retry). */
+        public int attempts;
+        /** Earliest time (System.currentTimeMillis()) this item may be started again. */
+        public long retryAt;
         String documentBase64;
 
         QueueItem(long dialogId, int messageId, String fileName, String displayName, long size, TLRPC.Document document) {
@@ -78,12 +100,41 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
         }
     }
 
+    /** Retry policy: up to MAX_ATTEMPTS automatic attempts, exponential backoff (ms). */
+    private static final int MAX_ATTEMPTS = 8;
+    private static final long[] RETRY_DELAYS_MS = {2000, 4000, 8000, 15000, 30000, 60000, 120000};
+    /** How often the controller re-checks the network while it is down (ms). */
+    private static final long NETWORK_POLL_MS = 5000;
+    /** Watchdog cadence and the no-progress threshold that counts as a stall (ms). */
+    private static final long WATCHDOG_INTERVAL_MS = 15000;
+    private static final long STALL_THRESHOLD_MS = 90000;
+
     private final int currentAccount;
+    /** Waiting items: PENDING (ready or waiting for retryAt) and FAILED (visible until cleared). */
     private final ArrayList<QueueItem> queue = new ArrayList<>();
+    /** The item being downloaded right now — kept OUT of {@link #queue}. */
     private QueueItem current;
     private AmberDownloadService attachedService;
     private long lastNotifyTime;
     private final ArrayList<QueueListener> queueListeners = new ArrayList<>();
+
+    /** Highest loadedBytes seen for the current item; drives the stall watchdog. */
+    private long currentLoadedHighWater;
+    /** Last time the current item made visible progress. */
+    private long lastProgressTime;
+
+    private boolean kickScheduled;
+    private boolean networkPollScheduled;
+    private boolean watchdogScheduled;
+
+    private final Runnable networkPollRunnable = () -> {
+        networkPollScheduled = false;
+        startNextIfNeeded();
+    };
+    private final Runnable watchdogRunnable = () -> {
+        watchdogScheduled = false;
+        checkCurrentStalled();
+    };
 
     public void addQueueListener(QueueListener listener) {
         synchronized (queueListeners) {
@@ -114,12 +165,13 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
         }
     }
 
-    /** Returns a copy of the queue including the currently downloading item (last). Must be called on the UI thread. */
+    /** Returns a copy of the queue: the downloading item first, then waiting/failed items. Must be called on the UI thread. */
     public ArrayList<QueueItem> getQueueSnapshot() {
-        ArrayList<QueueItem> all = new ArrayList<>(queue);
+        ArrayList<QueueItem> all = new ArrayList<>();
         if (current != null) {
             all.add(current);
         }
+        all.addAll(queue);
         return all;
     }
 
@@ -138,6 +190,25 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
             updateNotification(true);
         }
         return removed;
+    }
+
+    /** Manual retry: turns a FAILED item back into a fresh PENDING one. */
+    public void retryItem(QueueItem item) {
+        boolean found = false;
+        for (int a = 0; a < queue.size(); a++) {
+            QueueItem queued = queue.get(a);
+            if (queued.state == STATE_FAILED && queued.messageId == item.messageId && queued.dialogId == item.dialogId && queued.fileName.equals(item.fileName)) {
+                queued.state = STATE_PENDING;
+                queued.attempts = 0;
+                queued.retryAt = 0;
+                queued.loadedBytes = 0;
+                found = true;
+            }
+        }
+        if (found) {
+            persist();
+            startNextIfNeeded();
+        }
     }
 
     /** Removes all DONE/FAILED items from the queue. */
@@ -171,7 +242,7 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
                 continue;
             }
             DownloadQueueController controller = getInstance(a);
-            if (!controller.queue.isEmpty()) {
+            if (!controller.queue.isEmpty() || controller.current != null) {
                 controller.startNextIfNeeded();
             }
         }
@@ -190,7 +261,7 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
                 continue;
             }
             String fileName = FileLoader.getAttachFileName(document);
-            if (TextUtils.isEmpty(fileName)) {
+            if (TextUtils.isEmpty(fileName) || fileName.contains("" + Integer.MIN_VALUE)) {
                 continue;
             }
             if (hasActiveItemForFileName(fileName)) {
@@ -217,22 +288,22 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
             if (document != null) {
                 FileLoader.getInstance(currentAccount).cancelLoadFile(document);
             }
+            current = null;
         }
         queue.clear();
-        current = null;
         persist();
         AmberDownloadService.stop(ApplicationLoader.applicationContext);
         updateNotification(true);
     }
 
-    /** True if a PENDING/DOWNLOADING item with this name exists (terminal items may be re-queued). */
+    /** True if a PENDING/DOWNLOADING/FAILED item with this name exists (so re-selecting a failed file is deduped too). */
     private boolean hasActiveItemForFileName(String fileName) {
         if (current != null && fileName.equals(current.fileName)) {
             return true;
         }
         for (int a = 0; a < queue.size(); a++) {
             QueueItem item = queue.get(a);
-            if ((item.state == STATE_PENDING || item.state == STATE_DOWNLOADING) && fileName.equals(item.fileName)) {
+            if (fileName.equals(item.fileName)) {
                 return true;
             }
         }
@@ -241,7 +312,8 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
 
     /**
      * AmberGram: true when there is nothing actually in flight — no current download
-     * and no pending items. While idle the app must behave like regular Telegram:
+     * and no pending items. FAILED items do not keep the service alive.
+     * While idle the app must behave like regular Telegram:
      * no foreground service, no ongoing notification, no battery drain.
      */
     public boolean isIdle() {
@@ -251,30 +323,74 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
     private boolean hasPendingItems() {
         for (int a = 0; a < queue.size(); a++) {
             QueueItem item = queue.get(a);
-            if (item.state == STATE_PENDING || item.state == STATE_DOWNLOADING) {
+            if (item.state == STATE_PENDING) {
                 return true;
             }
         }
         return false;
     }
 
+    private boolean isNetworkConnected() {
+        try {
+            return ConnectionsManager.getInstance(currentAccount).getConnectionState() == ConnectionsManager.ConnectionStateConnected;
+        } catch (Throwable e) {
+            return true;
+        }
+    }
+
+    private void scheduleKick(long delayMs) {
+        if (kickScheduled) {
+            return;
+        }
+        kickScheduled = true;
+        AndroidUtilities.runOnUIThread(() -> {
+            kickScheduled = false;
+            startNextIfNeeded();
+        }, Math.max(500, Math.min(delayMs, 2 * NETWORK_POLL_MS)));
+    }
+
+    private long retryDelayFor(int attempts) {
+        int idx = Math.min(attempts - 1, RETRY_DELAYS_MS.length - 1);
+        return RETRY_DELAYS_MS[Math.max(0, idx)];
+    }
+
+    /**
+     * Starts the next item when nothing is downloading. Handles three waiting
+     * modes: an item ready to start, items waiting for their retry backoff, and
+     * no usable network (poll instead of failing instantly).
+     */
     private void startNextIfNeeded() {
         if (current != null) {
+            ensureWatchdog();
             updateNotification(true);
             return;
         }
         QueueItem next = null;
+        long now = System.currentTimeMillis();
+        long earliestRetryAt = Long.MAX_VALUE;
         for (int a = 0; a < queue.size(); a++) {
             QueueItem item = queue.get(a);
-            if (item.state == STATE_PENDING) {
+            if (item.state != STATE_PENDING) {
+                continue;
+            }
+            if (item.retryAt > now) {
+                earliestRetryAt = Math.min(earliestRetryAt, item.retryAt);
+                continue;
+            }
+            if (next == null) {
                 next = item;
-                break;
             }
         }
         if (next == null) {
+            if (earliestRetryAt != Long.MAX_VALUE) {
+                // All pending items are in their backoff window — wake up then.
+                updateNotification(true);
+                scheduleKick(earliestRetryAt - now);
+                return;
+            }
+            // Queue drained: drop DONE items, keep FAILED ones visible for the user.
             for (int a = queue.size() - 1; a >= 0; a--) {
-                QueueItem item = queue.get(a);
-                if (item.state == STATE_DONE || item.state == STATE_FAILED) {
+                if (queue.get(a).state == STATE_DONE) {
                     queue.remove(a);
                 }
             }
@@ -283,18 +399,35 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
             updateNotification(true);
             return;
         }
+        if (!isNetworkConnected()) {
+            // Do not start downloads that are doomed to fail right now; poll instead.
+            updateNotification(true);
+            if (!networkPollScheduled) {
+                networkPollScheduled = true;
+                AndroidUtilities.runOnUIThread(networkPollRunnable, NETWORK_POLL_MS);
+            }
+            return;
+        }
+        queue.remove(next);
         current = next;
         current.state = STATE_DOWNLOADING;
-        current.loadedBytes = 0;
+        current.attempts++;
+        currentLoadedHighWater = 0;
+        lastProgressTime = System.currentTimeMillis();
         persist();
         AmberDownloadService.start(ApplicationLoader.applicationContext, currentAccount);
+        ensureWatchdog();
 
         TLRPC.Document document = stringToDocument(current.documentBase64);
         if (document == null) {
-            current.state = STATE_FAILED;
-            persist();
-            current = null;
-            AndroidUtilities.runOnUIThread(this::startNextIfNeeded);
+            failCurrent(current, false);
+            return;
+        }
+        String checkName = FileLoader.getAttachFileName(document);
+        if (TextUtils.isEmpty(checkName) || checkName.contains("" + Integer.MIN_VALUE) || checkName.startsWith("0_0")) {
+            // FileLoader would silently refuse this one — mark failed right away
+            // instead of leaving a permanently "downloading" item.
+            failCurrent(current, false);
             return;
         }
         File cached = FileLoader.getInstance(currentAccount).getPathToAttach(document);
@@ -306,6 +439,69 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
         updateNotification(true);
     }
 
+    /**
+     * Finishes or retries the current item. Only acts if {@code item} is still the
+     * current one (protects against late/cancel events).
+     */
+    private void failCurrent(QueueItem item, boolean retriable) {
+        if (current != item || item == null) {
+            return;
+        }
+        current = null;
+        if (retriable && item.attempts < MAX_ATTEMPTS) {
+            requeueForRetry(item);
+        } else {
+            markItemFailed(item);
+        }
+        persist();
+        updateNotification(true);
+        startNextIfNeeded();
+        if (item.state == STATE_PENDING) {
+            scheduleKick(item.retryAt - System.currentTimeMillis());
+        }
+    }
+
+    /** Puts an item back into the waiting list with a backoff window (front keeps user order). */
+    private void requeueForRetry(QueueItem item) {
+        item.state = STATE_PENDING;
+        item.retryAt = System.currentTimeMillis() + retryDelayFor(item.attempts);
+        queue.add(0, item);
+    }
+
+    /** Out of attempts (or fatal error): keep the item visible as FAILED. */
+    private void markItemFailed(QueueItem item) {
+        item.state = STATE_FAILED;
+        item.retryAt = 0;
+        queue.add(0, item);
+    }
+
+    /** Watchdog: when the current item receives no bytes for a while, cancel and retry it. */
+    private void checkCurrentStalled() {
+        QueueItem item = current;
+        if (item == null) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        if (now - lastProgressTime > STALL_THRESHOLD_MS) {
+            TLRPC.Document document = stringToDocument(item.documentBase64);
+            if (document != null) {
+                FileLoader.getInstance(currentAccount).cancelLoadFile(document);
+            }
+            // The late fileLoadFailed event is ignored (current is already null / different item).
+            failCurrent(item, true);
+        } else {
+            ensureWatchdog();
+        }
+    }
+
+    private void ensureWatchdog() {
+        if (watchdogScheduled || current == null) {
+            return;
+        }
+        watchdogScheduled = true;
+        AndroidUtilities.runOnUIThread(watchdogRunnable, WATCHDOG_INTERVAL_MS);
+    }
+
     private void finishCurrentWithFile(File finalFile) {
         final QueueItem item = current;
         updateNotification(true);
@@ -313,10 +509,28 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
             final boolean ok = copyToPublicDownloadsSafely(item, finalFile);
             AndroidUtilities.runOnUIThread(() -> {
                 if (current == item) {
-                    item.state = ok ? STATE_DONE : STATE_FAILED;
-                    persist();
                     current = null;
-                    startNextIfNeeded();
+                    if (ok) {
+                        item.state = STATE_DONE;
+                        item.retryAt = 0;
+                        persist();
+                        startNextIfNeeded();
+                    } else {
+                        // The Telegram-side download succeeded but the copy into
+                        // public storage failed — same requeue/failed logic as
+                        // failCurrent (which cannot be used here: current is gone).
+                        if (item.attempts < MAX_ATTEMPTS) {
+                            requeueForRetry(item);
+                        } else {
+                            markItemFailed(item);
+                        }
+                        persist();
+                        updateNotification(true);
+                        startNextIfNeeded();
+                        if (item.state == STATE_PENDING) {
+                            scheduleKick(item.retryAt - System.currentTimeMillis());
+                        }
+                    }
                 }
             });
         });
@@ -425,12 +639,15 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
         }
         lastNotifyTime = now;
 
-        int total = queue.size();
+        int total = queue.size() + (current != null ? 1 : 0);
         int finished = 0;
+        int failed = 0;
         for (int a = 0; a < queue.size(); a++) {
             QueueItem item = queue.get(a);
-            if (item.state == STATE_DONE || item.state == STATE_FAILED) {
+            if (item.state == STATE_DONE) {
                 finished++;
+            } else if (item.state == STATE_FAILED) {
+                failed++;
             }
         }
         String name = current != null && !TextUtils.isEmpty(current.displayName) ? current.displayName : "";
@@ -447,6 +664,10 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
         if (id == NotificationCenter.fileLoadProgressChanged) {
             if (current != null && current.fileName.equals(args[0])) {
                 current.loadedBytes = (Long) args[1];
+                if (current.loadedBytes > currentLoadedHighWater) {
+                    currentLoadedHighWater = current.loadedBytes;
+                    lastProgressTime = System.currentTimeMillis();
+                }
                 updateNotification(false);
                 notifyQueueListeners();
             }
@@ -456,11 +677,9 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
             }
         } else if (id == NotificationCenter.fileLoadFailed) {
             if (current != null && current.fileName.equals(args[0])) {
-                current.state = STATE_FAILED;
-                persist();
-                current = null;
-                updateNotification(true);
-                startNextIfNeeded();
+                int reason = args.length > 1 && args[1] instanceof Integer ? (Integer) args[1] : 0;
+                // reason -1 = out of disk space (fatal); everything else is retried with backoff.
+                failCurrent(current, reason != -1);
             }
         }
     }
@@ -473,10 +692,11 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
         try {
             SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences(persistName(), Context.MODE_PRIVATE);
             org.json.JSONArray array = new org.json.JSONArray();
-            ArrayList<QueueItem> all = new ArrayList<>(queue);
+            ArrayList<QueueItem> all = new ArrayList<>();
             if (current != null) {
                 all.add(current);
             }
+            all.addAll(queue);
             for (int a = 0; a < all.size(); a++) {
                 QueueItem item = all.get(a);
                 org.json.JSONObject object = new org.json.JSONObject();
@@ -487,6 +707,8 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
                 object.put("size", item.size);
                 object.put("loaded", item.loadedBytes);
                 object.put("state", item.state);
+                object.put("attempts", item.attempts);
+                object.put("retryAt", item.retryAt);
                 object.put("doc", item.documentBase64);
                 array.put(object);
             }
@@ -520,12 +742,14 @@ public class DownloadQueueController implements NotificationCenter.NotificationC
                 item.documentBase64 = object.getString("doc");
                 item.state = object.optInt("state", STATE_PENDING);
                 item.loadedBytes = object.optLong("loaded", 0);
+                item.attempts = object.optInt("attempts", 0);
+                item.retryAt = object.optLong("retryAt", 0);
                 if (item.state == STATE_DOWNLOADING) {
                     // interrupted by process death: try again from the beginning
                     item.state = STATE_PENDING;
                     item.loadedBytes = 0;
                 }
-                if (item.state == STATE_PENDING) {
+                if (item.state == STATE_PENDING || item.state == STATE_FAILED) {
                     queue.add(item);
                 }
             }

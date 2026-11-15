@@ -160,6 +160,10 @@ public class AmbergramQueueActivity extends BaseFragment implements DownloadQueu
             TextView removeView = makeTextButton(context, LocaleController.getString(R.string.AmbergramQueueRemove), BRAND_ORANGE);
             removeView.setOnClickListener(v -> DownloadQueueController.getInstance(currentAccount).cancelPendingItem(item));
             topLine.addView(removeView, LayoutHelper.createLinear(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        } else if (item.state == DownloadQueueController.STATE_FAILED) {
+            TextView retryView = makeTextButton(context, LocaleController.getString(R.string.AmbergramQueueRetry), STATE_GREEN);
+            retryView.setOnClickListener(v -> DownloadQueueController.getInstance(currentAccount).retryItem(item));
+            topLine.addView(retryView, LayoutHelper.createLinear(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         }
 
         TextView statusView = new TextView(context);
