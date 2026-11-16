@@ -1678,7 +1678,7 @@ public class Theme {
             }
             if ("Dark Blue".equals(name) || "Night".equals(name) || "Amber".equals(name)) {
                 isDark = DARK;
-            } else if ("Blue".equals(name) || "Arctic Blue".equals(name) || "Day".equals(name)) {
+            } else if ("Blue".equals(name) || "Arctic Blue".equals(name) || "Day".equals(name) || "Amber Day".equals(name)) {
                 isDark = LIGHT;
             }
             if (isDark == UNKNOWN) {
@@ -4056,7 +4056,40 @@ public class Theme {
         sortAccents(themeInfo);
         themes.add(themeInfo);
         themesDict.put("Amber", themeInfo);
-        currentDayTheme = currentNightTheme = themeInfo;
+        currentNightTheme = themeInfo;
+
+        // Amber fork: UI 2.0 — paper-warm light companion of the Amber theme.
+        // currentDayTheme/currentNightTheme are now separate, so the night-mode
+        // toggle and auto-night actually switch between these two.
+        themeInfo = new ThemeInfo();
+        themeInfo.name = "Amber Day";
+        themeInfo.assetName = "amber_day.attheme";
+        themeInfo.previewBackgroundColor = 0xfffff8f1;
+        themeInfo.previewInColor = 0xfff1ebe1;
+        themeInfo.previewOutColor = 0xffffddb8;
+        themeInfo.sortIndex = 6;
+        // same accent contract as Amber: id 0 renders the authored colors and
+        // the recolor engine skips it (firstAccentIsDefault stays false to
+        // avoid the wallpaper marker dropping key_chat_wallpaper)
+        themeInfo.firstAccentIsDefault = false;
+        themeInfo.currentAccentId = 0;
+        themeInfo.setAccentColorOptions(
+                new int[]    { 0xFFC25E00, 0xFFB4382C, 0xFF8C6A1D },
+                null,
+                null,
+                new int[]    { 0xFFFFFFFF, 0xFFFFF6EA, 0xFFFBEEDC },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0, 1, 2 },
+                new String[] { "", "", "" },
+                new int[]    { 0, 0, 0 },
+                new int[]    { 0, 0, 0 }
+                );
+        sortAccents(themeInfo);
+        themes.add(themeInfo);
+        themesDict.put("Amber Day", themeInfo);
+        currentDayTheme = themeInfo;
 
         themeInfo = new ThemeInfo();
         themeInfo.name = "Arctic Blue";
@@ -4175,11 +4208,13 @@ public class Theme {
 
         sortThemes();
 
-        // Amber fork: one-time default — apply the Amber theme on fresh installs
-        // and once on upgraded installs (user can still change it afterwards)
-        if (!themeConfig.contains("amber_default_applied")) {
-            themeConfig.edit().putBoolean("amber_default_applied", true).apply();
-            MessagesController.getGlobalMainSettings().edit().putString("theme", "Amber").commit();
+        // Amber fork: UI 2.0 — one-time default v2 — land fresh and upgraded
+        // installs on the paper-warm Amber Day (night toggle switches to Amber);
+        // user can still change it afterwards
+        if (!themeConfig.contains("amber_default_v2_applied")) {
+            themeConfig.edit().putBoolean("amber_default_v2_applied", true).apply();
+            MessagesController.getGlobalMainSettings().edit().putString("theme", "Amber Day").commit();
+            MessagesController.getGlobalMainSettings().edit().putString("nighttheme", "Amber").commit();
         }
 
         ThemeInfo applyingTheme = null;
@@ -10256,6 +10291,9 @@ public class Theme {
                 return true;
             }
             if (accent.parentTheme.getKey().equals("Amber") && accent.id == 0) {
+                return true;
+            }
+            if (accent.parentTheme.getKey().equals("Amber Day") && accent.id == 0) {
                 return true;
             }
             if (accent.parentTheme.getKey().equals("Day") && accent.id == 9) {
