@@ -4030,9 +4030,9 @@ public class Theme {
         themeInfo = new ThemeInfo();
         themeInfo.name = "Amber";
         themeInfo.assetName = "amber.attheme";
-        themeInfo.previewBackgroundColor = 0xff141418;
-        themeInfo.previewInColor = 0xff1e1f25;
-        themeInfo.previewOutColor = 0xff3d2814;
+        themeInfo.previewBackgroundColor = 0xff17130e;
+        themeInfo.previewInColor = 0xff262017;
+        themeInfo.previewOutColor = 0xff5c4000;
         themeInfo.sortIndex = 0;
         // accent id 0 == accentBaseColor, so the default state renders the
         // amber.attheme colors exactly as authored (recolor engine skips it);

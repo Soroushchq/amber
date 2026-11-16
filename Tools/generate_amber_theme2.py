@@ -1,0 +1,186 @@
+#!/usr/bin/env python3
+# AmberGram UI 2.0 — مولد فایل تم از پالت مرکزی (قدم ۳/۴ نقشه راه)
+# تک منبع حقیقت: AmberTokens.java + AmberPalette.java — این اسکریپت آنها را
+# واقعاً تفسیر و ارزیابی می‌کند (بدون تکرار هیچ رنگی) و فایل attheme می‌سازد.
+#
+# مصرف:
+#   python3 Tools/generate_amber_theme2.py night  TMessagesProj/src/main/assets/amber.attheme
+#   python3 Tools/generate_amber_theme2.py day    TMessagesProj/src/main/assets/amber_day.attheme [BASE]
+#
+# منطق: فایل شب/روز = کلیدهای پایه (فایل تم فعلی برای پوشش کامل) + overlay کامل پالت جدید.
+# کلیدهای پالت بازنویسی می‌شوند؛ بقیه از پایه حفظ می‌شوند تا هیچ صفحه‌ای به
+# پیش‌فرض روشن تلگرام برنگردد (سقوط به defaultColors = فاجعه شب روشن).
+import re, sys, math, os
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SRC = os.path.join(ROOT, "TMessagesProj/src/main/java/org/telegram/messenger")
+
+def jround(x):
+    return math.floor(x + 0.5)  # Math.round(float) جاوا
+
+def mask32(v):
+    return int(v) & 0xFFFFFFFF
+
+def signed(v):
+    v = mask32(v)
+    return v - 0x100000000 if v > 0x7FFFFFFF else v
+
+def f_alpha(color, a):
+    a8 = jround(a * 255.0) & 0xFF
+    return mask32((a8 << 24) | (int(color) & 0xFFFFFF))
+
+def f_over(fg, bg, a):
+    fa = float(a)
+    fr, fgc, fb = (int(fg) >> 16) & 0xFF, (int(fg) >> 8) & 0xFF, int(fg) & 0xFF
+    br, bgc, bb = (int(bg) >> 16) & 0xFF, (int(bg) >> 8) & 0xFF, int(bg) & 0xFF
+    r = jround(fr * fa + br * (1 - fa))
+    g = jround(fgc * fa + bgc * (1 - fa))
+    b = jround(fb * fa + bb * (1 - fa))
+    return mask32((0xFF << 24) | (r << 16) | (g << 8) | b)
+
+# ── ۱) ثابت‌های AmberTokens ────────────────────────────────────────────────
+def load_tokens():
+    toks = {}
+    with open(os.path.join(SRC, "AmberTokens.java"), encoding="utf-8") as fh:
+        src = fh.read()
+    for m in re.finditer(r"public static final int (\w+) = (0x[0-9A-Fa-f]+);", src):
+        toks[m.group(1)] = mask32(int(m.group(2), 16))
+    for m in re.finditer(r"public static final float (\w+) = ([0-9.]+)f?;", src):
+        toks[m.group(1)] = float(m.group(2))
+    if len(toks) < 40:
+        sys.exit(f"FATAL: only {len(toks)} tokens parsed from AmberTokens.java")
+    return toks
+
+# ── ۲) تبدیل عبارت جاوا به پایتون ─────────────────────────────────────────
+def translate_ternaries(s):
+    # فقط یک سطح ternary با شرط d — اسکن دقیق مرزها با ردیابی عمق پرانتز
+    while True:
+        m = re.search(r"\bd \?", s)
+        if not m:
+            return s
+        i = m.start() + len("d ?")
+        # A: تا ' : ' هم‌سطح
+        depth = 0
+        j = i
+        while j < len(s):
+            c = s[j]
+            if c in "([":
+                depth += 1
+            elif c in ")]":
+                depth -= 1
+            elif depth == 0 and s[j:j+3] == " : ":
+                break
+            j += 1
+        if j >= len(s):
+            sys.exit(f"FATAL: ternary A-boundary not found in: {s}")
+        a_branch = s[i:j]
+        # B: تا مرز هم‌سطح (پرانتز بسته بیرونی / کاما / سمی‌کالن)
+        depth = 0
+        k = j + 3
+        while k < len(s):
+            c = s[k]
+            if c in "([":
+                depth += 1
+            elif c in ")]":
+                if depth == 0:
+                    break
+                depth -= 1
+            elif (c == "," and depth == 0) or c == ";":
+                break
+            k += 1
+        b_branch = s[j+3:k]
+        s = s[:m.start()] + f"({a_branch} if d else {b_branch})" + s[k:]
+
+def java_to_py(expr):
+    s = translate_ternaries(expr.strip())
+    s = s.replace("AmberTokens.alpha(", "f_alpha(")
+    s = s.replace("AmberTokens.over(", "f_over(")
+    s = s.replace("AmberTokens.", "")
+    s = re.sub(r"(\d+\.\d+)f", r"\1", s)  # پسوند float
+    return s
+
+# ── ۳) ارزیابی build() برای d مشخص ────────────────────────────────────────
+def eval_palette(d_value, tokens):
+    ns = dict(tokens)
+    ns["f_alpha"] = f_alpha
+    ns["f_over"] = f_over
+    ns["d"] = d_value
+    palette = {}
+    in_build = False
+    with open(os.path.join(SRC, "AmberPalette.java"), encoding="utf-8") as fh:
+        for line in fh:
+            t = line.strip()
+            if "private static Map<String, Integer> build" in t:
+                in_build = True
+                continue
+            if not in_build:
+                continue
+            if t.startswith("return m;"):
+                break
+            mloc = re.match(r"final (?:boolean|int) (\w+)\s+= (.*);$", t)
+            if mloc and mloc.group(1) != "d":
+                name, expr = mloc.group(1), java_to_py(mloc.group(2))
+                ns[name] = mask32(eval(expr, {"__builtins__": {}}, ns))
+                continue
+            mput = re.match(r'm\.put\("([^"]+)", (.*)\);$', t)
+            if mput:
+                key, expr = mput.group(1), java_to_py(mput.group(2))
+                palette[key] = mask32(eval(expr, {"__builtins__": {}}, ns))
+    if len(palette) < 400:
+        sys.exit(f"FATAL: only {len(palette)} palette entries evaluated")
+    return palette
+
+# ── ۴) فایل پایه ──────────────────────────────────────────────────────────
+def parse_theme_value(v):
+    v = v.strip()
+    if v.startswith("#"):  # #RRGGBB یا #AARRGGBB — مثل Color.parseColor
+        h = v[1:]
+        if len(h) == 6:
+            h = "FF" + h
+        return int(h, 16)
+    return int(v)
+
+def load_base(path):
+    base = {}
+    with open(path, encoding="utf-8") as fh:
+        for ln, line in enumerate(fh, 1):
+            line = line.strip()
+            if not line or "=" not in line or line.startswith(("WLS=", "WPS")):
+                continue
+            k, v = line.split("=", 1)
+            base[k] = parse_theme_value(v)
+    return base
+
+# ── ۵) تولید ──────────────────────────────────────────────────────────────
+def main():
+    if len(sys.argv) < 3:
+        sys.exit("usage: generate_amber_theme2.py night|day OUT [BASE]")
+    mode, out_path = sys.argv[1], sys.argv[2]
+    base_path = sys.argv[3] if len(sys.argv) > 3 else os.path.join(ROOT, "TMessagesProj/src/main/assets/amber.attheme")
+    d = (mode == "day")
+    tokens = load_tokens()
+    palette = eval_palette(d, tokens)
+    base = load_base(base_path)
+    merged = dict(base)
+    replaced = sum(1 for k in palette if k in merged)
+    added = sum(1 for k in palette if k not in merged)
+    merged.update(palette)
+    lines = [f"{k}={signed(merged[k])}" for k in sorted(merged)]
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    with open(out_path, "w", encoding="utf-8") as fh:
+        fh.write("\n".join(lines) + "\n")
+    # ── راستی‌آزمایی رفت‌وبرگشت ──
+    back = load_base(out_path)
+    errs = []
+    for k, v in palette.items():
+        if k not in back or mask32(back[k]) != mask32(v):
+            errs.append(k)
+    if errs:
+        sys.exit(f"FATAL: round-trip mismatch for {len(errs)} keys: {errs[:8]}")
+    print(f"OK {mode}: base={len(base)} palette={len(palette)} replaced={replaced} added={added} total={len(merged)}")
+    for k in ("windowBackgroundWhite", "chat_inBubble", "chat_outBubble", "divider", "chats_unreadCounterText"):
+        v = merged[k]
+        print(f"  {k} = 0x{mask32(v):08X}")
+
+if __name__ == "__main__":
+    main()
