@@ -1,0 +1,17 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- AmberGram UI 2.0 (قدم ۱۰): اسپلش سرد-استارت — شب گرم (توقف‌های وایپرپ شب) -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:startColor="#FF1C1710"
+                android:centerColor="#FF17130E"
+            endColor="#FF12100B"/>
+        </shape>
+    </item>
+    <item
+        android:width="150dp"
+        android:height="150dp"
+        android:gravity="center"
+        android:drawable="@drawable/splash_plane"/>
+</layer-list>

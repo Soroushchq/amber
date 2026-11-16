@@ -7,8 +7,8 @@
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:actionBarStyle">@style/ActionBar.Transparent.TMessages.Start</item>
-        <item name="android:colorBackground">@android:color/white</item>
-        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:colorBackground">@color/app_window_bg</item>
+        <item name="android:windowBackground">@drawable/splash_amber</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:textViewStyle">@style/MyTextViewStyle</item>
     </style>
@@ -18,8 +18,8 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBarOverlay">false</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:colorBackground">@android:color/white</item>
-        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:colorBackground">@color/app_window_bg</item>
+        <item name="android:windowBackground">@color/app_window_bg</item>
         <item name="android:itemTextAppearance">@style/ActionBar.Transparent.TMessages.Item</item>
         <item name="android:listViewStyle">@style/Theme.TMessages.ListView</item>
         <item name="android:listChoiceBackgroundIndicator">@drawable/list_selector_ex</item>
@@ -32,8 +32,8 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBarOverlay">false</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:colorBackground">@android:color/black</item>
-        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:colorBackground">#17130E</item>
+        <item name="android:windowBackground">#17130E</item>
         <item name="android:itemTextAppearance">@style/ActionBar.Transparent.TMessages.Item</item>
         <item name="android:listViewStyle">@style/Theme.TMessages.ListView</item>
         <item name="android:listChoiceBackgroundIndicator">@drawable/list_selector_ex</item>

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- AmberGram UI 2.0 (قدم ۱۰): رنگ‌های پنجره/اسپلش شب — مقادیر از AmberTokens -->
+    <color name="splash_bg">#17130E</color>
+    <color name="app_window_bg">#17130E</color>
     <color name="divider">#dcdcdc</color>
     <color name="widget_name">#ffffff</color>
     <color name="widget_badge">#ffffff</color>
