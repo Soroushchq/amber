@@ -123,7 +123,9 @@ public final class AmberPalette {
 
         // ── اکشن‌بار ─────────────────────────────────────────────────────────
         m.put("actionBarDefault", header);
-        m.put("actionBarDefaultIcon", text);
+        // قدم ۱۱ — آیکون‌های هدر اکسپرسیو: جوهر کم‌رنگ (dim) مثل موک کانسپت C،
+        // نه متن کامل — سلسله‌مراتب بصری: لوگو پررنگ، آیکون‌ها ثانویه.
+        m.put("actionBarDefaultIcon", dim);
         m.put("actionBarDefaultTitle", text);
         m.put("actionBarDefaultSubtitle", dim);
         m.put("actionBarDefaultSelector", AmberTokens.alpha(text, d ? 0.08f : 0.10f));
@@ -131,7 +133,7 @@ public final class AmberPalette {
         m.put("actionBarDefaultSearchPlaceholder", dim);
         m.put("actionBarDefaultSearchArchivedPlaceholder", dim);
         m.put("actionBarDefaultArchived", d ? AmberTokens.DAY_SURFACE : AmberTokens.NIGHT_WALLPAPER_TOP);
-        m.put("actionBarDefaultArchivedIcon", text);
+        m.put("actionBarDefaultArchivedIcon", dim);
         m.put("actionBarDefaultArchivedTitle", text);
         m.put("actionBarDefaultArchivedSelector", AmberTokens.alpha(text, 0.08f));
         m.put("actionBarDefaultSubmenuBackground", d ? 0xFFFFFFFF : AmberTokens.NIGHT_SURFACE);

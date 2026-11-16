@@ -5293,7 +5293,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             contentView.addView(blurredView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
         }
 
-        actionBarDefaultPaint.setColor(getThemedColor(Theme.key_windowBackgroundWhite));
+        // UI2 قدم ۱۱ — ناحیه هدر لیست چت با رنگ «کانتینر» Expressive رندر می‌شود
+        // (key_actionBarDefault = AmberTokens.DAY_HEADER #FFE9CF / NIGHT_HEADER #1F1912)
+        // نه رنگ پس‌زمینه لیست؛ تفاوت لایه‌ای هدر/لیست مثل موک کانسپت C.
+        // حالت‌های جستجو/اکشن‌مود مسیر خودشان را دارند (قدم ۱۷/۱۸).
+        actionBarDefaultPaint.setColor(getThemedColor(Theme.key_actionBarDefault));
         /*
         if (inPreviewMode) {
             final TLRPC.User currentUser = getUserConfig().getCurrentUser();
@@ -5482,10 +5486,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 }
 
                 if (folderId != 0 || communityId != 0) {
+                    // قدم ۱۱ — نگه‌داشتن کانتینر هدر حین اسلاید؛ رفتار no-op آپستریم با رنگ جدید
                     actionBarDefaultPaint.setColor(
                             ColorUtils.blendARGB(
-                                    getThemedColor(Theme.key_windowBackgroundWhite),
-                                    getThemedColor(Theme.key_windowBackgroundWhite),
+                                    getThemedColor(Theme.key_actionBarDefault),
+                                    getThemedColor(Theme.key_actionBarDefault),
                                     progress
                             )
                     );
@@ -14098,7 +14103,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     public void onThemeColorsChanged() {
         try {
             super.onThemeColorsChanged();
-            actionBarDefaultPaint.setColor(getThemedColor(Theme.key_windowBackgroundWhite));
+            // قدم ۱۱ — کانتینر هدر (نه رنگ لیست)
+            actionBarDefaultPaint.setColor(getThemedColor(Theme.key_actionBarDefault));
             cellDelegateThemeColors();
             updateExtraThemeColors();
         } catch (Exception e) {
