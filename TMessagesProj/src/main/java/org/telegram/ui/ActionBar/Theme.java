@@ -76,6 +76,7 @@ import androidx.core.math.MathUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.telegram.messenger.AmberTokens;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.Bitmaps;
@@ -4034,17 +4035,19 @@ public class Theme {
         themeInfo.previewInColor = 0xff262017;
         themeInfo.previewOutColor = 0xff5c4000;
         themeInfo.sortIndex = 0;
-        // accent id 0 == accentBaseColor, so the default state renders the
-        // amber.attheme colors exactly as authored (recolor engine skips it);
-        // firstAccentIsDefault stays false to avoid the 0x100000000L wallpaper
-        // marker which would drop key_chat_wallpaper back to the light default
+        // Amber fork: UI 2.0 — accent system (قدم ۶): the 3 seeds come straight
+        // from AmberTokens.ACCENT_NIGHT (single source of truth). Accent id 0 is
+        // the authored look: recolor engine skips it by equality (accentColor ==
+        // accentBaseColor) and zeroed wallpaper overrides leave the attheme
+        // motion-gradient wallpaper untouched. Accents 1/2 hue-shift the whole
+        // warm palette (incl. the wallpaper blobs) via Telegram's own engine.
         themeInfo.firstAccentIsDefault = false;
         themeInfo.currentAccentId = 0;
         themeInfo.setAccentColorOptions(
-                new int[]    { 0xFFF97316, 0xFFFF8C00, 0xFFEA580C },
+                AmberTokens.ACCENT_NIGHT,
                 null,
                 null,
-                new int[]    { 0xFF000000, 0xFF171309, 0xFF161006 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
                 new int[]    { 0x00000000, 0x00000000, 0x00000000 },
                 new int[]    { 0x00000000, 0x00000000, 0x00000000 },
                 new int[]    { 0x00000000, 0x00000000, 0x00000000 },
@@ -4068,16 +4071,16 @@ public class Theme {
         themeInfo.previewInColor = 0xfff1ebe1;
         themeInfo.previewOutColor = 0xffffddb8;
         themeInfo.sortIndex = 6;
-        // same accent contract as Amber: id 0 renders the authored colors and
-        // the recolor engine skips it (firstAccentIsDefault stays false to
-        // avoid the wallpaper marker dropping key_chat_wallpaper)
+        // same accent contract as Amber (قدم ۶): seeds from
+        // AmberTokens.ACCENT_DAY, id 0 renders the authored colors and leaves
+        // the wallpaper untouched (zeroed overrides), 1/2 recolor organically.
         themeInfo.firstAccentIsDefault = false;
         themeInfo.currentAccentId = 0;
         themeInfo.setAccentColorOptions(
-                new int[]    { 0xFFC25E00, 0xFFB4382C, 0xFF8C6A1D },
+                AmberTokens.ACCENT_DAY,
                 null,
                 null,
-                new int[]    { 0xFFFFFFFF, 0xFFFFF6EA, 0xFFFBEEDC },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
                 new int[]    { 0x00000000, 0x00000000, 0x00000000 },
                 new int[]    { 0x00000000, 0x00000000, 0x00000000 },
                 new int[]    { 0x00000000, 0x00000000, 0x00000000 },
