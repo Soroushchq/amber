@@ -11,8 +11,10 @@ import java.util.HashMap;
 
 public class ThemeColors {
 
-    public static final int TELEGRAM_COLOR = 0xFF229AF0;        // -14509328
-    public static final int TELEGRAM_COLOR_TEXT = 0xFF298ACF;   // -14054705
+    // AmberGram UI 2.0 (قدم ۱۰): رنگ «لوگوی» آپستریم آبی بود؛ حالا اکسنت آمبر برند است
+    // (اینتیرو، نقاط صف، پیش‌فرض‌های دیالوگ‌ها — همه از همین دو ثابت تغذیه می‌شوند)
+    public static final int TELEGRAM_COLOR = 0xFFF5A623;        // -678365
+    public static final int TELEGRAM_COLOR_TEXT = 0xFFC25E00;   // -4039168
     public static final int DEFAULT_BLACK_TEXT = 0xFF1A1D21;   // -15065823
 
     private static SparseArray<String> colorKeysMap;
