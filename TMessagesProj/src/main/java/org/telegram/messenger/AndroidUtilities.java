@@ -256,6 +256,10 @@ public class AndroidUtilities {
     public final static String TYPEFACE_ROBOTO_MONO = "fonts/rmono.ttf";
     public final static String TYPEFACE_MERRIWEATHER_BOLD = "fonts/mw_bold.ttf";
     public final static String TYPEFACE_AMBERGRAM_UI = "fonts/ambergramui.ttf";
+    /** AmberGram UI 2.0 (قدم ۹): محور وزن برند — برش‌های استاتیک همان خانواده (OFL) */
+    public final static String TYPEFACE_AMBERGRAM_UI_REGULAR = "fonts/ambergramui-regular.ttf";
+    public final static String TYPEFACE_AMBERGRAM_UI_MED = "fonts/ambergramui-med.ttf";
+    public final static String TYPEFACE_AMBERGRAM_UI_SEMIBOLD = "fonts/ambergramui-semibold.ttf";
 
     public static Typeface mediumTypeface;
     public static ThreadLocal<byte[]> readBufferLocal = new ThreadLocal<>();
@@ -290,6 +294,28 @@ public class AndroidUtilities {
             return Typeface.create(null, 500, false);
         }
         return getTypeface(TYPEFACE_ROBOTO_MEDIUM);
+    }
+
+    /**
+     * AmberGram UI 2.0 (قدم ۹): مقیاس نوع M3 روی فونت برند — دسترسی‌دهنده‌های
+     * وزن ۴۰۰/۵۰۰/۶۰۰ همان خانواده Baloo Bhaijaan 2 (مقادیر از
+     * AmberTokens.TYPE_* خوانده می‌شوند؛ مصرف تدریجی از قدم ۱۱ به بعد).
+     * bold() همان صدای برند موجود (برش ۷۰۰) می‌ماند؛ فالبک‌ها اگر asset
+     * غایب بود رفرش برند را نمی‌شکنند.
+     */
+    public static Typeface brandRegular() {
+        Typeface t = getTypeface(TYPEFACE_AMBERGRAM_UI_REGULAR);
+        return t != null ? t : bold();
+    }
+
+    public static Typeface brandMedium() {
+        Typeface t = getTypeface(TYPEFACE_AMBERGRAM_UI_MED);
+        return t != null ? t : brandRegular();
+    }
+
+    public static Typeface brandSemibold() {
+        Typeface t = getTypeface(TYPEFACE_AMBERGRAM_UI_SEMIBOLD);
+        return t != null ? t : bold();
     }
 
     private static final Hashtable<String, Typeface> typefaceCache = new Hashtable<>();
@@ -2526,6 +2552,16 @@ public class AndroidUtilities {
                     Typeface t;
                     if (Build.VERSION.SDK_INT >= 26) {
                         Typeface.Builder builder = new Typeface.Builder(ApplicationLoader.applicationContext.getAssets(), assetPath);
+                        if (assetPath.startsWith("fonts/ambergramui-")) {
+                            // قدم ۹: مپ صریح وزن برش‌های برند — قبل از قواعد substring عمومی
+                            if (assetPath.contains("-regular")) {
+                                builder.setWeight(400);
+                            } else if (assetPath.contains("-med.")) {
+                                builder.setWeight(500);
+                            } else if (assetPath.contains("-semibold")) {
+                                builder.setWeight(600);
+                            }
+                        }
                         if (assetPath.contains("rextrabold")) {
                             builder.setWeight(800);
                         }
