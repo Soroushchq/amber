@@ -16,7 +16,7 @@ public final class AmberTokens {
     private AmberTokens() {}
 
     /** نسخه سند توکن — با هر تغییر ناپایه‌ای bump می‌شود */
-    public static final String DESIGN_VERSION = "2.0-c-step1";
+    public static final String DESIGN_VERSION = "2.0-c-step9";
 
     /** رژیم تم — قدم ۴ روز/شب را در ThemeInfo جدا می‌کند */
     public static final int MODE_DAY = 0;
@@ -160,6 +160,45 @@ public final class AmberTokens {
     public static final float ELEV_FAB = 6f;
     public static final float ELEV_NAV = 8f;
     public static final float ELEV_SHEET = 16f;
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // مقیاس نوع M3 — قدم ۹ (روی فونت برند Baloo Bhaijaan 2 / AmberGram UI)
+    //
+    // هر نقش یک int[12]: [سایز، ارتفاع‌خط، ترکینگ×۱۰۰، وزن] × (بزرگ، متوسط، کوچک)
+    // واحد سایز/ارتفاع‌خط = sp، ترکینگ = ×۱۰۰sp (۵۰ یعنی ۰.۵sp)، وزن = کلاس OS/2.
+    // محور وزن برند روی همان خانواده (OFL، بدون RFN): ۴۰۰/۵۰۰/۶۰۰/۷۰۰ —
+    //   ۴۰۰ → fonts/ambergramui-regular.ttf، ۵۰۰ → ambergramui-med.ttf،
+    //   ۶۰۰ → ambergramui-semibold.ttf، ۷۰۰ → ambergramui.ttf (صدای برند موجود)
+    //   (نام فایل «med» عمداً کوتاه است تا در getTypeface به تلهٔ
+    //    contains("medium") → setWeight(700) تکان نخورد؛ مپ صریح در getTypeface)
+    //
+    // نقشه مصرف درون‌اپ (مصرف تدریجی از قدم ۱۱ / فاز ۲ به بعد):
+    //   TITLE_LARGE   → عنوان اکشن‌بار (مقصد ۲۲/۲۸)
+    //   TITLE_MEDIUM  → عنوان ردیف‌ها (۱۶/۲۴)
+    //   BODY_LARGE    → متن پیام پیش‌فرض (۱۶)
+    //   BODY_MEDIUM   → زیرعنوان ردیف‌ها (۱۴)
+    //   LABEL_MEDIUM  → زمان/بج/متادیتا (۱۲)
+    //   LABEL_LARGE   → سربرگ‌های بخش تنظیمات (۱۴)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** نمایش (Display) — لارج ۵۷/۶۴؛ مدیوم ۴۵/۵۲؛ اسمال ۳۶/۴۴ */
+    public static final int[] TYPE_DISPLAY = { 57, 64, -25, 400,  45, 52, 0, 400,  36, 44, 0, 400 };
+    /** سرفصل (Headline) — لارج ۳۲/۴۰؛ مدیوم ۲۸/۳۶؛ اسمال ۲۴/۳۲ */
+    public static final int[] TYPE_HEADLINE = { 32, 40, 0, 400,  28, 36, 0, 400,  24, 32, 0, 400 };
+    /** عنوان (Title) — لارج ۲۲/۲۸؛ مدیوم ۱۶/۲۴؛ اسمال ۱۴/۲۰ */
+    public static final int[] TYPE_TITLE = { 22, 28, 0, 400,  16, 24, 15, 500,  14, 20, 10, 500 };
+    /** متن (Body) — لارج ۱۶/۲۴؛ مدیوم ۱۴/۲۰؛ اسمال ۱۲/۱۶ */
+    public static final int[] TYPE_BODY = { 16, 24, 50, 400,  14, 20, 25, 400,  12, 16, 40, 400 };
+    /** برچسب (Label) — لارج ۱۴/۲۰؛ مدیوم ۱۲/۱۶؛ اسمال ۱۱/۱۶ */
+    public static final int[] TYPE_LABEL = { 14, 20, 10, 500,  12, 16, 50, 500,  11, 16, 50, 500 };
+
+    /** شاخص فیلد در int[12] هر نقش */
+    public static final int TYPE_SIZE = 0, TYPE_LINE = 1, TYPE_TRACK = 2, TYPE_WEIGHT = 3;
+
+    /** اندازه نمونه در نقش (۰=لارج، ۱=متوسط، ۲=اسمال) — خروجی sp */
+    public static int typeSizeSp(int[] role, int variant) {
+        return role[variant * 4 + TYPE_SIZE];
+    }
 
     // ─────────────────────────────────────────────────────────────────────────
     // هلپرها — مشتق‌گیری پالت و ممیزی WCAG (قدم ۴۵)
