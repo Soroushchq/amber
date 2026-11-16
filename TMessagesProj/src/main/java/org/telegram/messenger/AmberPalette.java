@@ -119,6 +119,7 @@ public final class AmberPalette {
         m.put("windowBackgroundChecked", accent);
         m.put("windowBackgroundUnchecked", outline);
         m.put("windowBackgroundCheckText", text);
+        m.put("divider", divider);
 
         // ── اکشن‌بار ─────────────────────────────────────────────────────────
         m.put("actionBarDefault", header);
@@ -206,7 +207,13 @@ public final class AmberPalette {
         m.put("chats_tabletSelectedOverlay", sel);
 
         // ── صفحه چت: بوم و حباب‌ها ──────────────────────────────────────────
-        m.put("chat_wallpaper", d ? AmberTokens.DAY_WALLPAPER_BOTTOM : AmberTokens.NIGHT_WALLPAPER_MID);
+        // وایپرپ گرادیانی متحرک (MotionBackgroundDrawable): پایه + سه توقف؛
+        // نام‌های عجیب chat_wallpaper_gradient_to / key_..._to2/to3 عمداً
+        // همان قرارداد ThemeColors.createColorKeysMap تلگرام است.
+        m.put("chat_wallpaper", d ? AmberTokens.DAY_WALLPAPER_TOP : AmberTokens.NIGHT_WALLPAPER_MID);
+        m.put("chat_wallpaper_gradient_to", d ? AmberTokens.DAY_WALLPAPER_BOTTOM : AmberTokens.NIGHT_WALLPAPER_TOP);
+        m.put("key_chat_wallpaper_gradient_to2", d ? AmberTokens.DAY_BG : AmberTokens.NIGHT_WALLPAPER_BOTTOM);
+        m.put("key_chat_wallpaper_gradient_to3", d ? AmberTokens.DAY_HEADER : AmberTokens.NIGHT_SURFACE);
         m.put("chat_inBubble", inBubble);
         m.put("chat_inBubbleSelected", selIn);
         m.put("chat_inBubbleSelectedOverlay", AmberTokens.alpha(0xFF000000, d ? 0.06f : 0.10f));
