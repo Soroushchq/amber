@@ -52,6 +52,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.telegram.messenger.AmberTokens;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -437,7 +438,7 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
 
         private SeekBarView sizeBar;
         private int startRadius = 0;
-        private int endRadius = 17;
+        private int endRadius = (int) AmberTokens.SHAPE_BUBBLE;
 
         private TextPaint textPaint;
 
