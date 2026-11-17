@@ -263,6 +263,20 @@ public final class AmberPalette {
         m.put("chat_wallpaper_gradient_to", d ? AmberTokens.DAY_WALLPAPER_BOTTOM : AmberTokens.NIGHT_WALLPAPER_TOP);
         m.put("key_chat_wallpaper_gradient_to2", d ? AmberTokens.DAY_BG : AmberTokens.NIGHT_WALLPAPER_BOTTOM);
         m.put("key_chat_wallpaper_gradient_to3", d ? AmberTokens.DAY_HEADER : AmberTokens.NIGHT_SURFACE);
+        // قدم ۱۹ — کلید پنجم وایپرپ (زاویه گرادیان دومرحله‌ای؛ مسیر موشن از آن استفاده نمی‌کند
+        // ولی برای کامل بودن attheme و ثبات ادیتور تم صریح شد؛ پیش‌فرض آپستریم هم ۴۵ است)
+        m.put("chat_wallpaper_gradient_rotation", 45);
+        // قدم ۱۹ — پس‌زمینه صفحه چت در حالت کم‌حجم (compact/battery-saver): قبلاً از fallback
+        // windowBackgroundWhite می‌آمد؛ حالا پایهٔ وایپرپ به‌صورت تخت = «کم‌حجم یعنی وایپرپ بدون گرادیان»
+        m.put("chat_compact_background", d ? AmberTokens.DAY_WALLPAPER_TOP : AmberTokens.NIGHT_WALLPAPER_MID);
+        // پردهٔ محو لبهٔ پایین: روز جوهر×۳٪ (گرم) / شب مشکی×۳٪ (مثل آپستریم)
+        m.put("chat_compact_backgroundGradient", AmberTokens.alpha(d ? AmberTokens.DAY_TEXT : 0xFF000000, 0.03f));
+        // قرص اکشن روی بوم کم‌حجم (چیپ سرویس/نام استیکر/ریپلای): آپستریم ۵٪ مشکی بود که
+        // روی بوم تیرهٔ شب عملاً نامرئی می‌شد ← روز جوهر×۶٪ / شب جوهر روشن×۱۰٪ (پیل تونال)
+        m.put("chat_compact_actionBackground", AmberTokens.alpha(d ? AmberTokens.DAY_TEXT : AmberTokens.NIGHT_TEXT, d ? 0.06f : 0.10f));
+        // متن/آیکون قرص: آپستریم مشکی خالص (شب روی پیل تیره نامرئی!) ← جوهر/dim
+        m.put("chat_compact_actionText", text);
+        m.put("chat_compact_actionIcon", dim);
         m.put("chat_inBubble", inBubble);
         m.put("chat_inBubbleSelected", selIn);
         m.put("chat_inBubbleSelectedOverlay", AmberTokens.alpha(0xFF000000, d ? 0.06f : 0.10f));
