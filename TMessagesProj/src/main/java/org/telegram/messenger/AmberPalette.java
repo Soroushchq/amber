@@ -136,7 +136,9 @@ public final class AmberPalette {
         m.put("actionBarDefaultArchivedIcon", dim);
         m.put("actionBarDefaultArchivedTitle", text);
         m.put("actionBarDefaultArchivedSelector", AmberTokens.alpha(text, 0.08f));
-        m.put("actionBarDefaultSubmenuBackground", d ? 0xFFFFFFFF : AmberTokens.NIGHT_SURFACE);
+        // قدم ۱۶ — روز سفید هاردکد نشتی رنگ خارج از توکن بود ← سطح گرم DAY_SURFACE؛ شب NIGHT_SURFACE حفظ
+        // سایه ۹-پیچ با MULTIPLY توسط همین رنگ تینت می‌شود → سایه گرم روز / تیره شب خودکار
+        m.put("actionBarDefaultSubmenuBackground", d ? AmberTokens.DAY_SURFACE : AmberTokens.NIGHT_SURFACE);
         m.put("actionBarDefaultSubmenuItem", text);
         m.put("actionBarDefaultSubmenuItemIcon", dim);
         m.put("actionBarDefaultSubmenuSeparator", divider);

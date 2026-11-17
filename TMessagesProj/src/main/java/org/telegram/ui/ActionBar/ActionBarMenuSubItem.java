@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import androidx.core.graphics.ColorUtils;
 
+import org.telegram.messenger.AmberTokens;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.ImageLocation;
 import org.telegram.messenger.LocaleController;
@@ -54,7 +55,7 @@ public class ActionBarMenuSubItem extends FrameLayout implements Theme.Colorable
     private android.graphics.ColorFilter appliedIconFilter;
     private Drawable appliedSelectorBackground;
 
-    int selectorRad = 12;
+    int selectorRad = (int) AmberTokens.SHAPE_MENU_ROW; // قدم ۱۶ — توکن به‌جای ۱۲ هاردکد آپستریم
     boolean top;
     boolean bottom;
 
