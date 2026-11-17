@@ -34,6 +34,7 @@ import org.telegram.SQLite.SQLiteCursor;
 import org.telegram.SQLite.SQLitePreparedStatement;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.AmberAntiAds;
+import org.telegram.messenger.AmberTokens;
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.ContactsController;
 import org.telegram.messenger.DialogObject;
@@ -2465,7 +2466,9 @@ public class DialogsSearchAdapter extends RecyclerListView.SelectionAdapter {
             button.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
             button.setText(LocaleController.getString(R.string.SearchMessagesFilterEmptySearchAll));
             ThemeBind.textColor(button, Theme.key_featuredStickers_addButton, resourcesProvider);
-            ThemeBind.selectorBackground(button, Theme.createSimpleSelectorRoundRectDrawable(6, 0, Theme.multAlpha(Theme.getColor(Theme.key_featuredStickers_addButton, resourcesProvider), .15f)), null, ThemeBind.multAlpha(Theme.key_featuredStickers_addButton, .15f), resourcesProvider);
+            // UI2 قدم ۱۷ — شعاع چیپ «جستجوی همه» از ۶px هاردکد به توکن SHAPE_BADGE (۱۲dp) بایند شد؛
+            // چیپ = خانواده بج — صدای پیل قدم ۱۴؛ روی ارتفاع ~۲۶dp عملاً پیل کامل می‌شود
+            ThemeBind.selectorBackground(button, Theme.createSimpleSelectorRoundRectDrawable(dp(AmberTokens.SHAPE_BADGE), 0, Theme.multAlpha(Theme.getColor(Theme.key_featuredStickers_addButton, resourcesProvider), .15f)), null, ThemeBind.multAlpha(Theme.key_featuredStickers_addButton, .15f), resourcesProvider);
             button.setOnClickListener(v -> onClickAll.run());
             addView(button, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 0, 0, 0, 38));
         }

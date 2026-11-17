@@ -129,7 +129,9 @@ public final class AmberPalette {
         m.put("actionBarDefaultTitle", text);
         m.put("actionBarDefaultSubtitle", dim);
         m.put("actionBarDefaultSelector", AmberTokens.alpha(text, d ? 0.08f : 0.10f));
-        m.put("actionBarDefaultSearch", fieldBg);
+        // قدم ۱۷ — متن/کرسر فیلد جستجو روی هدر: قبلاً fieldBg بود (روز سفید روی کرم FFE9CF
+        // = ۱٫۱۳:۱ و شب تیره روی تیره ≈ ۱٫۰۵:۱ = عملاً نامرئی) ← جوهر (text) هم‌زبانه actionBarDefaultTitle
+        m.put("actionBarDefaultSearch", text);
         m.put("actionBarDefaultSearchPlaceholder", dim);
         m.put("actionBarDefaultSearchArchivedPlaceholder", dim);
         m.put("actionBarDefaultArchived", d ? AmberTokens.DAY_SURFACE : AmberTokens.NIGHT_WALLPAPER_TOP);
@@ -160,6 +162,17 @@ public final class AmberPalette {
         // UI2 قدم ۱۳ — ripple پرس کارت ردیف گرم شد (اکسنت×۸٪ روز / ×۱۰٪ شب به‌جای
         // خاکستری بی‌هویت پایه) تا کارت پرس Expressive با زبان کانسپت C هم‌خوان باشد.
         m.put("listSelectorSDK21", AmberTokens.alpha(accent, d ? 0.08f : 0.10f));
+        // قدم ۱۷ — selector عمومی (کلید پیش‌فرض آپستریم 0x0f000000 سرد = نشتی خاکستری؛
+        // فقط چند سایت زنده دارد: ripple دکمه پاک‌کردن جستجو/آیکون‌های اضافه فیلد جستجو +
+        // کلیدهای fallback مثل settings/profile-tab) ← هم‌زبانه listSelectorSDK21
+        m.put("listSelector", AmberTokens.alpha(accent, d ? 0.08f : 0.10f));
+        // قدم ۱۷ — کرسر فیلد جستجوی شناور (FragmentSearchField): قبلاً F97A20 خارج از توکن
+        // (میراث پایه قدیمی) ← اکسنت؛ کنتراست روی پس‌زمینه تونال فیلد: روز ۳٫۲۸:۱ / شب ۷٫۲۸:۱
+        m.put("groupcreate_cursor", accent);
+        // قدم ۱۷ — سرستون‌های بخش‌بندی نتایج جستجو (GraySectionCell): قبلاً 121213 سرد
+        // (روز تقریباً مشکی روی لیست روشن = شکاف هویتی) ← سطح گرم surface + متن dim
+        m.put("graySection", surface);
+        m.put("graySectionText", dim);
         m.put("chats_name", text);
         m.put("chats_nameMessage", dim);
         m.put("chats_nameMessage_threeLines", dim);
