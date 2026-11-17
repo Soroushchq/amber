@@ -42,6 +42,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.graphics.ColorUtils;
 
+import org.telegram.messenger.AmberTokens;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BotWebViewVibrationEffect;
 import org.telegram.messenger.ChatObject;
@@ -976,7 +977,7 @@ public class ItemOptions {
 
     public ItemOptions addProfile(TLObject obj, CharSequence subtitle, Runnable onClickListener) {
         final FrameLayout userButton = new FrameLayout(context);
-        ThemeBind.selectorBackground(userButton, Theme.createRadSelectorDrawable(Theme.getColor(Theme.key_listSelector, resourcesProvider), 0, 12), null, ThemeBind.of(Theme.key_listSelector), resourcesProvider);
+        ThemeBind.selectorBackground(userButton, Theme.createRadSelectorDrawable(Theme.getColor(Theme.key_listSelector, resourcesProvider), 0, (int) AmberTokens.SHAPE_MENU_ROW), null, ThemeBind.of(Theme.key_listSelector), resourcesProvider);
 
         final BackupImageView imageView = new BackupImageView(context);
         imageView.setRoundRadius(dp(17));
@@ -1017,7 +1018,7 @@ public class ItemOptions {
 
     public ItemOptions addProfileCustom(TLObject obj, CharSequence text, Runnable onClickListener) {
         final FrameLayout userButton = new FrameLayout(context);
-        ThemeBind.selectorBackground(userButton, Theme.createRadSelectorDrawable(Theme.getColor(Theme.key_listSelector, resourcesProvider), 0, 12), null, ThemeBind.of(Theme.key_listSelector), resourcesProvider);
+        ThemeBind.selectorBackground(userButton, Theme.createRadSelectorDrawable(Theme.getColor(Theme.key_listSelector, resourcesProvider), 0, (int) AmberTokens.SHAPE_MENU_ROW), null, ThemeBind.of(Theme.key_listSelector), resourcesProvider);
 
         final BackupImageView imageView = new BackupImageView(context);
         imageView.setRoundRadius(dp(17));
@@ -1315,18 +1316,18 @@ public class ItemOptions {
                 final View first = popupLayout.getItemAt(0);
                 final View last = popupLayout.getItemAt(popupLayout.getItemsCount() - 1);
                 if (first instanceof ActionBarMenuSubItem) {
-                    ((ActionBarMenuSubItem) first).updateSelectorBackground(true, first == last, 12);
+                    ((ActionBarMenuSubItem) first).updateSelectorBackground(true, first == last, (int) AmberTokens.SHAPE_MENU_ROW);
                 } else if (first instanceof MessagePreviewView.ToggleButton || first instanceof FrameLayout) {
-                    ThemeBind.selectorBackground(first, Theme.createRadSelectorDrawable(Theme.getColor(Theme.key_dialogButtonSelector, resourcesProvider), 12, first == last ? 12 : 0), null, ThemeBind.of(Theme.key_dialogButtonSelector), resourcesProvider);
+                    ThemeBind.selectorBackground(first, Theme.createRadSelectorDrawable(Theme.getColor(Theme.key_dialogButtonSelector, resourcesProvider), (int) AmberTokens.SHAPE_MENU_ROW, first == last ? (int) AmberTokens.SHAPE_MENU_ROW : 0), null, ThemeBind.of(Theme.key_dialogButtonSelector), resourcesProvider);
                 } else if (first != null && first.getBackground() instanceof RippleDrawable) {
-                    ThemeBind.selectorBackground(first, Theme.createRadSelectorDrawable(Theme.getColor(Theme.key_dialogButtonSelector, resourcesProvider), 12, first == last ? 12 : 0), null, ThemeBind.of(Theme.key_dialogButtonSelector), resourcesProvider);
+                    ThemeBind.selectorBackground(first, Theme.createRadSelectorDrawable(Theme.getColor(Theme.key_dialogButtonSelector, resourcesProvider), (int) AmberTokens.SHAPE_MENU_ROW, first == last ? (int) AmberTokens.SHAPE_MENU_ROW : 0), null, ThemeBind.of(Theme.key_dialogButtonSelector), resourcesProvider);
                 }
                 if (last instanceof ActionBarMenuSubItem) {
-                    ((ActionBarMenuSubItem) last).updateSelectorBackground(last == first, true, 12);
+                    ((ActionBarMenuSubItem) last).updateSelectorBackground(last == first, true, (int) AmberTokens.SHAPE_MENU_ROW);
                 } else if (last instanceof MessagePreviewView.ToggleButton || last instanceof FrameLayout) {
-                    ThemeBind.selectorBackground(last, Theme.createRadSelectorDrawable(Theme.getColor(Theme.key_dialogButtonSelector, resourcesProvider), first == last ? 12 : 0, 12), null, ThemeBind.of(Theme.key_dialogButtonSelector), resourcesProvider);
+                    ThemeBind.selectorBackground(last, Theme.createRadSelectorDrawable(Theme.getColor(Theme.key_dialogButtonSelector, resourcesProvider), first == last ? (int) AmberTokens.SHAPE_MENU_ROW : 0, (int) AmberTokens.SHAPE_MENU_ROW), null, ThemeBind.of(Theme.key_dialogButtonSelector), resourcesProvider);
                 } else if (last != null && last.getBackground() instanceof RippleDrawable) {
-                    ThemeBind.selectorBackground(last, Theme.createRadSelectorDrawable(Theme.getColor(Theme.key_dialogButtonSelector, resourcesProvider), first == last ? 12 : 0, 12), null, ThemeBind.of(Theme.key_dialogButtonSelector), resourcesProvider);
+                    ThemeBind.selectorBackground(last, Theme.createRadSelectorDrawable(Theme.getColor(Theme.key_dialogButtonSelector, resourcesProvider), first == last ? (int) AmberTokens.SHAPE_MENU_ROW : 0, (int) AmberTokens.SHAPE_MENU_ROW), null, ThemeBind.of(Theme.key_dialogButtonSelector), resourcesProvider);
                 }
             }
         }
