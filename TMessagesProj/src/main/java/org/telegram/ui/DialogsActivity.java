@@ -98,6 +98,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import org.telegram.messenger.AccountInstance;
+import org.telegram.messenger.AmberTokens;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.AnimationNotificationsLocker;
 import org.telegram.messenger.ApplicationLoader;
@@ -3988,6 +3989,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             viewPage.listView.setAnimateEmptyView(true, RecyclerListView.EMPTY_VIEW_ANIMATION_TYPE_ALPHA);
             viewPage.listView.setClipToPadding(false);
             viewPage.listView.setPivotY(0);
+            // UI2 قدم ۱۳ — ردیف‌های چت به‌صورت کارت: ripple پرس با ماسک رادیوس توکن SHAPE_CARD
+            // (۲۰dp) به‌جای لبه‌مربعی تمام‌عرض آپستریم؛ با فاصله‌گذاری استاندارد تلگرام
+            // (بدون حاشیه اضافه). با تغییر تم، اسلات listSelectorColor خودش بازمی‌سازد.
+            viewPage.listView.setSelectorRadius(dp((int) AmberTokens.SHAPE_CARD));
+            viewPage.listView.setSelectorDrawableColor(viewPage.listView.getSelectorDrawableColor());
             if (initialDialogsType == DIALOGS_TYPE_BOT_REQUEST_PEER) {
                 ThemeBind.backgroundColor(viewPage.listView, Theme.key_windowBackgroundGray, getResourceProvider());
             }

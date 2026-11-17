@@ -156,6 +156,9 @@ public final class AmberPalette {
         m.put("actionBarActionModeReactionDot", accent);
 
         // ── لیست چت ──────────────────────────────────────────────────────────
+        // UI2 قدم ۱۳ — ripple پرس کارت ردیف گرم شد (اکسنت×۸٪ روز / ×۱۰٪ شب به‌جای
+        // خاکستری بی‌هویت پایه) تا کارت پرس Expressive با زبان کانسپت C هم‌خوان باشد.
+        m.put("listSelectorSDK21", AmberTokens.alpha(accent, d ? 0.08f : 0.10f));
         m.put("chats_name", text);
         m.put("chats_nameMessage", dim);
         m.put("chats_nameMessage_threeLines", dim);
