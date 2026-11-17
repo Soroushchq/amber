@@ -1120,7 +1120,9 @@ public class ProfileSearchCell extends BaseCell implements NotificationCenter.No
             final float s = openButtonBounce.getScale(.06f);
             canvas.scale(s, s, openButtonRect.centerX(), openButtonRect.centerY());
             canvas.drawRoundRect(openButtonRect, openButtonRect.height() / 2.0f, openButtonRect.height() / 2.0f, openButtonBackgroundPaint);
-            openButtonText.draw(canvas, x + dp(14), getHeight() / 2.0f, 0xFFFFFFFF, 1.0f);
+            // UI2 قدم ۱۷ — متن دکمه Open روی پس‌زمینه اکسنت از سفید هاردکد به روی‌اکسنت بایند شد؛
+            // شب سفید روی اکسنت روشن ۲٫۰۳:۱ بود (نامракт) — کلید قدم ۱۵ add_buttonIcon = onAccent
+            openButtonText.draw(canvas, x + dp(14), getHeight() / 2.0f, Theme.getColor(Theme.key_featuredStickers_addButtonIcon, resourcesProvider), 1.0f);
             canvas.restore();
         }
     }
