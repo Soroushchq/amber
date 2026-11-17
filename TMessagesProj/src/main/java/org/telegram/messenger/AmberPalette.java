@@ -277,6 +277,22 @@ public final class AmberPalette {
         // متن/آیکون قرص: آپستریم مشکی خالص (شب روی پیل تیره نامرئی!) ← جوهر/dim
         m.put("chat_compact_actionText", text);
         m.put("chat_compact_actionIcon", dim);
+        // قدم ۲۰ — زنجیرهٔ حباب ورودی در حالت کم‌حجم (میراث قدم ۱۹): ۵ کلید `chat_compact_in*`
+        // آپستریم سرد بودند (خاکستری 0x80A1AAB3 / جوهر سرد 1A1D21) و مدت‌ها هیچ‌کدام در پالت نبودند؛
+        // صدای هر کلید از منبع mapCompact همان کلید عادی کپی شد:
+        m.put("chat_compact_inTimeText", time);
+        // ساعت/بازدیدها: آپستریم نیمه‌شفاف سرد (روی کاغذ روز ~۱٫۴:۱) ← «زمان» حباب جامد
+        // (بوم کم‌حجم تخت است؛ ترکیب OVER_BACKGROUND با رنگ جامد = هویت)
+        m.put("chat_compact_inAudioDuration", dim);
+        // مدت صدا: هم‌صدای chat_inAudioDurationText
+        m.put("chat_compact_inWaveform", accent);
+        // پر موج صدا: هم‌صدای chat_inVoiceSeekbarFill
+        m.put("chat_compact_inWaveformBackground", AmberTokens.alpha(inText, d ? 0.30f : 0.35f));
+        // بسترهٔ موج: آپستریم ۳۰٪ جوهر سرد (شب روی بوم تیره نامرئی بود) ← جوهر×۳۰٪ روز / ×۳۵٪ شب
+        m.put("chat_compact_inTranscribeButton", accent);
+        // دکمهٔ پیاده‌سازی صدا: آپستریم سرد جامد 1A1D21 بود؛ این کلید فقط برای دکمهٔ پیاده‌سازی
+        // مصرف می‌شود ولی setColor آن رنگ را «رنگ اصلی دکمه» می‌گیرد (آیکون = خودِ رنگ، بستره = ×۱۵٫۶٪) —
+        // پس اکسنت جامد (آیکون روی بوم کم‌حجم ۴٫۰۱/۹٫۱۲) نه نسخهٔ شفاف
         m.put("chat_inBubble", inBubble);
         m.put("chat_inBubbleSelected", selIn);
         m.put("chat_inBubbleSelectedOverlay", AmberTokens.alpha(0xFF000000, d ? 0.06f : 0.10f));
@@ -357,9 +373,15 @@ public final class AmberPalette {
         m.put("chat_inArticleDetailsLine", outline);
         m.put("chat_inPollCorrectAnswer", green);
         m.put("chat_inPollWrongAnswer", red);
-        m.put("chat_inReactionButtonBackground", AmberTokens.alpha(accent, d ? 0.10f : 0.12f));
+        m.put("chat_inReactionButtonBackground", accent);
+        // قدم ۲۰ — آپستریم جامد است (TELEGRAM_COLOR) و مصرف‌کننده‌ها خودشان آلفا می‌سازند:
+        // چیپ ری‌اکشن غیرانتخاب‌شده ×۰٫۱۵۶، چیپ انتخاب‌شده جامد، transcribe آیکون جامد/بستره ×۰٫۱۵۶،
+        // ReactionTabHolderView غیرانتخاب‌شده ۰x10 و TopicsSidePanel/TopicButton/SearchTagsList جامد یا آلفای خودشان —
+        // مقدار قبلی (اکسنت×۱۰٪) همهٔ این‌ها را تقریباً نامرئی می‌کرد (چیپ ۱٫۶٪!)
         m.put("chat_inReactionButtonText", accent);
-        m.put("chat_inReactionButtonTextSelected", accent);
+        // متن چیپ غیرانتخاب‌شده روی تینت اکسنت (هم‌صدای آپستریم TELEGRAM_COLOR_TEXT)
+        m.put("chat_inReactionButtonTextSelected", onAccent);
+        // قدم ۲۰ — متن روی چیپ انتخاب‌شدهٔ جامد اکسنت: آپستریم سفید؛ شب اکسنت روشن با سفید ۲٫۰۳:۱ ← onAccent (۴٫۲۹/۷٫۲۳)
         m.put("chat_inQuote", AmberTokens.alpha(inText, d ? 0.10f : 0.12f));
         m.put("chat_inViews", dim);
         m.put("chat_inViewsSelected", dim);
