@@ -173,6 +173,21 @@ public final class AmberPalette {
         // (روز تقریباً مشکی روی لیست روشن = شکاف هویتی) ← سطح گرم surface + متن dim
         m.put("graySection", surface);
         m.put("graySectionText", dim);
+        // قدم ۱۸ — خانواده سوییچ/چک‌باکس انتخاب (حالت انتخاب/آرشیو و سوییچ‌های عمومی):
+        // switch2Track قبلاً در روز قرمز آپستریم (F57480) و شب خاکستری سرد (3A3A3E) بود ← هم‌زبانه switchTrack
+        // switch2TrackChecked در روز آبی آپستریم (229AF0) و شب F97316 خارج‌ازتوکن بود ← اکسنت
+        // (سوییچ متن‌دار TextCheckCell2/UniversalAdapter/چیپ‌های چک‌باکس)
+        m.put("switch2Track", d ? 0xFFDCCFB8 : AmberTokens.NIGHT_OUTLINE);
+        m.put("switch2TrackChecked", accent);
+        // متن فرعی ردیف‌های منوی اکشن‌مود (ActionBarMenuSubItem.subtextView): خاکستری سرد آپستریم 7C8288 روی
+        // کارت گرم قدم ۱۶ ← dim (کنتراست ۴٫۳۴/۶٫۲۰)
+        m.put("groupcreate_sectionText", dim);
+        // پس‌زمینه چیپ‌های فیلتر جستجو (ActionBarMenuItem.SearchFilterView): خاکستری سرد F2F2F2/1D1D21 ← سطح گرم
+        m.put("groupcreate_spanBackground", surface);
+        // متن/آیکون روی اکسنت (چیپ انتخاب‌شده فیلتر + آواتار ترکیبی): سفید هاردکد آپستریم — شب روی اکسنت روشن ۲٫۰۳:۱ ← onAccent
+        m.put("featuredStickers_buttonText", onAccent);
+        // دستگیره انتخاب متن فیلد جستجو: آبی آپستریم روز (63C8FF) و F97316 شب ← اکسنت (۴٫۰۸/۸٫۷۹)
+        m.put("chat_TextSelectionCursor", accent);
         m.put("chats_name", text);
         m.put("chats_nameMessage", dim);
         m.put("chats_nameMessage_threeLines", dim);
