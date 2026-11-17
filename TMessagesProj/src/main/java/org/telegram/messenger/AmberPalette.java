@@ -88,6 +88,9 @@ public final class AmberPalette {
         final int deepFile = d ? 0xFFF7E3C8 : 0xFF2E2618;
         final int outDim = AmberTokens.alpha(outText, 0.65f);
         final int outTime = d ? 0xFFA8701E : 0xFFD9BC7A;
+        // قدم ۲۱ — تیک خوانده‌شدهٔ حباب خروجی: روز accentBright (E8871E) روی حباب FFDDB8 فقط ۲٫۰۶:۱ بود
+        // ← «کهربای برشته» 9C5200 (۴٫۵۰:۱؛ از تیک ارسال اکسنت C25E00 عمیق‌تر و متمایز)؛ شب accentBright سالم است (۵٫۵۸)
+        final int sentCheckRead = d ? 0xFF9C5200 : AmberTokens.NIGHT_ACCENT_BRIGHT;
         final int red = d ? 0xFFB4382C : 0xFFFF6E54;
         final int green = d ? 0xFF3D7A2B : 0xFF7DBE72;
 
@@ -293,6 +296,39 @@ public final class AmberPalette {
         // دکمهٔ پیاده‌سازی صدا: آپستریم سرد جامد 1A1D21 بود؛ این کلید فقط برای دکمهٔ پیاده‌سازی
         // مصرف می‌شود ولی setColor آن رنگ را «رنگ اصلی دکمه» می‌گیرد (آیکون = خودِ رنگ، بستره = ×۱۵٫۶٪) —
         // پس اکسنت جامد (آیکون روی بوم کم‌حجم ۴٫۰۱/۹٫۱۲) نه نسخهٔ شفاف
+        // قدم ۲۱ — زنجیرهٔ کم‌حجم حباب خروجی: ۱۲ کلید `chat_compact_out*` + ۴ کلید چیپ ری‌اکشن + آیکون دکمهٔ کناری
+        // همگی آپستریم سرد بودند (خاکستری 808384 / جوهر سرد 1A1D21) و در پالت نبودند؛ صدای هر کلید از منبع
+        // mapCompact همان کلید عادی کپی شد (میراث قدم ۱۹/۲۰):
+        // بستر حباب خروجی کم‌حجم: آپستریم 0F000000 (۹٪ مشکی سرد) ← حباب خروجیِ هموار روی بوم تخت؛
+        // روز outBubble×۸۵٪ = FFE1BF (جدایی از بوم ۱٫۱۷ ≈ جدایی آپستریم؛ از حباب ورودی ۱٫۰۶) / شب ×۵۵٪ = 3D2C06 (۱٫۲۰ از ورودی)
+        m.put("chat_compact_outBackground", AmberTokens.over(outBubble, d ? AmberTokens.DAY_WALLPAPER_TOP : AmberTokens.NIGHT_WALLPAPER_MID, d ? 0.85f : 0.55f));
+        // ساعت/بازدیدهای خروجی: هم‌صدای chat_outTimeText (روی بستر کم‌حجم ۳٫۵۴/۷٫۳۲)
+        m.put("chat_compact_outTimeText", outTime);
+        // تیک ارسال: هم‌صدای chat_outSentCheck = اکسنت (۳٫۶۲/۶٫۶۴ روی بستر)
+        m.put("chat_compact_outCheck", accent);
+        // ریپلای خروجی: بسترهٔ تینت اکسنت×۱۰٪ + خط و متن هم‌صدای عادی (متن روی بستر+tint ~۱۳/۱۰)
+        m.put("chat_compact_outReplyBackground", AmberTokens.alpha(accent, 0.10f));
+        m.put("chat_compact_outReplyLine", accent);
+        m.put("chat_compact_outReplyText", outText);
+        // اکسنت خروجی (نام فوروارد/از طریق بات/سایت/منو/کوت/ادمین) و پرکننده (لودر/سیکبار صدا): اکسنت
+        m.put("chat_compact_outAccent", accent);
+        m.put("chat_compact_outAccentFill", accent);
+        // آیکون روی پرکنندهٔ اکسنت (دایرهٔ پیشرفت فایل/تماس): onAccent — هم‌الگوی قدم ۱۵/۱۷ (۴٫۲۹/۷٫۲۳)
+        m.put("chat_compact_outAccentIcon", onAccent);
+        // متن ثانویهٔ خروجی (حجم فایل/مدت صدا): هم‌صدای outTime (۳٫۳۸/۷٫۳۲ — آپستریم 808384 حدود ۲٫۸ بود)
+        m.put("chat_compact_outSecondaryText", outTime);
+        // تراک سیکبار صوتی/فایل: جوهر×۲۲٪ روز / ×۲۰٪ شب روی بستر کم‌حجم؛ پر = اکسنت
+        m.put("chat_compact_outAccentLight", AmberTokens.alpha(outText, d ? 0.22f : 0.20f));
+        // بوردر جدول و جداکنندهٔ خروجی: جوهر×۲۵٪ روز / ×۳۰٪ شب (روی بستر ۱٫۶۵/۲٫۲۸)
+        m.put("chat_compact_outAccentBorder", AmberTokens.alpha(outText, d ? 0.25f : 0.30f));
+        // چیپ ری‌اکشن در حالت کم‌حجم (ورودی/خروجی مشترک؛ under = بستر حباب خودش): بسترهٔ اکسنت×۱۲٪ (متن ۳٫۴۷/۷٫۳۶)
+        m.put("chat_compact_reactionBackground", AmberTokens.alpha(accent, 0.12f));
+        m.put("chat_compact_reactionText", accent);
+        // چیپ انتخاب‌شده = قرص اکسنت جامد + onAccent (۴٫۲۹/۷٫۲۳ — هم‌الگوی قدم ۱۵/۱۷/۲۰)
+        m.put("chat_compact_reactionBackgroundSelected", accent);
+        m.put("chat_compact_reactionTextSelected", onAccent);
+        // آیکون دکمهٔ پیاده‌سازی صدا در کم‌حجم (blend به رنگ اصلی دکمه در ChatMessageAudio): اکسنت — هم‌صدای inTranscribeButton قدم ۲۰
+        m.put("chat_compact_sideButtonIcon", accent);
         m.put("chat_inBubble", inBubble);
         m.put("chat_inBubbleSelected", selIn);
         m.put("chat_inBubbleSelectedOverlay", AmberTokens.alpha(0xFF000000, d ? 0.06f : 0.10f));
@@ -454,20 +490,28 @@ public final class AmberPalette {
         m.put("chat_outArticleDetailsLine", AmberTokens.alpha(outText, 0.30f));
         m.put("chat_outPollCorrectAnswer", d ? 0xFF3D7A2B : 0xFF9BC77E);
         m.put("chat_outPollWrongAnswer", d ? 0xFFB4382C : 0xFFFF8A75);
-        m.put("chat_outReactionButtonBackground", AmberTokens.alpha(outText, d ? 0.10f : 0.14f));
+        // قدم ۲۱ — رفع هم‌الگوی قدم ۲۰ (سمت خروجی): بسترهٔ چیپ ری‌اکشن خروجی آپستریم «جامد» است (78c272 سبز) و
+        // مصرف‌کننده‌ها خودشان آلفا می‌سازند (چیپ غیرانتخاب‌شده ×۰٫۱۵۶ در ReactionsLayoutInBubble، تاپیک آلفا۳۸ در
+        // MessageTopicButton، blend رنگ اصلی transcribe در ChatMessageAudio، اوورلی ReactionsEffectOverlay) —
+        // مقدار قبلی (اکسنت×۱۰٪) بعد از ضرب ۰٫۱۵۶ چیپ را ~۱٪ می‌کرد ← اکسنت جامد (هم‌الگوی chat_inReactionButtonBackground قدم ۲۰)
+        m.put("chat_outReactionButtonBackground", accent);
         m.put("chat_outReactionButtonText", accent);
-        m.put("chat_outReactionButtonTextSelected", accent);
+        // متن چیپ انتخاب‌شده روی قرص اکسنت جامد از اکسنت بود (روی اکسنت نامرئی!) ← onAccent (۴٫۲۹/۷٫۲۳)
+        m.put("chat_outReactionButtonTextSelected", onAccent);
         m.put("chat_outQuote", AmberTokens.alpha(outText, 0.12f));
         m.put("chat_outViews", outDim);
         m.put("chat_outViewsSelected", outDim);
         m.put("chat_outSentCheck", accent);
-        m.put("chat_outSentCheckRead", accentBright);
+        // قدم ۲۱ — روز از accentBright (روی حباب FFDDB8 فقط ۲٫۰۶:۱) به sentCheckRead؛ شب همان accentBright (۵٫۵۸)
+        m.put("chat_outSentCheckRead", sentCheckRead);
         m.put("chat_outSentCheckSelected", accent);
-        m.put("chat_outSentCheckReadSelected", accentBright);
+        m.put("chat_outSentCheckReadSelected", sentCheckRead);
         m.put("chat_outSentClock", AmberTokens.alpha(outText, 0.60f));
         m.put("chat_outSentClockSelected", AmberTokens.alpha(outText, 0.60f));
         m.put("chat_outAdminText", AmberTokens.alpha(outText, 0.60f));
         m.put("chat_outAdminSelectedText", AmberTokens.alpha(outText, 0.60f));
+        // قدم ۲۱ — لینک داخل حباب خروجی: آپستریم آبی 2678b6 خارج‌ازتوکن بود و اصلاً در پالت نبود ← اکسنت
+        m.put("chat_messageLinkOut", accent);
         m.put("chat_outLinkSelectBackground", AmberTokens.alpha(accent, 0.25f));
         m.put("chat_outTextSelectionCursor", accent);
         m.put("chat_outTextSelectionHighlight", AmberTokens.alpha(accent, 0.30f));
