@@ -59,6 +59,7 @@ public final class AmberPalette {
         // ── اتم‌ها ───────────────────────────────────────────────────────────
         final int text = d ? AmberTokens.DAY_TEXT : AmberTokens.NIGHT_TEXT;
         final int dim = d ? AmberTokens.DAY_TEXT_DIM : AmberTokens.NIGHT_TEXT_DIM;
+        final int navPill = d ? AmberTokens.DAY_NAV_PILL : AmberTokens.NIGHT_NAV_PILL;
         final int time = d ? AmberTokens.DAY_TIME : AmberTokens.NIGHT_TIME;
         final int accent = d ? AmberTokens.DAY_ACCENT : AmberTokens.NIGHT_ACCENT;
         final int accentBright = d ? AmberTokens.DAY_ACCENT_BRIGHT : AmberTokens.NIGHT_ACCENT_BRIGHT;
@@ -140,9 +141,9 @@ public final class AmberPalette {
         m.put("actionBarDefaultSubmenuItem", text);
         m.put("actionBarDefaultSubmenuItemIcon", dim);
         m.put("actionBarDefaultSubmenuSeparator", divider);
-        m.put("actionBarTabActiveText", accent);
+        m.put("actionBarTabActiveText", outText);
         m.put("actionBarTabUnactiveText", dim);
-        m.put("actionBarTabLine", accent);
+        m.put("actionBarTabLine", navPill);
         m.put("actionBarTabSelector", AmberTokens.alpha(accent, 0.10f));
         m.put("actionBarWhiteSelector", AmberTokens.alpha(accent, 0.12f));
         m.put("actionBarBrowser", bg);

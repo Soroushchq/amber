@@ -1509,7 +1509,9 @@ public class FilterTabsView extends FrameLayout {
 
             final int y = height / 2 - dp(14);
             selectorDrawable.setBounds((int) (indicatorX - dp(TAB_INTERNAL_PADDING) - add), y, (int) (indicatorX + indicatorWidth + dp(TAB_INTERNAL_PADDING) + add), y + dp(28));
-            selectorDrawable.setAlpha(31);
+            // UI2 قدم ۱۲ — پیل شناور فعال Expressive: آلفای ۳۱ آپستریم حذف شد تا پیل با رنگ کامل
+            // key_actionBarTabLine (= AmberTokens.DAY_NAV_PILL #FFDDB8 روز / NIGHT_NAV_PILL #5C4000 شب) رندر شود؛
+            // فِیدِ 255×listView.getAlpha() که بالای متد ست شده حفظ می‌ماند.
             selectorDrawable.draw(canvas);
             canvas.restore();
         }
