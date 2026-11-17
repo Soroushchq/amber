@@ -7,10 +7,13 @@ import static org.telegram.messenger.AndroidUtilities.lerp;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Outline;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewOutlineProvider;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
@@ -19,8 +22,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RawRes;
 
+import org.telegram.messenger.AmberTokens;
 import org.telegram.messenger.LocaleController;
-import org.telegram.messenger.utils.ViewOutlineProviderImpl;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable;
 import org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundColorProviderThemed;
@@ -71,8 +74,18 @@ public class FragmentFloatingButton extends FrameLayout implements FactorAnimato
 
         ScaleStateListAnimator.apply(this);
         if (!isSubButton) {
-            setOutlineProvider(ViewOutlineProviderImpl.BOUNDS_OVAL);
+            // UI2 قدم ۱۵ — فرم Expressive فاب: outline مستطیل‌گرد با شعاع توکن SHAPE_FAB
+            // (۲۰dp؛ آپستریم دایره کامل BOUNDS_OVAL بود) + ارتفاع سایه از توکن ELEV_FAB
+            // (۶dp) + تینت آمبر سایه (روز اکسنت گرم ×۳۰٪ / شب خنثی ×۴۵٪) روی API 28+.
+            setOutlineProvider(new ViewOutlineProvider() {
+                @Override
+                public void getOutline(View view, Outline outline) {
+                    outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), dp((int) AmberTokens.SHAPE_FAB));
+                }
+            });
+            setElevation(dp((int) AmberTokens.ELEV_FAB));
             setTranslationZ(dpf2(0.5f));
+            applyAmberShadowTint();
         }
 
         if (isSubButton) {
@@ -148,6 +161,19 @@ public class FragmentFloatingButton extends FrameLayout implements FactorAnimato
     private BlurredBackgroundDrawable iBlur3Background;
     private BlurredBackgroundColorProviderThemed iBlur3ColorProviderTabs;
 
+    /** UI2 قدم ۱۵ — تینت سایه فاب از توکن‌ها؛ در updateColors هم صدا می‌شود تا سوییچ روز/شب اعمال شود */
+    private void applyAmberShadowTint() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+            return;
+        }
+        final boolean dark = resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark();
+        final int shadow = dark
+                ? AmberTokens.alpha(AmberTokens.NIGHT_SHADOW_TINT, AmberTokens.NIGHT_SHADOW_ALPHA)
+                : AmberTokens.alpha(AmberTokens.DAY_SHADOW_TINT, AmberTokens.DAY_SHADOW_ALPHA);
+        setOutlineAmbientShadowColor(shadow);
+        setOutlineSpotShadowColor(shadow);
+    }
+
     private Drawable themedBackground;
     private int themedIconColor;
     private boolean themedIconColorSet;
@@ -190,13 +216,18 @@ public class FragmentFloatingButton extends FrameLayout implements FactorAnimato
                 setBackground(themedBackground = Theme.createInsetRoundRectDrawable(themedBackgroundPressedColor = pressedColor, rad, dp(6)));
             }
         } else {
-            final int iconColor = Theme.getColor(Theme.key_chats_actionIcon, resourcesProvider);
+            // UI2 قدم ۱۵ — فاب Expressive: پس‌زمینه ← featuredStickers_addButton (توکن accent؛
+            // روز تا امروز نشتی آبی 4DA0EB و شب F97316 خارج از توکن بود)، پرس = over(accent،
+            // onAccent، ۲۰٪)، جوهر آیکون = کلید جدید featuredStickers_addButtonIcon (onAccent؛
+            // chats_actionIcon دست‌نخورده ماند تا فاب‌های کلاسیک با پس‌زمینه deepFile سالم بمانند)
+            // و فرم مربع‌گرد از SHAPE_FAB به‌جای دایره. سایه آمبر هم رفرش می‌شود.
+            final int iconColor = Theme.getColor(Theme.key_featuredStickers_addButtonIcon, resourcesProvider);
             if (iconColor != themedIconColor || !themedIconColorSet) {
                 themedIconColor = iconColor;
                 themedIconColorSet = true;
                 imageView.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
             }
-            progressView.setProgressColor(Theme.getColor(Theme.key_chats_actionIcon, resourcesProvider));
+            progressView.setProgressColor(Theme.getColor(Theme.key_featuredStickers_addButtonIcon, resourcesProvider));
             final int color = Theme.getColor(Theme.key_featuredStickers_addButton, resourcesProvider);
             final int pressedColor = Theme.getColor(Theme.key_featuredStickers_addButtonPressed, resourcesProvider);
             if (recolorBackground) {
@@ -210,8 +241,9 @@ public class FragmentFloatingButton extends FrameLayout implements FactorAnimato
             } else {
                 themedBackgroundColor = color;
                 themedBackgroundPressedColor = pressedColor;
-                setBackground(themedBackground = Theme.createSimpleSelectorCircleDrawable(dp(48), color, pressedColor));
+                setBackground(themedBackground = Theme.createSimpleSelectorRoundRectDrawable(dp((int) AmberTokens.SHAPE_FAB), color, pressedColor));
             }
+            applyAmberShadowTint();
         }
     }
 

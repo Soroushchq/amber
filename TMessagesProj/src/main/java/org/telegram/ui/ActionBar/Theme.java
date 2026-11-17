@@ -3305,6 +3305,8 @@ public class Theme {
     public static final int key_featuredStickers_addButton = colorsCount++;
     public static final int key_featuredStickers_addButton2 = colorsCount++;
     public static final int key_featuredStickers_addButtonPressed = colorsCount++;
+    // UI2 قدم ۱۵ — جوهر آیکون فاب Expressive روی featuredStickers_addButton (توکن onAccent)
+    public static final int key_featuredStickers_addButtonIcon = colorsCount++;
     public static final int key_featuredStickers_removeButtonText = colorsCount++;
     public static final int key_featuredStickers_buttonText = colorsCount++;
     public static final int key_featuredStickers_unread = colorsCount++;

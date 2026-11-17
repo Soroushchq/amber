@@ -16,7 +16,7 @@ public final class AmberTokens {
     private AmberTokens() {}
 
     /** نسخه سند توکن — با هر تغییر ناپایه‌ای bump می‌شود */
-    public static final String DESIGN_VERSION = "2.0-c-step14";
+    public static final String DESIGN_VERSION = "2.0-c-step15";
 
     /** رژیم تم — قدم ۴ روز/شب را در ThemeInfo جدا می‌کند */
     public static final int MODE_DAY = 0;
@@ -133,7 +133,7 @@ public final class AmberTokens {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Shape — Expressive Material (حباب ۲۶، کارت ۲۰، پیل ۳۲، دیالوگ ۲۸، فیلد ۱۶، بج ۱۲)
+    // Shape — Expressive Material (حباب ۲۶، کارت ۲۰، پیل ۳۲، دیالوگ ۲۸، فیلد ۱۶، بج ۱۲، فاب ۲۰)
     // ─────────────────────────────────────────────────────────────────────────
 
     public static final float SHAPE_BUBBLE = 26f;
@@ -143,6 +143,8 @@ public final class AmberTokens {
     public static final float SHAPE_FIELD = 16f;
     /** قدم ۱۴ — شعاع شمارنده/بج لیست چت (آپستریم ۱۱٫۵ بود؛ ۱۲ ≥ نصف ارتفاع بج = پیل کامل) */
     public static final float SHAPE_BADGE = 12f;
+    /** قدم ۱۵ — شعاع فاب شناور Expressive (مربع‌گرد ۲۰dp؛ آپستریم دایره کامل بود) */
+    public static final float SHAPE_FAB = 20f;
 
     // ─────────────────────────────────────────────────────────────────────────
     // Motion — 150/250/400ms + فنر (stiffness 380 / damping 0.78)

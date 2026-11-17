@@ -180,6 +180,15 @@ public final class AmberPalette {
         m.put("chats_actionIcon", accent);
         m.put("chats_actionMessage", dim);
         m.put("chats_actionPressedBackground", AmberTokens.alpha(text, 0.08f));
+        // UI2 قدم ۱۵ — فاب شناور Expressive (FragmentFloatingButton): پس‌زمینه از
+        // featuredStickers_addButton ← اکسنت (روز تا امروز نشتی آبی 4DA0EB و شب F97316 خارج
+        // از توکن بود)، پرس = over(accent، onAccent، ۲۰٪) و جوهر آیکون روی کلید جدید
+        // featuredStickers_addButtonIcon ← onAccent (کلید chats_actionIcon دست‌نخورده ماند
+        // چون فاب‌های کلاسیک دیگر صفحه‌ها با پس‌زمینه deepFile به جوهر اکسنت نیاز دارند).
+        // شعاع فرم و سایه آمبر در خود کلاس از SHAPE_FAB/ELEV_FAB/SHADOW_* توکن می‌خواند.
+        m.put("featuredStickers_addButton", accent);
+        m.put("featuredStickers_addButtonPressed", AmberTokens.over(accent, onAccent, 0.20f));
+        m.put("featuredStickers_addButtonIcon", onAccent);
         m.put("chats_archiveBackground", surface);
         m.put("chats_archiveIcon", dim);
         m.put("chats_archiveText", dim);

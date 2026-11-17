@@ -642,6 +642,8 @@ public class ThemeColors {
         defaultColors[key_featuredStickers_addButton] = TELEGRAM_COLOR;
         defaultColors[key_featuredStickers_addButton2] = 0xFF56baf0;
         defaultColors[key_featuredStickers_addButtonPressed] = 0xff2288d1;
+        // UI2 قدم ۱۵ — جوهر آیکون فاب
+        defaultColors[key_featuredStickers_addButtonIcon] = 0xffffffff;
         defaultColors[key_featuredStickers_removeButtonText] = 0xff5093d3;
         defaultColors[key_featuredStickers_buttonText] = 0xffffffff;
         defaultColors[key_featuredStickers_unread] = 0xff4da6ea;
@@ -1641,6 +1643,7 @@ public class ThemeColors {
         colorKeysMap.put(key_featuredStickers_addButton, "featuredStickers_addButton");
         colorKeysMap.put(key_featuredStickers_addButton2, "featuredStickers_addButton2");
         colorKeysMap.put(key_featuredStickers_addButtonPressed, "featuredStickers_addButtonPressed");
+        colorKeysMap.put(key_featuredStickers_addButtonIcon, "featuredStickers_addButtonIcon");
         colorKeysMap.put(key_featuredStickers_removeButtonText, "featuredStickers_removeButtonText");
         colorKeysMap.put(key_featuredStickers_buttonText, "featuredStickers_buttonText");
         colorKeysMap.put(key_featuredStickers_unread, "featuredStickers_unread");
