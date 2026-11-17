@@ -1030,10 +1030,12 @@ public class ReactionsLayoutInBubble {
 
             if (choosen) {
                 if (paid) {
-                    backgroundColor = 0xFFE8AB02;
-                    textColor = 0xFFFFFFFF;
-                    serviceTextColor = 0xFFFFFFFF;
-                    serviceBackgroundColor = 0xFFE8AB02;
+                    // قدم ۲۴ — رنگ‌های ستاره‌ای خارج‌ازتوکن؛ سفید روی E8AB02 در هر دو حالت ۲٫۰۵:۱ بود ← قرص اکسنت + onAccent
+                    // (هم‌الگوی چیپ ری‌اکشن معمولی قدم ۲۰/۲۱: ۴٫۲۹ روز / ۷٫۲۳ شب)
+                    backgroundColor = Theme.getColor(isOutOwner() ? Theme.key_chat_outReactionButtonBackground : Theme.key_chat_inReactionButtonBackground, resourcesProvider);
+                    textColor = Theme.getColor(isOutOwner() ? Theme.key_chat_outReactionButtonTextSelected : Theme.key_chat_inReactionButtonTextSelected, resourcesProvider);
+                    serviceTextColor = textColor;
+                    serviceBackgroundColor = backgroundColor;
                 } else {
                     backgroundColor = Theme.getColor(isOutOwner() ? Theme.key_chat_outReactionButtonBackground : Theme.key_chat_inReactionButtonBackground, resourcesProvider);
                     textColor = Theme.getColor(isOutOwner() ? Theme.key_chat_outReactionButtonTextSelected : Theme.key_chat_inReactionButtonTextSelected, resourcesProvider);
@@ -1047,9 +1049,10 @@ public class ReactionsLayoutInBubble {
                 }
             } else {
                 if (paid) {
-                    textColor = 0xFFE8AB02;
-                    backgroundColor = 0x40E8AB02;
-                    serviceTextColor = 0xFFFFFFFF;
+                    // قدم ۲۴ — متن ستاره‌ای E8AB02 روی حباب خروجی روز فقط ۱٫۵۹:۱ ← اکسنت (۳٫۳۳ روز / ۴٫۷۳ شب)؛ بسترهٔ ۲۵٪ اکسنت هم‌وزن 0x40 آپستریم؛ سرویس از کلید پالتی chat_serviceText به‌جای سفید هاردکد
+                    textColor = Theme.getColor(isOutOwner() ? Theme.key_chat_outReactionButtonText : Theme.key_chat_inReactionButtonText, resourcesProvider);
+                    backgroundColor = ColorUtils.setAlphaComponent(Theme.getColor(isOutOwner() ? Theme.key_chat_outReactionButtonBackground : Theme.key_chat_inReactionButtonBackground, resourcesProvider), 0x40);
+                    serviceTextColor = Theme.getColor(Theme.key_chat_serviceText, resourcesProvider);
                     serviceBackgroundColor = Color.TRANSPARENT;
                 } else {
                     textColor = Theme.getColor(isOutOwner() ? Theme.key_chat_outReactionButtonText : Theme.key_chat_inReactionButtonText, resourcesProvider);

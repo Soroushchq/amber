@@ -498,6 +498,11 @@ public final class AmberPalette {
         m.put("chat_outReactionButtonText", accent);
         // متن چیپ انتخاب‌شده روی قرص اکسنت جامد از اکسنت بود (روی اکسنت نامرئی!) ← onAccent (۴٫۲۹/۷٫۲۳)
         m.put("chat_outReactionButtonTextSelected", onAccent);
+        // قدم ۲۴ — دو کلید سرویس ری‌اکشن (چیپ ری‌اکشن انتخاب‌شدهٔ روی چیپ سرویس/تاریخ — ChatActionCell) در پالت نبودند:
+        // شب F97316 نارنجی خارج‌ازتوکن (بازماندهٔ مولد کهربایی قدیمی) و روز اصلاً کلید نداشت (پیش‌فرض سفید/مشکی آپستریم)
+        // ← قرص اکسنت + onAccent (۴٫۲۹/۷٫۲۳ — هم‌الگوی چیپ انتخاب‌شدهٔ معمولی قدم ۲۰/۲۱)
+        m.put("chat_reactionServiceButtonBackgroundSelected", accent);
+        m.put("chat_reactionServiceButtonTextSelected", onAccent);
         m.put("chat_outQuote", AmberTokens.alpha(outText, 0.12f));
         m.put("chat_outViews", outDim);
         m.put("chat_outViewsSelected", outDim);
