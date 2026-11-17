@@ -560,10 +560,14 @@ public final class AmberPalette {
         // قدم ۲۲ — پیل صدای ضبط‌شده: قبلاً FFEFC9/332717 خارج‌ازتوکن ← توکن هدر (FFE9CF) و بوردر هدر شب (332818)
         m.put("chat_recordedVoiceBackground", d ? AmberTokens.DAY_HEADER : AmberTokens.NIGHT_HEADER_BORDER);
         m.put("chat_recordedVoiceDarkerBackground", headerBorder);
-        m.put("chat_recordedVoiceDot", accent);
+        // قدم ۲۳ — نقطهٔ ضبط صوتی: آپستریم قرمز da564d (معنای «در حال ضبط») ولی اکسنت کهربایی بود ← قرمز پالت
+        // (روز B4382C روی فیلد سفید ۶٫۵ / شب E2695B روی پیل ۳٫۱ — لایه‌های Cup Red/Box Red لوتّی و بج تقویم)
+        m.put("chat_recordedVoiceDot", red);
         m.put("chat_recordedVoicePlayPause", accent);
         m.put("chat_recordedVoiceProgress", accent);
-        m.put("chat_recordedVoiceProgressInner", d ? 0xFFFFFFFF : AmberTokens.NIGHT_TEXT);
+        // قدم ۲۳ — موج پخش‌نشده/دستگیره/مدتِ پیل ضبط‌شده: آپستریم سفید روی آبی بود؛ پیل ما کرم است و روز
+        // سفید روی کرم = نامرئی (۱٫۱۸:۱!) ← جوهر روز (۱۲٫۶+) / شب متن روشن (۱۲٫۵۹)
+        m.put("chat_recordedVoiceProgressInner", d ? AmberTokens.DAY_TEXT : AmberTokens.NIGHT_TEXT);
         m.put("chat_secretTimeText", dim);
         m.put("chat_secretChatStatusText", d ? 0xFFB4382C : 0xFFE2695B);
         m.put("chat_stickerNameText", accent);
@@ -589,7 +593,10 @@ public final class AmberPalette {
         m.put("chat_messagePanelVoiceBackground", header);
         m.put("chat_messagePanelVoiceDelete", dim);
         m.put("chat_messagePanelVoiceDuration", text);
-        m.put("chat_messagePanelVoicePressed", AmberTokens.alpha(text, 0.08f));
+        // قدم ۲۳ — آپستریم این کلید «سفید» است و همهٔ مصرف‌کننده‌هایش معنای آیکون دارند نه بستره:
+        // تینت MULTIPLY حالت پرس میک/ویدیو/ارسال، menuPaint در SenderSelectView، چک‌مارک کپشن (با ریاضی آلفا)،
+        // آیکون معکوس دکمهٔ ارسال (که جدا به onAccent رفت) — مقدار قبلی (جوهر×۸٪) همه را تقریباً نامرئی می‌کرد ← جوهر جامد
+        m.put("chat_messagePanelVoicePressed", text);
         // قدم ۲۲ — قفل ضبط صوتی (حباب شناور لبهٔ صفحه؛ نام کلید در attheme طبق قرارداد عجیب آپستریم با پیشوند key_ است):
         // آیکون آپستریم A4A4A4 سرد ← dim گرم؛ بسترهٔ آپستریم سفید (قبلاً اکسنت!) ← fieldBg هم‌زبانهٔ فیلد
         // (DarkThemeResourceProvider اورراید خودش را دارد)؛ سایهٔ صفر ← مشکی آپستریم

@@ -145,6 +145,7 @@ import org.telegram.messenger.NotificationsController;
 import org.telegram.messenger.R;
 import org.telegram.messenger.SendMessagesHelper;
 import org.telegram.messenger.SharedConfig;
+import org.telegram.messenger.AmberTokens;
 import org.telegram.messenger.SharedPrefsHelper;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
@@ -15655,9 +15656,13 @@ public class ChatActivityEnterView extends FrameLayout implements
         private int drawableColor, inactiveDrawableColor, drawableInverseColor;
 
         public void updateColors() {
-            int color = isNewDesignSendButton ? Color.WHITE : Theme.getColor(Theme.key_chat_messagePanelSend, resourcesProvider);
+            // قدم ۲۳ — رنگ آیکون دکمهٔ ارسال: سفید هاردکد آپستریم روی قرص اکسنت — شب روی کهربا فقط ۲٫۳۶:۱ بود
+            // ← onAccent (کلید قدم ۱۵؛ روز سفید همان ۴٫۲۹ / شب ۳A2400 = ۷٫۲۳ — هم‌الگوی فاب/چیپ‌ها)
+            int color = Theme.getColor(isNewDesignSendButton ? Theme.key_featuredStickers_addButtonIcon : Theme.key_chat_messagePanelSend, resourcesProvider);
             int c = Theme.getColor(Theme.key_glass_defaultIcon, resourcesProvider);
-            int inverseColor = Theme.getColor(Theme.key_chat_messagePanelVoicePressed, resourcesProvider);
+            // قدم ۲۳ — رنگ آیکون معکوس (روی همان قرص اکسنت کشیده می‌شود): قبلاً key_chat_messagePanelVoicePressed
+            // بود که در پالت ما «تینت ۸٪» است (آپستریم سفید بود) ← همان onAccent (الگوی آپستریم: هر دو یک‌رنگ)
+            int inverseColor = Theme.getColor(Theme.key_featuredStickers_addButtonIcon, resourcesProvider);
             if (color != drawableColor || c != inactiveDrawableColor || inverseColor != drawableInverseColor) {
                 drawableColor = color;
                 inactiveDrawableColor = c;
@@ -15666,6 +15671,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                 inactiveDrawable.setColorFilter(new PorterDuffColorFilter(Color.argb(0xb4, Color.red(c), Color.green(c), Color.blue(c)), PorterDuff.Mode.SRC_IN));
                 drawableInverse.setColorFilter(new PorterDuffColorFilter(inverseColor, PorterDuff.Mode.SRC_IN));
             }
+            priceText.setTextColor(color);
             if (isNewDesignSendButton) {
                 backgroundPaint.setColor(Theme.getColor(Theme.key_chat_messagePanelSend, resourcesProvider));
             } else if (shouldDrawBackground()) {
@@ -15729,7 +15735,10 @@ public class ChatActivityEnterView extends FrameLayout implements
         /* * */
 
         private final RectF backgroundRect = new RectF();
-        private static final int RADIUS = 19;
+        // قدم ۲۳ — فرم دکمهٔ ارسال/ضبط: شعاع ۱۹dp هاردکد آپستریم ← توکن SHAPE_FAB (۲۰dp؛ دومین مصرف‌کنندهٔ این
+        // توکن — فاب قدم ۱۵=۲۰، کارت/منو=۲۰، حباب=۲۶) — روی مربع ۳۸dp همان دایره است (شعاع به نصف‌ارتفاع کم می‌شود)،
+        // فقط در حالت قرص ستاره‌ها انتهای گردتر می‌شود
+        private static final int RADIUS = (int) AmberTokens.SHAPE_FAB;
 
         private void checkBackgroundRect() {
             final float margin = dpf2(3);
