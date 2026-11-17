@@ -553,9 +553,12 @@ public final class AmberPalette {
         m.put("chat_replyPanelIcons", dim);
         m.put("chat_replyPanelLine", divider);
         m.put("chat_replyPanelName", accent);
-        m.put("chat_recordTime", d ? 0xFFFFFFFF : AmberTokens.NIGHT_TEXT);
+        m.put("chat_recordTime", dim);
+        // قدم ۲۲ — باگ واقعی: تایمر ضبط و فلش «لغو» روی پیل صدای کرم (header FFE9CF) سفید بود = نامرئی (۱٫۱۴:۱)!
+        // آپستریم خاکستری 8e959b روی آبی خودش هم ~۲٫۰ بود ← dim گرم (روی کرم ۴٫۹۴ روز / روی پیل شب ۵٫۶۱)
         m.put("chat_recordVoiceCancel", dim);
-        m.put("chat_recordedVoiceBackground", d ? 0xFFFFEFC9 : 0xFF332717);
+        // قدم ۲۲ — پیل صدای ضبط‌شده: قبلاً FFEFC9/332717 خارج‌ازتوکن ← توکن هدر (FFE9CF) و بوردر هدر شب (332818)
+        m.put("chat_recordedVoiceBackground", d ? AmberTokens.DAY_HEADER : AmberTokens.NIGHT_HEADER_BORDER);
         m.put("chat_recordedVoiceDarkerBackground", headerBorder);
         m.put("chat_recordedVoiceDot", accent);
         m.put("chat_recordedVoicePlayPause", accent);
@@ -570,9 +573,13 @@ public final class AmberPalette {
         m.put("chat_stickerViaBotNameText", accent);
         m.put("chat_inlineResultIcon", dim);
 
-        // ── پنل پیام ────────────────────────────────────────────────────────
-        m.put("chat_messagePanelBackground", d ? 0xFFFFEFC9 : AmberTokens.NIGHT_HEADER);
-        m.put("chat_messagePanelShadow", 0x00000000);
+        // ── پنل پیام ── قدم ۲۲ — شیت پایین = فیلد سفید: قبلاً FFEFC9 خارج‌ازتوکن (روز) و هدر (شب) بود ←
+        // توکن fieldBg (روز FFFFFF — هم‌زبانهٔ کارت دیالوگ‌ها و فیلد جستجو؛ شب 241D14 = سطح فیلد، یک پله بالاتر از وایپرپ)
+        m.put("chat_messagePanelBackground", fieldBg);
+        // قدم ۲۲ — مرز بالای شیت: قبلاً صفر = کاملاً بی‌مرز بود؛ این کلید گرادیان مویی بالای پنل را رنگ می‌کند
+        // (MULTIPLY روی compose_panel_shadow) — روز جوهر گرم (ترکیب روی کاغذ ≈ ECE3D7 = خانوادهٔ مرز E9DFD0 نقشه‌راه)
+        // / شب مشکی آپستریم (روی بوم تیره نامحسوس؛ جدایی از پلهٔ روشن‌تر فیلد می‌آید)
+        m.put("chat_messagePanelShadow", d ? AmberTokens.DAY_TEXT : 0xFF000000);
         m.put("chat_messagePanelText", text);
         m.put("chat_messagePanelHint", dim);
         m.put("chat_messagePanelCursor", accent);
@@ -583,13 +590,18 @@ public final class AmberPalette {
         m.put("chat_messagePanelVoiceDelete", dim);
         m.put("chat_messagePanelVoiceDuration", text);
         m.put("chat_messagePanelVoicePressed", AmberTokens.alpha(text, 0.08f));
-        m.put("key_chat_messagePanelVoiceLock", header);
-        m.put("key_chat_messagePanelVoiceLockBackground", accent);
-        m.put("key_chat_messagePanelVoiceLockShadow", 0x00000000);
+        // قدم ۲۲ — قفل ضبط صوتی (حباب شناور لبهٔ صفحه؛ نام کلید در attheme طبق قرارداد عجیب آپستریم با پیشوند key_ است):
+        // آیکون آپستریم A4A4A4 سرد ← dim گرم؛ بسترهٔ آپستریم سفید (قبلاً اکسنت!) ← fieldBg هم‌زبانهٔ فیلد
+        // (DarkThemeResourceProvider اورراید خودش را دارد)؛ سایهٔ صفر ← مشکی آپستریم
+        m.put("key_chat_messagePanelVoiceLock", dim);
+        m.put("key_chat_messagePanelVoiceLockBackground", fieldBg);
+        m.put("key_chat_messagePanelVoiceLockShadow", 0xFF000000);
 
         // ── پنل پیوست ───────────────────────────────────────────────────────
         m.put("chat_attachAudioBackground", d ? 0xFFB4382C : 0xFFE2695B);
         m.put("chat_attachContactBackground", d ? 0xFF8C6A1D : 0xFFC79A3E);
+        // قدم ۲۲ — متن دکمهٔ مخاطب (کلید مرده در این فورک ولی برای کامل بودن attheme): آپستریم DFA000 طلایی ← «زمان»
+        m.put("chat_attachContactText", time);
         m.put("chat_attachGalleryBackground", accent);
         m.put("chat_attachPhotoBackground", accentBright);
         m.put("chat_attachLocationBackground", green);
