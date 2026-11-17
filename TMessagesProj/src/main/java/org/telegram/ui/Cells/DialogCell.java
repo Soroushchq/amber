@@ -60,6 +60,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 import androidx.core.math.MathUtils;
 
+import org.telegram.messenger.AmberTokens;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.ChatObject;
@@ -4070,7 +4071,10 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
             gtx += translationX;
         }
 
-        float cornersRadius = dp(8) * cornerProgress;
+        // UI2 قدم ۱۳ — شعاع کارت ردیف چت از ۸dp آپستریم به توکن شکل SHAPE_CARD (۲۰dp) بایند شد؛
+        // همه سطوح کارتی ردیف (انتخاب/کانتینر راست/سواپ) از یک توکن واحد می‌خوانند و
+        // فاصله‌گذاری ردیف‌ها استاندارد تلگرام می‌ماند (بدون حاشیه اضافه).
+        float cornersRadius = dp((int) AmberTokens.SHAPE_CARD) * cornerProgress;
         if (isSelected) {
             rect.set(0, 0, getMeasuredWidth(), AndroidUtilities.lerp(getMeasuredHeight(), getCollapsedHeight(), rightFragmentOpenedProgress));
             rect.offset(0, -translateY + collapseOffset);
