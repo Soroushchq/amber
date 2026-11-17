@@ -62,7 +62,9 @@ public class Switch extends View implements Theme.Colorable {
 
     private OnCheckedChangeListener onCheckedChangeListener;
 
-    private int trackColorKey = Theme.key_fill_RedNormal;
+    // UI2 قدم ۱۸ — مسیر پیش‌فرض سوییچ از fill_RedNormal (قرمز تخریبی آپستریم!) به
+    // switch2Track (خنثی گرم) رفت؛ با گام ۱۸ پالت، جفت «خنثی←اکسنت» می‌سازد نه «قرمز←آبی»
+    private int trackColorKey = Theme.key_switch2Track;
     private int trackCheckedColorKey = Theme.key_switch2TrackChecked;
     private int thumbColorKey = Theme.key_windowBackgroundWhite;
     private int thumbCheckedColorKey = Theme.key_windowBackgroundWhite;
