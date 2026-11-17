@@ -4621,6 +4621,11 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                         int x = mentionLeft;
                         rect.set(x, countTop, x + mentionWidth + dp(BADGE_TEXT_PADDING * 2), countTop + dp(BADGE_SIZE));
                         Paint paint = drawCounterMuted && folderId != 0 ? Theme.dialogs_countGrayPaint : Theme.dialogs_countPaint;
+                        // UI2 قدم ۱۴ — متن منشنِ بج بی‌صدا با جوهر dim؛ پس از ترسیم بازگشت
+                        final boolean mutedMentionBadge = drawCounterMuted && folderId != 0;
+                        if (mutedMentionBadge) {
+                            Theme.dialogs_countTextPaint2.setColor(Theme.getColor(Theme.key_chats_unreadCounterMutedText, resourcesProvider));
+                        }
                         canvas.drawRoundRect(rect, rect.height() / 2f, rect.height() / 2f, paint);
                         Theme.dialogs_countTextPaint2.setAlpha((int) ((1.0f - reorderIconProgress) * 255));
 
@@ -4628,6 +4633,9 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                         canvas.translate(mentionLeft + dp(BADGE_TEXT_PADDING), countTop + dp(4));
                         mentionLayout.draw(canvas);
                         canvas.restore();
+                        if (mutedMentionBadge) {
+                            Theme.dialogs_countTextPaint2.setColor(Theme.getColor(Theme.key_chats_unreadCounterText, resourcesProvider));
+                        }
                     } else {
                         final Drawable drawable = Theme.dialogs_mentionDrawable;
 
@@ -5352,6 +5360,12 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 restoreCountTextPaint = true;
             } else {
                 paint = drawCounterMuted || currentDialogFolderId != 0 ? Theme.dialogs_countGrayPaint : Theme.dialogs_countPaint;
+                // UI2 قدم ۱۴ — متن بج بی‌صدا با جوهر dim (کلید chats_unreadCounterMutedText)
+                // تا روی کانتینر تونال خوانا بماند؛ پس از ترسیم به جوهر اصلی برگردانده می‌شود.
+                if (drawCounterMuted || currentDialogFolderId != 0) {
+                    Theme.dialogs_countTextPaint2.setColor(Theme.getColor(Theme.key_chats_unreadCounterMutedText, resourcesProvider));
+                    restoreCountTextPaint = true;
+                }
             }
 
             if (countOldLayout == null || unreadCount == 0) {
@@ -5387,9 +5401,9 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                         canvas.drawPath(counterPath, counterPaintOutline);
                     }
                 } else {
-                    canvas.drawRoundRect(rect, dp(11.5f), dp(11.5f), paint);
+                    canvas.drawRoundRect(rect, dp(AmberTokens.SHAPE_BADGE), dp(AmberTokens.SHAPE_BADGE), paint);
                     if (outline) {
-                        canvas.drawRoundRect(rect, dp(11.5f), dp(11.5f), counterPaintOutline);
+                        canvas.drawRoundRect(rect, dp(AmberTokens.SHAPE_BADGE), dp(AmberTokens.SHAPE_BADGE), counterPaintOutline);
                     }
                 }
                 if (drawLayout != null) {
@@ -5439,9 +5453,9 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                         canvas.drawPath(counterPath, counterPaintOutline);
                     }
                 } else {
-                    canvas.drawRoundRect(rect, dp(11.5f), dp(11.5f), paint);
+                    canvas.drawRoundRect(rect, dp(AmberTokens.SHAPE_BADGE), dp(AmberTokens.SHAPE_BADGE), paint);
                     if (outline) {
-                        canvas.drawRoundRect(rect, dp(11.5f), dp(11.5f), counterPaintOutline);
+                        canvas.drawRoundRect(rect, dp(AmberTokens.SHAPE_BADGE), dp(AmberTokens.SHAPE_BADGE), counterPaintOutline);
                     }
                 }
                 if (countAnimationStableLayout != null) {

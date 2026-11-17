@@ -2779,6 +2779,8 @@ public class Theme {
     public static final int key_chats_unreadCounter = colorsCount++;
     public static final int key_chats_unreadCounterMuted = colorsCount++;
     public static final int key_chats_unreadCounterText = colorsCount++;
+    // UI2 قدم ۱۴ — جوهر بج بی‌صدا (سطح muted)؛ در تم‌های بالادستی از پیش‌فرض خاکستری می‌آید
+    public static final int key_chats_unreadCounterMutedText = colorsCount++;
     public static final int key_chats_name = colorsCount++;
     public static final int key_chats_nameArchived = colorsCount++;
     public static final int key_chats_secretName = colorsCount++;

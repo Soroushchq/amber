@@ -74,7 +74,6 @@ public final class AmberPalette {
         final int inText = d ? AmberTokens.DAY_IN_TEXT : AmberTokens.NIGHT_IN_TEXT;
         final int outBubble = d ? AmberTokens.DAY_OUT_BUBBLE : AmberTokens.NIGHT_OUT_BUBBLE;
         final int outText = d ? AmberTokens.DAY_OUT_TEXT : AmberTokens.NIGHT_OUT_TEXT;
-        final int badgeBg = d ? AmberTokens.DAY_BADGE_BG : AmberTokens.NIGHT_BADGE_BG;
         final int badgeText = d ? AmberTokens.DAY_BADGE_TEXT : AmberTokens.NIGHT_BADGE_TEXT;
         final int fieldBg = d ? AmberTokens.DAY_FIELD_BG : AmberTokens.NIGHT_FIELD_BG;
         final int fieldBorder = d ? AmberTokens.DAY_FIELD_BORDER : AmberTokens.NIGHT_FIELD_BORDER;
@@ -187,9 +186,14 @@ public final class AmberPalette {
         m.put("chats_archivePinBackground", headerBorder);
         m.put("chats_archivePullDownBackground", headerBorder);
         m.put("chats_archivePullDownBackgroundActive", accent);
-        m.put("chats_unreadCounter", badgeBg);
-        m.put("chats_unreadCounterText", badgeText);
-        m.put("chats_unreadCounterMuted", surface);
+        m.put("chats_unreadCounter", accent);
+        m.put("chats_unreadCounterText", onAccent);
+        // UI2 قدم ۱۴ — شمارنده/بج‌ها: پرایمری = اکسنت/روی‌اکسنت (مثل مولد توکن)،
+        // بی‌صدا = کانتینر تونال خنثی (مرز ظریف) با جوهر dim — پیش از این muted
+        // با سطح + متن سفید سراسری رندر می‌شد (روژه ~۱٫۱:۱ نامرئی؛ شب ~۱٫۰۵:۱).
+        // متن بی‌صدا کلید جدید chats_unreadCounterMutedText است (ثبت در Theme/ThemeColors).
+        m.put("chats_unreadCounterMuted", outline);
+        m.put("chats_unreadCounterMutedText", dim);
         m.put("chats_pinnedIcon", dim);
         m.put("chats_pinnedOverlay", AmberTokens.alpha(accent, 0.08f));
         m.put("chats_sentCheck", accent);
@@ -617,7 +621,9 @@ public final class AmberPalette {
         m.put("stories_circle_live1", d ? 0xFFB4382C : 0xFFE2695B);
         m.put("stories_circle_live2", d ? 0xFF8C2E2E : 0xFFB44A3E);
         m.put("topics_unreadCounter", accent);
-        m.put("topics_unreadCounterMuted", surface);
+        // UI2 قدم ۱۴ — بج تاپیک بی‌صدا سبک شبح است (پر α۳۰٪ + متن هم‌رنگ)؛
+        // رنگ قبلی surface = متن تقریباً نامرئی روی کاغذ؛ جوهر dim خوانا و آرام است.
+        m.put("topics_unreadCounterMuted", dim);
         m.put("glass_defaultIcon", text);
         m.put("glass_defaultText", text);
         m.put("glass_tabSelected", AmberTokens.alpha(accent, 0.30f));

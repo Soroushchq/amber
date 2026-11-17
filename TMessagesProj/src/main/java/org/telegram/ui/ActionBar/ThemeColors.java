@@ -232,6 +232,7 @@ public class ThemeColors {
         defaultColors[key_chats_unreadCounter] = TELEGRAM_COLOR;
         defaultColors[key_chats_unreadCounterMuted] = 0xffBEC3C7;
         defaultColors[key_chats_unreadCounterText] = 0xffffffff;
+        defaultColors[key_chats_unreadCounterMutedText] = 0xffffffff;
         defaultColors[key_chats_archiveBackground] = TELEGRAM_COLOR;
         defaultColors[key_chats_archivePinBackground] = 0xff9faab3;
         defaultColors[key_chats_archiveIcon] = 0xffffffff;
@@ -1150,6 +1151,7 @@ public class ThemeColors {
         colorKeysMap.put(key_chats_unreadCounter, "chats_unreadCounter");
         colorKeysMap.put(key_chats_unreadCounterMuted, "chats_unreadCounterMuted");
         colorKeysMap.put(key_chats_unreadCounterText, "chats_unreadCounterText");
+        colorKeysMap.put(key_chats_unreadCounterMutedText, "chats_unreadCounterMutedText");
         colorKeysMap.put(key_chats_name, "chats_name");
         colorKeysMap.put(key_chats_nameArchived, "chats_nameArchived");
         colorKeysMap.put(key_chats_secretName, "chats_secretName");
