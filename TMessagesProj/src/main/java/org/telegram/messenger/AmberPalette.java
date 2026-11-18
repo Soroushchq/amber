@@ -805,6 +805,13 @@ public final class AmberPalette {
         m.put("dialogInputFieldActivated", accent);
         m.put("dialogButton", accent);
         m.put("dialogButtonSelector", AmberTokens.alpha(accent, 0.10f));
+        // قدم ۲۹ — دو کلید شیت هدیه (GiftSheet) در پالت نبودند: روز پیش‌فرض سرد بی‌سند F5F6F7/56595C آپستریم
+        // می‌گرفت و شب fallback به windowBackgroundGray = بسترهٔ وایپرپ (۱۷۱۳۰E) می‌شد — سطح شیت
+        // پایین‌تر از پلهٔ M3 (شیت روشن‌تر از بستر است، نه تیره‌تر!) ← سطح دیالوگ (fieldBg):
+        // روز FFFFFF (هم‌زبانهٔ پیش‌فرض BottomSheet که خودش key_dialogBackground است) /
+        // شب 241D14 یک پله بالاتر از وایپرپ؛ متن تب = dim (روی سطح دیالوگ ۵٫۰۹/۶٫۲۰ ≥ ۴٫۵)
+        m.put("dialogGiftsBackground", fieldBg);
+        m.put("dialogGiftsTabText", dim);
         m.put("dialogIcon", dim);
         m.put("dialogGrayLine", divider);
         m.put("dialogTopBackground", surface);

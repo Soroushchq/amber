@@ -57,6 +57,7 @@ import androidx.annotation.Nullable;
 import androidx.core.graphics.ColorUtils;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.AmberTokens;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LiteMode;
@@ -646,7 +647,8 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
                             (getHeight() + h) / 2f
                     );
                 } else {
-                    r = dp(20);
+                    // UI2 قدم ۲۹ — شعاع مسیر بلور دستی از ۲۰dp آپستریم به توکن SHAPE_DIALOG بایند شد
+                    r = dp((int) AmberTokens.SHAPE_DIALOG);
                     AndroidUtilities.rectTmp.set(getPaddingLeft(), getPaddingTop(), getMeasuredWidth() - getPaddingRight(), getMeasuredHeight() - getPaddingBottom());
                 }
 
@@ -819,7 +821,8 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
                 containerView.setPadding(0, 0, 0, 0);
                 containerView.setBackground(shadowDrawable);
 
-                containerView.setOutlineProvider(ViewOutlineProviderImpl.boundsWithPaddingRoundRect(dp(8), dp(20)));
+                // UI2 قدم ۲۹ — شعاع کارت دیالوگ در مسیر بلور بومی از ۲۰dp آپستریم به توکن SHAPE_DIALOG بایند شد
+                containerView.setOutlineProvider(ViewOutlineProviderImpl.boundsWithPaddingRoundRect(dp(8), dp((int) AmberTokens.SHAPE_DIALOG)));
                 containerView.setClipToOutline(true);
 
                 drawBackground = false;
@@ -1457,7 +1460,8 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
                 if (progressViewStyle == ALERT_TYPE_MESSAGE) {
                     blurredNativeBackground = true;
                     window.setBackgroundBlurRadius(50);
-                    float rad = dp(12);
+                    // UI2 قدم ۲۹ — شعاع پنجرهٔ بلور بومی از ۱۲dp آپستریم به توکن SHAPE_DIALOG بایند شد (هم‌زبانهٔ ۹-پیچ بازتولیدشده)
+                    float rad = dp((int) AmberTokens.SHAPE_DIALOG);
                     ShapeDrawable shapeDrawable = new ShapeDrawable(new RoundRectShape(new float[]{rad, rad, rad, rad, rad, rad, rad, rad}, null, null));
                     shapeDrawable.getPaint().setColor(ColorUtils.setAlphaComponent(backgroundColor, (int) (blurAlpha * 255)));
                     window.setBackgroundDrawable(shapeDrawable);
