@@ -142,6 +142,10 @@ public final class AmberTokens {
     /** قدم ۲۹ — شعاع کارت دیالوگ Expressive: ۹-پیچ popup_fixed_alert4 بازتولید شد (آپستریم ~۱۶dp بود)
      *  + سه مسیر بلور AlertDialog (خروجی ۲۰/۱۲dp ناهمخوان) به همین توکن بایند شد؛ اسپینر ۱۸ خودش سطح کوچک است */
     public static final float SHAPE_DIALOG = 28f;
+    /** قدم ۳۰ — شعاع قوس بالای پوستهٔ باتم‌شیت Expressive: ۹-پچ sheet_shadow_round با
+     *  Tools/regenerate_sheet_9patch.py بازتولید شد (قوس نرم مؤثر آپستریم ~۲۰dp بود)؛ هم‌زبانهٔ SHAPE_DIALOG.
+     *  مصرف‌کننده: asset ۹-پچ (۱۸ مصرف‌کنندهٔ BottomSheet) — حاشیه‌های کارت و پدینگ محتوا عیناً آپستریم حفظ شد */
+    public static final float SHAPE_SHEET = 28f;
     public static final float SHAPE_FIELD = 16f;
     /** قدم ۱۴ — شعاع شمارنده/بج لیست چت (آپستریم ۱۱٫۵ بود؛ ۱۲ ≥ نصف ارتفاع بج = پیل کامل) */
     public static final float SHAPE_BADGE = 12f;
