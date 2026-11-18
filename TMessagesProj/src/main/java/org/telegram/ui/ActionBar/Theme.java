@@ -8862,7 +8862,10 @@ public class Theme {
             }
         }
         Drawable drawable = wallpaperOverride != null ? wallpaperOverride : currentWallpaper;
-        boolean drawServiceGradient = !compact && (drawable instanceof MotionBackgroundDrawable || drawable instanceof BitmapDrawable) && SharedConfig.getDevicePerformanceClass() != SharedConfig.PERFORMANCE_CLASS_LOW && LiteMode.isEnabled(LiteMode.FLAG_CHAT_BACKGROUND);
+        // قدم ۲۵ — اگر تم به‌صراحت بسترهٔ سرویس را تعریف کرده باشد (کلید chat_serviceBackground در attheme)، چیپ از همان کلید می‌آید نه از پچِ بلورِ وایپرپ؛
+        // در تم روز کهربایی پچِ ماتریس‌شدهٔ وایپرپ روشن می‌ماند (×۰٫۹۲−۶٪ روی کرم) و متنِ اجباری سفید فقط ۱٫۵۸:۱ می‌گرفت — حالا اسکریم توکنی ۵٫۸۸:۱؛
+        // بدون کلید صریح، رفتار آپستریم (پچ بلور + متن سفید اجباری) عیناً محفوظ است؛ به‌علاوه ظاهر چیپ بین دستگاه‌های کم‌قدرت و پرقدرت یکدست شد
+        boolean drawServiceGradient = !compact && (drawable instanceof MotionBackgroundDrawable || drawable instanceof BitmapDrawable) && (currentColors == null || currentColors.indexOfKey(key_chat_serviceBackground) < 0) && SharedConfig.getDevicePerformanceClass() != SharedConfig.PERFORMANCE_CLASS_LOW && LiteMode.isEnabled(LiteMode.FLAG_CHAT_BACKGROUND);
         if (drawServiceGradient) {
             Bitmap newBitmap = null;
             if (drawable instanceof MotionBackgroundDrawable) {

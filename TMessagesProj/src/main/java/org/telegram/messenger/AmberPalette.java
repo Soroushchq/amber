@@ -83,7 +83,13 @@ public final class AmberPalette {
         final int selIn = AmberTokens.over(accent, inBubble, d ? 0.14f : 0.16f);
         final int selOut = AmberTokens.over(accent, outBubble, d ? 0.14f : 0.16f);
         final int divider = d ? AmberTokens.DAY_OUTLINE : AmberTokens.alpha(AmberTokens.NIGHT_OUTLINE, 0.55f);
-        final int svcBg = AmberTokens.alpha(d ? AmberTokens.DAY_TEXT_DIM : AmberTokens.NIGHT_SURFACE, 0.70f);
+        // قدم ۲۵ — چیپ سرویس/تاریخ: با «احترام به کلید» در applyChatServiceMessageColor چیپ همیشه از کلید می‌آید؛
+        // روز: اسکریم جوهر ۶۵٪ (متن سفید ۵٫۸۸:۱ روی ترکیب با وایپرپ کرم — قبلاً DAY_TEXT_DIM×۷۰٪ فقط ۳٫۰۴:۱)؛ شب بدون تغییر (۱۵٫۱:۱)
+        final int svcBg = AmberTokens.alpha(d ? AmberTokens.DAY_TEXT : AmberTokens.NIGHT_SURFACE, d ? 0.65f : 0.70f);
+        // انتخاب‌شده/فشرده: روز جوهر ۷۸٪ (تیره‌تر) / شب سطح +۱۲٪ به‌سمت متن (روشن‌تر) — بازخورد محسوس در هر دو (قبلاً همان رنگ عادی بود)
+        final int svcBgSel = AmberTokens.alpha(d ? AmberTokens.DAY_TEXT : AmberTokens.over(AmberTokens.NIGHT_TEXT, AmberTokens.NIGHT_SURFACE, 0.12f), d ? 0.78f : 0.72f);
+        // ریپل داخل چیپ (دکمه‌های بات): سفید ۱۴٪ روی قرص تیره — قبلاً همان رنگ چیپ بود = ریپل نامرئی
+        final int svcSel = AmberTokens.alpha(d ? 0xFFFFFFFF : AmberTokens.NIGHT_TEXT, 0.14f);
         final int goDown = AmberTokens.alpha(d ? AmberTokens.DAY_WALLPAPER_TOP : AmberTokens.NIGHT_SURFACE, d ? 0.90f : 0.80f);
         final int deepFile = d ? 0xFFF7E3C8 : 0xFF2E2618;
         final int outDim = AmberTokens.alpha(outText, 0.65f);
@@ -280,6 +286,8 @@ public final class AmberPalette {
         // متن/آیکون قرص: آپستریم مشکی خالص (شب روی پیل تیره نامرئی!) ← جوهر/dim
         m.put("chat_compact_actionText", text);
         m.put("chat_compact_actionIcon", dim);
+        // قدم ۲۵ — متن دکمه‌های بات روی قرص کم‌حجم: آپستریم مشکی خالص (شب روی پیل تیرهٔ جوهر روشن ۱۰٪ نامرئی) ← هم‌زبانهٔ compact_actionText
+        m.put("chat_compact_botButtonText", text);
         // قدم ۲۰ — زنجیرهٔ حباب ورودی در حالت کم‌حجم (میراث قدم ۱۹): ۵ کلید `chat_compact_in*`
         // آپستریم سرد بودند (خاکستری 0x80A1AAB3 / جوهر سرد 1A1D21) و مدت‌ها هیچ‌کدام در پالت نبودند؛
         // صدای هر کلید از منبع mapCompact همان کلید عادی کپی شد:
@@ -528,8 +536,8 @@ public final class AmberPalette {
         m.put("chat_textSelectBackground", AmberTokens.alpha(accent, 0.35f));
         m.put("chat_serviceText", d ? 0xFFFFFFFF : AmberTokens.NIGHT_TEXT);
         m.put("chat_serviceBackground", svcBg);
-        m.put("chat_serviceBackgroundSelected", svcBg);
-        m.put("chat_serviceBackgroundSelector", svcBg);
+        m.put("chat_serviceBackgroundSelected", svcBgSel);
+        m.put("chat_serviceBackgroundSelector", svcSel);
         m.put("chat_serviceIcon", d ? 0xFFFFFFFF : AmberTokens.NIGHT_TEXT);
         m.put("chat_serviceLink", d ? 0xFFFFEFC9 : 0xFFFFDDB8);
         m.put("chat_goDownButton", goDown);
@@ -549,7 +557,8 @@ public final class AmberPalette {
         m.put("chat_searchPanelText", dim);
         m.put("chat_searchPanelIcons", dim);
         m.put("chat_stickersHintPanel", d ? 0xFFF7EFE4 : AmberTokens.NIGHT_SURFACE);
-        m.put("chat_botButtonText", accent);
+        // قدم ۲۵ — متن دکمه‌های بات روی چیپ سرویس تیره: اکسنت (روز ۱٫۳۷:۱ نامرئی!) ← هم‌زبانهٔ serviceText (۵٫۸۸/۱۵٫۱)
+        m.put("chat_botButtonText", d ? 0xFFFFFFFF : AmberTokens.NIGHT_TEXT);
         m.put("chat_botKeyboardButtonBackground", accent);
         m.put("chat_botKeyboardButtonBackgroundPressed", accentBright);
         m.put("chat_botKeyboardButtonText", onAccent);
