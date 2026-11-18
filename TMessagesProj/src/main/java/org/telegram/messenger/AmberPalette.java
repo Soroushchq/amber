@@ -98,6 +98,9 @@ public final class AmberPalette {
         // ← «کهربای برشته» 9C5200 (۴٫۵۰:۱؛ از تیک ارسال اکسنت C25E00 عمیق‌تر و متمایز)؛ شب accentBright سالم است (۵٫۵۸)
         final int sentCheckRead = d ? 0xFF9C5200 : AmberTokens.NIGHT_ACCENT_BRIGHT;
         final int red = d ? 0xFFB4382C : 0xFFFF6E54;
+        // قدم ۲۸ — قرمزِ سمت حباب خروجی (هم‌الگوی تفکیک time/outTime): حباب خروجی شب روشن‌تر است
+        // (5C4000) و FF6E54 روی تینت خودش فقط ۲٫۹۶ می‌شد ← سالمون روشن‌تر FF8E78 (۳٫۶۶ روی چیپ)
+        final int redOut = d ? 0xFFB4382C : 0xFFFF8E78;
         final int green = d ? 0xFF3D7A2B : 0xFF7DBE72;
 
         // ── پنجره‌ها و سطوح عمومی ────────────────────────────────────────────
@@ -344,6 +347,19 @@ public final class AmberPalette {
         m.put("chat_compact_reactionTextSelected", onAccent);
         // آیکون دکمهٔ پیاده‌سازی صدا در کم‌حجم (blend به رنگ اصلی دکمه در ChatMessageAudio): اکسنت — هم‌صدای inTranscribeButton قدم ۲۰
         m.put("chat_compact_sideButtonIcon", accent);
+        // قدم ۲۸ — کروم حالت کم‌حجم (فید لبه‌ها، اسپینر، متن پول‌داون/تاپیک/ریپلای): قبلاً روز کلید نداشت
+        // و پیش‌فرض‌های سیاه/سفید بی‌سند آپستریم می‌گرفت؛ شب هم مقدارهای قدیمی (121213 نه رنگ بستر) بود ←
+        // فید = رنگ بستر کم‌حجم (chat_compact_background قدم ۱۹) تا لبهٔ محتوا در خود بستر محو شود؛
+        // محتوا = text/dim هم‌زبان حباب‌ها؛ خط گلس = روز خنثی آپستریم ۲۴٪ / شب صفر (قرارداد گلس قدم ۲۷)
+        m.put("chat_compact_fadeEdge", d ? AmberTokens.DAY_WALLPAPER_TOP : AmberTokens.NIGHT_WALLPAPER_MID);
+        m.put("chat_compact_fadeMiddle", AmberTokens.alpha(d ? AmberTokens.DAY_WALLPAPER_TOP : AmberTokens.NIGHT_WALLPAPER_MID, 0.64f));
+        m.put("chat_compact_progress", text);
+        m.put("chat_compact_pullingDownText", text);
+        m.put("chat_compact_topicEmptyText", text);
+        m.put("chat_compact_topicSeparatorText", text);
+        m.put("chat_compact_replyText", dim);
+        m.put("chat_compact_inputGlassOutline", d ? 0x24000000 : 0x00000000);
+        m.put("chat_compact_buttonGlassOutline", d ? 0x24000000 : 0x00000000);
         m.put("chat_inBubble", inBubble);
         m.put("chat_inBubbleSelected", selIn);
         m.put("chat_inBubbleSelectedOverlay", AmberTokens.alpha(0xFF000000, d ? 0.06f : 0.10f));
@@ -441,6 +457,33 @@ public final class AmberPalette {
         m.put("chat_inTextSelectionHighlight", AmberTokens.alpha(accent, 0.30f));
         m.put("chat_inDownCall", accent);
         m.put("chat_inDivider", outline);
+        // قدم ۲۸ — تماس سبز داخل حباب ورودی (ردیف تماس ازدست‌رفته): آپستریم 00C853 خارج‌ازتوکن ←
+        // سبز معنایی پالت (هم‌صدای attachLocationBackground/پاسخ درست نظرسنجی) — ۴٫۳۰/۷٫۴۰ روی حباب
+        m.put("chat_inGreenCall", green);
+        // برچسب «مدیر» متن‌سطح ورودی: آپستریم فقط fallback به inTimeText داشت ← صریح‌سازی همان مقدار
+        m.put("chat_inAdminText", time);
+        m.put("chat_inAdminSelectedText", dim);
+
+        // قدم ۲۸ — ریشه‌کنی دکمه‌های نامشخص: خانوادهٔ msgIvButton (دکمه‌های InstantView/اینلاین‌بات داخل
+        // حباب). آپستریم روز چهار زبان ناهمگون بی‌سند داشت (خاکستری EDEDED / سبزفام DCF4CB / آبی 229AF0
+        // / سبز 53AB49) و شب چیپ 17171A روی حباب 262017 فقط ۱٫۰۵:۱ بود (دکمهٔ نامرئی!) ← زبان یکپارچه:
+        // Default = چیپ تُنال جوهر×۱۲٪ روی بستر حباب خودش (پرس ×۲۰٪) با متن پیام؛ Primary = قرص اکسنت +
+        // onAccent (۴٫۲۹/۷٫۲۳ — هم‌الگوی قدم ۱۵/۱۷/۲۰)؛ Danger/Success = تینت ×۱۲٪/×۲۰٪ رنگ معنایی با متن هم‌رنگ
+        m.put("chat_msgIvButtonDefaultIn", AmberTokens.over(inText, inBubble, 0.12f));
+        m.put("chat_msgIvButtonDefaultInPressed", AmberTokens.over(inText, inBubble, 0.20f));
+        m.put("chat_msgIvButtonDefaultInText", inText);
+        m.put("chat_msgIvButtonDefaultInlineIn", AmberTokens.over(inText, inBubble, 0.12f));
+        m.put("chat_msgIvButtonDefaultInlineInPressed", AmberTokens.over(inText, inBubble, 0.20f));
+        m.put("chat_msgIvButtonDefaultInlineInText", inText);
+        m.put("chat_msgIvButtonPrimaryIn", accent);
+        m.put("chat_msgIvButtonPrimaryInPressed", AmberTokens.over(accent, onAccent, 0.20f));
+        m.put("chat_msgIvButtonPrimaryInText", onAccent);
+        m.put("chat_msgIvButtonDangerIn", AmberTokens.over(red, inBubble, 0.12f));
+        m.put("chat_msgIvButtonDangerInPressed", AmberTokens.over(red, inBubble, 0.20f));
+        m.put("chat_msgIvButtonDangerInText", red);
+        m.put("chat_msgIvButtonSuccessIn", AmberTokens.over(green, inBubble, 0.12f));
+        m.put("chat_msgIvButtonSuccessInPressed", AmberTokens.over(green, inBubble, 0.20f));
+        m.put("chat_msgIvButtonSuccessInText", green);
 
         // ── متن حباب خروجی ──────────────────────────────────────────────────
         m.put("chat_messageTextOut", outText);
@@ -483,6 +526,23 @@ public final class AmberPalette {
         m.put("chat_outAudioSeekbar", AmberTokens.alpha(outText, 0.30f));
         m.put("chat_outAudioSeekbarFill", accent);
         m.put("chat_outAudioSeekbarSelected", accent);
+        // قدم ۲۸ — تماس سبز خروجی + خانوادهٔ msgIvButton سمت خروجی (هم‌زبانهٔ ورودی؛ چیپ روی بستر حباب خروجی)
+        m.put("chat_outGreenCall", green);
+        m.put("chat_msgIvButtonDefaultOut", AmberTokens.over(outText, outBubble, 0.12f));
+        m.put("chat_msgIvButtonDefaultOutPressed", AmberTokens.over(outText, outBubble, 0.20f));
+        m.put("chat_msgIvButtonDefaultOutText", outText);
+        m.put("chat_msgIvButtonDefaultInlineOut", AmberTokens.over(outText, outBubble, 0.12f));
+        m.put("chat_msgIvButtonDefaultInlineOutPressed", AmberTokens.over(outText, outBubble, 0.20f));
+        m.put("chat_msgIvButtonDefaultInlineOutText", outText);
+        m.put("chat_msgIvButtonPrimaryOut", accent);
+        m.put("chat_msgIvButtonPrimaryOutPressed", AmberTokens.over(accent, onAccent, 0.20f));
+        m.put("chat_msgIvButtonPrimaryOutText", onAccent);
+        m.put("chat_msgIvButtonDangerOut", AmberTokens.over(red, outBubble, 0.12f));
+        m.put("chat_msgIvButtonDangerOutPressed", AmberTokens.over(red, outBubble, 0.20f));
+        m.put("chat_msgIvButtonDangerOutText", redOut);
+        m.put("chat_msgIvButtonSuccessOut", AmberTokens.over(green, outBubble, 0.12f));
+        m.put("chat_msgIvButtonSuccessOutPressed", AmberTokens.over(green, outBubble, 0.20f));
+        m.put("chat_msgIvButtonSuccessOutText", green);
         m.put("chat_outAudioCacheSeekbar", AmberTokens.alpha(outText, 0.15f));
         m.put("chat_outVoiceSeekbar", AmberTokens.alpha(outText, 0.30f));
         m.put("chat_outVoiceSeekbarFill", accent);
@@ -561,6 +621,43 @@ public final class AmberPalette {
         m.put("chat_mediaLoaderPhotoIcon", 0xFFFFFFFF);
         m.put("chat_mediaLoaderPhotoSelected", 0x7F000000);
         m.put("chat_mediaLoaderPhotoIconSelected", 0xFFD9D9D9);
+        // قدم ۲۸ — خانوادهٔ «رنگ روی مدیا» (تایم/ویوز/منو/پیشرفت/تیک و ساعت ارسال روی عکس/ویدیو):
+        // آپستریم مشکی/سفید خنثی روی تصویر مستقل از تم است (هم‌الگوی mediaLoaderPhoto قدم ۲۶) ولی
+        // کلیدها در پالت نبودند — روز به پیش‌فرض‌های بی‌سند می‌افتاد و شب mediaViews مقدار junk تیرهٔ
+        // 1A1A1C داشت (خاکستری تیره روی اسکریم تیره = ناخوانا) ← صریح‌سازی سفید/اسکریم خنثی در هر دو حالت
+        m.put("chat_mediaTimeText", 0xFFFFFFFF);
+        m.put("chat_mediaTimeBackground", 0x66000000);
+        m.put("chat_mediaViews", 0xFFFFFFFF);
+        m.put("chat_mediaMenu", 0xFFFFFFFF);
+        m.put("chat_mediaInfoText", 0xFFFFFFFF);
+        m.put("chat_mediaProgress", 0xFFFFFFFF);
+        m.put("chat_mediaSentCheck", 0xFFFFFFFF);
+        m.put("chat_mediaSentClock", 0xB2FFFFFF);
+        // مدت ویدیو و متن بازی پیش‌نمایش (روی بستر مدیا): سفید خنثی آپستریم
+        m.put("chat_previewDurationText", 0xFFFFFFFF);
+        m.put("chat_previewGameText", 0xFFFFFFFF);
+        // نوار «ذخیرهٔ GIF» (اسکریم تیره + متن سفید — خنثی روی تصویر؛ روز قبلاً آبی‌فام E21F2B38 داشت)
+        m.put("chat_gifSaveHintBackground", 0x82141416);
+        m.put("chat_gifSaveHintText", 0xFFFFFFFF);
+        // سطوح آلفای بلور روکش چت (خنثی؛ مستقل از تم — روز کلید نداشت)
+        m.put("chat_BlurAlpha", 0xB2000000);
+        m.put("chat_BlurAlphaSlow", 0xCC000000);
+        // قدم ۲۸ — بج خطای ارسال: مربع‌گرد painted با chat_sentError + علامت تعجب tinted با
+        // chat_sentErrorIcon. روز FF0000 خام خارج‌ازتوکن بود ← قرمز معنایی پالت B4382C (۴٫۶۰ روی حباب
+        // خروجی، تعجب سفید ۵٫۹۳ روی بج)؛ شب هر دو قرمز هم‌خانواده بودند (تعجب E5646C روی بج F6574E فقط
+        // ۱٫۰۸:۱ = نامرئی!) ← تعجب سفید شد؛ بج هم F6574E → FF5D50 شد تا هم شکل بج روی حباب ۳٫۱۸ و
+        // هم تعجب سفید روی بج ۳٫۰۳ (هر دو ≥۳٫۰ — پنجرهٔ باریک بین دو قید)
+        m.put("chat_sentError", d ? 0xFFB4382C : 0xFFFF5D50);
+        m.put("chat_sentErrorIcon", 0xFFFFFFFF);
+        // قفل هدر (گفت‌وگوی پنهان/بات تأییدشده): آپستریم 222222 و سفیدِ بی‌ربط به هدر ← dim هم‌زبان
+        // سایر آیکون‌های هدر (actionBarDefaultIcon قدم ۱۱)
+        m.put("chat_lockIcon", dim);
+        // دکمهٔ «افزودن مخاطب» (چیپ متن + تینت ×۱۰٪) و دکمهٔ ویرایش مدیا روی تصویر: روز آبی 308ED0/1A9CFF
+        // خارج‌ازتوکن ← اکسنت (هم‌زبانهٔ چیپ ری‌اکشن و لینک‌ها)
+        m.put("chat_addContact", accent);
+        m.put("chat_editMediaButton", accent);
+        // لینک داخل حباب ورودی: روز آبی 127ACA خارج‌ازتوکن ← اکسنت هم‌زبان messageLinkOut قدم ۲۱
+        m.put("chat_messageLinkIn", accent);
 
         // ── اشتراکی صفحه چت ─────────────────────────────────────────────────
         m.put("chat_linkSelectBackground", AmberTokens.alpha(accent, 0.25f));
@@ -678,6 +775,17 @@ public final class AmberPalette {
         m.put("chat_emojiPanelStickerPackSelectorLine", accent);
         m.put("chat_emojiSearchBackground", fieldBg);
         m.put("chat_emojiSearchIcon", dim);
+        // قدم ۲۸ — تکمیل خانوادهٔ ایموجی (تب‌های پنل پایین، نام/آیکون پک استیکر، متن خالی، ترندینگ):
+        // روز کلید نداشتند (خاکستری-آبی سرد بی‌سند؛ آیکون پک b1b6bc روی پنل کرم فقط ۱٫۷:۱!) و شب
+        // خاکستری 9C9CA1 بی‌سند؛ NewTrending روز آبی 3FA4F0 بود ← همه با dim/accent/text هم‌زبان پنل
+        m.put("chat_emojiBottomPanelIcon", dim);
+        m.put("chat_emojiPanelEmptyText", dim);
+        m.put("chat_emojiPanelTrendingTitle", text);
+        m.put("chat_emojiPanelTrendingDescription", dim);
+        m.put("chat_emojiPanelNewTrending", accent);
+        m.put("chat_emojiPanelStickerSetName", dim);
+        m.put("chat_emojiPanelStickerSetNameHighlight", accent);
+        m.put("chat_emojiPanelStickerSetNameIcon", dim);
 
         // ── دیالوگ‌ها ────────────────────────────────────────────────────────
         m.put("dialogBackground", fieldBg);
