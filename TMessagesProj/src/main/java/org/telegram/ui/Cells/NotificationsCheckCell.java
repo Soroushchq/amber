@@ -112,7 +112,8 @@ public class NotificationsCheckCell extends FrameLayout {
                 return NotificationsCheckCell.this.processColor(color);
             }
         };
-        checkBox.setColors(Theme.key_switchTrack, Theme.key_switchTrackChecked, Theme.key_windowBackgroundWhite, Theme.key_windowBackgroundWhite);
+        // UI2 قدم ۳۱ — انگشت خاموش از switchTrackBlueThumb (شب dim روشن M3-dark) — هم‌الگوی TextCheckCell
+        checkBox.setColors(Theme.key_switchTrack, Theme.key_switchTrackChecked, Theme.key_switchTrackBlueThumb, Theme.key_switchTrackBlueThumbChecked);
         addView(checkBox, LayoutHelper.createFrame(37, 40, (LocaleController.isRTL ? Gravity.LEFT : Gravity.RIGHT) | Gravity.CENTER_VERTICAL, 21, 0, 21, 0));
         checkBox.setFocusable(false);
     }

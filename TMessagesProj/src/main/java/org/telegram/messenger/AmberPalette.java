@@ -818,12 +818,17 @@ public final class AmberPalette {
         m.put("dialogScrollGlow", AmberTokens.alpha(accent, 0.30f));
         m.put("dialogRoundCheckBox", accent);
         m.put("dialogRoundCheckBoxCheck", onAccent);
-        m.put("dialogRadioBackground", outline);
+        // قدم ۳۱ — حلقهٔ رادیو دیالوگ: outline روز روی کاغذ ۱٫۲۵:۱ و شب روی وایپرپ ۱٫۳۱:۱ بود
+        // (حلقهٔ نامرئی — آپستریم b3b3b3 خاکستری میانی ~۲٫۱ داشت) ← dim هم‌زبانهٔ
+        // dialogCheckboxSquareUnchecked (روز ۴٫۸۴ / شب ۶٫۶۳ — زبان M3: مرز غیرفعال = onSurfaceVariant)
+        m.put("dialogRadioBackground", dim);
         m.put("dialogRadioBackgroundChecked", accent);
         m.put("dialogCheckboxSquareBackground", accent);
         m.put("dialogCheckboxSquareCheck", onAccent);
         m.put("dialogCheckboxSquareUnchecked", dim);
-        m.put("dialogCheckboxSquareDisabled", outline);
+        // قدم ۳۱ — outline ← dim (تیک onAccent نامرئی را می‌ساخت)؛ کامنت باید بالای خط باشد —
+        // مولد فقط m.putهای تمام‌شده با ");" را ارزیابی می‌کند
+        m.put("dialogCheckboxSquareDisabled", dim);
         m.put("dialogLineProgress", accent);
         m.put("dialogLineProgressBackground", outline);
         m.put("dialogSearchBackground", fieldBg);
@@ -843,23 +848,38 @@ public final class AmberPalette {
         m.put("dialog_inlineProgressBackground", outline);
         m.put("dialog_liveLocationProgress", accent);
 
-        // ── کنترل‌ها: سوییچ/چک‌باکس/رادیو ───────────────────────────────────
+        // ── کنترل‌ها: سوییچ/چک‌باکس/رادیو (ممیزی کامل قدم ۳۱) ────────────────
+        // زبان M3: ریل غیرفعال = سطح بلندتر از بستر (ظریف)، ریل فعال = اکسنت،
+        // انگشت خاموش = روشن (روز سفید هم‌زبانهٔ M3-light؛ شب dim هم‌زبانهٔ هندل خاکستری M3-dark)،
+        // انگشت روشن = onAccent، مرز غیرفعال چک‌باکس/رادیو = onSurfaceVariant (dim).
         m.put("switchTrack", d ? 0xFFDCCFB8 : AmberTokens.NIGHT_OUTLINE);
         m.put("switchTrackChecked", accent);
         m.put("switchTrackBlue", d ? 0xFFDCCFB8 : AmberTokens.NIGHT_OUTLINE);
         m.put("switchTrackBlueChecked", accent);
         m.put("switchTrackBlueSelector", AmberTokens.alpha(accent, 0.12f));
         m.put("switchTrackBlueSelectorChecked", AmberTokens.alpha(accent, 0.12f));
-        m.put("switchTrackBlueThumb", onAccent);
+        // قدم ۳۱ — انگشت سوییچ خاموش: قبلاً onAccent بود (شب 3A2400 تیره روی ریل تیرهٔ NIGHT_OUTLINE
+        // فقط ~۱٫۰:۱ = انگشت نامرئی در همهٔ سوییچ‌های خانوادهٔ Blue) و روز سفید مطلوب M3-light بود.
+        // ← روز FFF8F1 هم‌زبانهٔ windowBackgroundWhite (سفید M3-light، روی ریل DCCFB8 ۱٫۴۶:۱
+        // — با ضخامت انگشت ۲۰dp و جابه‌جایی مکانی قابل‌تشخیص، هم‌الگوی آپستریم a6adb3/سفید)،
+        // شب dim = هندل روشن M3-dark (روی ریل 382C1C: ۵٫۰۶:۱). مصرف‌کننده‌ها: ۸ سایت خانوادهٔ Blue
+        // + از این قدم TextCheckCell/NotificationsCheckCell هم انگشت‌شان از این جفت می‌آید.
+        m.put("switchTrackBlueThumb", d ? 0xFFFFF8F1 : AmberTokens.NIGHT_TEXT_DIM);
         m.put("switchTrackBlueThumbChecked", onAccent);
         m.put("checkbox", accent);
         m.put("checkboxCheck", onAccent);
-        m.put("checkboxDisabled", d ? 0xFFDCCFB8 : AmberTokens.NIGHT_OUTLINE);
+        // قدم ۳۱ — چک‌باکس گرد غیرفعال (CheckBoxBase/GroupCreateCheckBox): DCCFB8/شب NIGHT_OUTLINE
+        // با تیک onAccent نامرئی بود (روز سفید روی DCCFB8 ۱٫۴۶:۱، شب 3A2400 روی 382C1C ~۱٫۰:۱)
+        // ← dim (تیک onAccent روی آن: روز ۴٫۸۴ / شب ۵٫۰۶ — آپستریم b0b9c2 خاکستری میانی)
+        m.put("checkboxDisabled", dim);
         m.put("checkboxSquareBackground", accent);
         m.put("checkboxSquareCheck", onAccent);
         m.put("checkboxSquareUnchecked", dim);
-        m.put("checkboxSquareDisabled", outline);
-        m.put("radioBackground", outline);
+        // قدم ۳۱ — چک‌باکس مربعی غیرفعال: outline با تیک onAccent نامرئی (روز ۱٫۲۵ / شب ~۱٫۰) ← dim
+        m.put("checkboxSquareDisabled", dim);
+        // قدم ۳۱ — حلقهٔ رادیو غیرفعال: outline حلقهٔ نامرئی می‌ساخت (روز E9DFD0 روی کاغذ ۱٫۲۵:۱،
+        // شب 382C1C روی وایپرپ ۱٫۳۱:۱ — آپستریم b3b3b3 ~۲٫۱) ← dim هم‌زبانهٔ checkboxSquareUnchecked
+        m.put("radioBackground", dim);
         m.put("radioBackgroundChecked", accent);
 
         // ── پروفایل ─────────────────────────────────────────────────────────
