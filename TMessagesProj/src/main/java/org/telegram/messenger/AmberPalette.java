@@ -531,6 +531,30 @@ public final class AmberPalette {
         m.put("chat_outUpCall", accent);
         m.put("chat_outDivider", outline);
 
+        // ── قدم ۲۶ — خانوادهٔ انتخاب پیام (اکشن‌مود انتخاب) ─────────────────
+        // بسترهٔ پیام انتخاب‌شده + هایلایت پرش به پیام: آپستریم آبی 0x280a90f0 خارج‌ازتوکن و کلید در
+        // پالت نبود؛ در دستگاه‌های پرقدرت با والپیپر متحرک، applyChatMessageSelectedBackgroundColor
+        // به‌جای کلید از «پچ گرادیانِ خود والپیپر» استفاده می‌کرد (هم‌الگوی باگ چیپ سرویس قدم ۲۵ —
+        // ظاهر ناهمگون بین دستگاه‌ها). با تعریف صریح کلید در تم (بدون کلید emoticon، مسیر حذفِ
+        // Theme.java فعال نمی‌شود) مسیر توکنی قطعی می‌رود ← تینت اکسنت ×۰٫۱۵۶ (هم‌زبانهٔ چیپ ری‌اکشن
+        // غیرانتخاب‌شده)؛ متن روی بسترهٔ تینت‌خورده: روز ۱۲٫۰۵/۱۰٫۳۴، شب ۱۰٫۴۰/۵٫۷۲
+        m.put("chat_selectedBackground", AmberTokens.alpha(accent, 0.156f));
+        // برچسب «مدیر» زیر نام فرستنده (ChatMessageCell) — آپستریم روز خاکستری-آبی c0c6cb روی حباب
+        // کرم فقط ۱٫۴۵:۱ (نامرئی‌وار) و 89b4c1 خارج‌ازتوکن ← dim (۴٫۲۹/۶٫۰۱ — هم‌زبانهٔ برچسب‌های
+        // ثانویهٔ حباب)؛ حالت انتخاب‌شده هم‌رنگ می‌ماند (بازخورد حالت را تینت بستره می‌دهد)
+        m.put("chat_adminText", dim);
+        m.put("chat_adminSelectedText", dim);
+        // نشان نقش creator/admin (لِی‌اوت امضای ادمین + تینت اسپن ریپلای) — آپستریم 955CDB بنفش /
+        // 40A920 سبز خارج‌ازتوکن ← اکسنت (۳٫۶۲/۷٫۹۶ — هم‌زبانهٔ نام‌ها؛ تمایز نقش با خودِ متن نشان)
+        m.put("chat_tagCreator", accent);
+        m.put("chat_tagAdmin", accent);
+        // اسکریم رادیال‌پروگرس روی مدیا در حال دانلود — مقادیر خنثی آپستریم (مشکی/سفید روی تصویر)
+        // درست‌اند و مستقل از تم‌اند؛ صریح‌سازی برای رفت‌وبرگشت کامل و قطعیت
+        m.put("chat_mediaLoaderPhoto", 0x66000000);
+        m.put("chat_mediaLoaderPhotoIcon", 0xFFFFFFFF);
+        m.put("chat_mediaLoaderPhotoSelected", 0x7F000000);
+        m.put("chat_mediaLoaderPhotoIconSelected", 0xFFD9D9D9);
+
         // ── اشتراکی صفحه چت ─────────────────────────────────────────────────
         m.put("chat_linkSelectBackground", AmberTokens.alpha(accent, 0.25f));
         m.put("chat_textSelectBackground", AmberTokens.alpha(accent, 0.35f));
