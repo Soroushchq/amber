@@ -265,25 +265,26 @@ AAPT2_BORDER_BLACK = (0, 0, 0, 255)
 
 
 def sanitize_border(im):
-    # AAPT2 فقط پیکسل‌های مرزی شفاف کامل، سیاه (هر آلفا) و قرمز (layout bounds) را می‌پذیرد؛
-    # هالهٔ سایهٔ SDF کل بوم را می‌پوشاند و پیش از مارکرکشی در ردیف مرزی (به‌ویژه پایین — کارت ممتد) نشت می‌کند؛
-    # پیکسل‌های نامعتبر (خاکستری نیمه‌شفاف) باید صفر شوند وگرنه AAPT: error: file failed to compile.
+    # قانون نهایی aapt2 (با ماتریس ترکیبی سنتتیک + باینری aapt2 واقعی ۲.۲۰ اثبات شد):
+    #   مرز = فقط (0,0,0,0) شفاف | (0,0,0,255) سیاهِ کاملاً مات | (255,0,0,255) قرمز مات (layout bounds)
+    #   هر آلفای میانی (۱ تا ۲۵۴) حتی برای سیاه = «found an invalid color» — سیاهِ نیمه‌شفاف مجاز نیست!
+    # هالهٔ سایهٔ SDF کل بوم را می‌پوشاند و پیش از مارکرکشی در ردیف مرزی (به‌ویژه پایین — کارت ممتد)
+    # هم خاکستری نیمه‌شفاف و هم سیاهِ نیمه‌شفاف (۰,۰,۰,آلفای ۱-۷) باقی می‌گذارد — همه باید صفر شوند.
     px = im.load()
     w, h = im.size
     fixed = 0
     coords = [(x, 0) for x in range(w)] + [(x, h - 1) for x in range(w)] \
         + [(0, y) for y in range(h)] + [(w - 1, y) for y in range(h)]
     for c in coords:
-        r, g, b, a = px[c]
-        valid = a == 0 or (r == 0 and g == 0 and b == 0) or (r == 255 and g == 0 and b == 0)
-        if not valid:
+        p = px[c]
+        if p != (0, 0, 0, 255) and p != (255, 0, 0, 255):
             px[c] = (0, 0, 0, 0)
             fixed += 1
     return fixed
 
 
 def validate_aapt2(path):
-    # راستی‌آزمایی پس از ذخیره: مرز = شفاف|سیاه|قرمز + وجود مارکر کشش بالا/چپ — خطا = توقف loudly
+    # راستی‌آزمایی پس از ذخیره با قانون دقیق aapt2 (شفاف | سیاهِ مات | قرمز مات) + وجود مارکر کشش بالا/چپ
     im = Image.open(path).convert("RGBA")
     px = im.load()
     w, h = im.size
@@ -291,8 +292,8 @@ def validate_aapt2(path):
         + [(0, y) for y in range(h)] + [(w - 1, y) for y in range(h)]
     bad = [c for c in coords if not (
         px[c][3] == 0
-        or (px[c][0] == 0 and px[c][1] == 0 and px[c][2] == 0)
-        or (px[c][0] == 255 and px[c][1] == 0 and px[c][2] == 0)
+        or px[c] == (0, 0, 0, 255)
+        or px[c] == (255, 0, 0, 255)
     )]
     top_black = sum(1 for x in range(w) if px[x, 0] == AAPT2_BORDER_BLACK)
     left_black = sum(1 for y in range(h) if px[0, y] == AAPT2_BORDER_BLACK)
