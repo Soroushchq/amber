@@ -261,6 +261,49 @@ def rebuild(src_path, radius_dp):
     return out, (L, T, R, B), (cl, ct, cr, cb), (sx0, sx1), (sy0, sy1), (bx0, bx1), r_new, s
 
 
+AAPT2_BORDER_BLACK = (0, 0, 0, 255)
+
+
+def sanitize_border(im):
+    # AAPT2 فقط پیکسل‌های مرزی شفاف کامل، سیاه (هر آلفا) و قرمز (layout bounds) را می‌پذیرد؛
+    # هالهٔ سایهٔ SDF کل بوم را می‌پوشاند و پیش از مارکرکشی در ردیف مرزی (به‌ویژه پایین — کارت ممتد) نشت می‌کند؛
+    # پیکسل‌های نامعتبر (خاکستری نیمه‌شفاف) باید صفر شوند وگرنه AAPT: error: file failed to compile.
+    px = im.load()
+    w, h = im.size
+    fixed = 0
+    coords = [(x, 0) for x in range(w)] + [(x, h - 1) for x in range(w)] \
+        + [(0, y) for y in range(h)] + [(w - 1, y) for y in range(h)]
+    for c in coords:
+        r, g, b, a = px[c]
+        valid = a == 0 or (r == 0 and g == 0 and b == 0) or (r == 255 and g == 0 and b == 0)
+        if not valid:
+            px[c] = (0, 0, 0, 0)
+            fixed += 1
+    return fixed
+
+
+def validate_aapt2(path):
+    # راستی‌آزمایی پس از ذخیره: مرز = شفاف|سیاه|قرمز + وجود مارکر کشش بالا/چپ — خطا = توقف loudly
+    im = Image.open(path).convert("RGBA")
+    px = im.load()
+    w, h = im.size
+    coords = [(x, 0) for x in range(w)] + [(x, h - 1) for x in range(w)] \
+        + [(0, y) for y in range(h)] + [(w - 1, y) for y in range(h)]
+    bad = [c for c in coords if not (
+        px[c][3] == 0
+        or (px[c][0] == 0 and px[c][1] == 0 and px[c][2] == 0)
+        or (px[c][0] == 255 and px[c][1] == 0 and px[c][2] == 0)
+    )]
+    top_black = sum(1 for x in range(w) if px[x, 0] == AAPT2_BORDER_BLACK)
+    left_black = sum(1 for y in range(h) if px[0, y] == AAPT2_BORDER_BLACK)
+    if bad or top_black == 0 or left_black == 0:
+        raise AssertionError(
+            f"AAPT2 validation FAILED for {path}: bad_border={len(bad)} "
+            f"top_markers={top_black} left_markers={left_black}"
+        )
+    return len(bad), top_black, left_black
+
+
 def measure_card(path, expect_r_px=None):
     # راستی‌آزمایی هندسی asset تولیدشده: انحراف لبهٔ قوس از دایرهٔ موردانتظار
     # (مرکز قوس گوشهٔ بالا-چپ = (cl + r, ct + r))
@@ -297,12 +340,15 @@ def main():
         if not os.path.exists(src):
             continue
         out, old_box, new_box, sx, sy, bx, r_new, s = rebuild(src, rdp)
+        n_fixed = sanitize_border(out)
         out.save(src, optimize=True)
+        bad, top_m, left_m = validate_aapt2(src)
         L, T, R, B, dev, c_fit = measure_card(src, expect_r_px=r_new)
         dev_s = f"dev_mean={dev[0]:+.2f}px dev_max={dev[1]:.2f}px" if dev else ""
         print(
             f"{dpi}: old_card={old_box} new_card={new_box} size={out.size} "
             f"R_set={r_new}px({r_new/s:.1f}dp) stretch_x={sx} stretch_y={sy} pad_bottom={bx} "
+            f"border_fixed={n_fixed} aapt2_ok(bad={bad},top={top_m},left={left_m}) "
             f"{dev_s} (center={c_fit})"
         )
 
