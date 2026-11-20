@@ -126,6 +126,10 @@ public class AmbergramProxyManager {
             new Source("TG-MTProxy", "https://raw.githubusercontent.com/tgmtproxy/telegram-mtproto-proxy-list/main/proxies.txt", FORMAT_LINKS),
             new Source("Argh94", "https://raw.githubusercontent.com/Argh94/Proxy-List/main/MTProto.txt", FORMAT_LINKS),
             new Source("0xRadikal", "https://raw.githubusercontent.com/0xRadikal/Free-Telegram-Proxy/main/all/tg.txt", FORMAT_LINKS),
+            new Source("Iliya3ProX", "https://raw.githubusercontent.com/Iliya3ProX/good_proxies/main/proxies.txt", FORMAT_LINKS),
+            new Source("FerhatAcer", "https://raw.githubusercontent.com/ferhatacer90/mtproxy-list/main/proxies.txt", FORMAT_LINKS),
+            new Source("TGProxyPink", "https://raw.githubusercontent.com/tgproxypink/telegram-proxy-list/main/proxies.txt", FORMAT_LINKS),
+            new Source("SuryaDev", "https://raw.githubusercontent.com/suryadev-sm/free-mtproto-proxy-list/main/proxies.txt", FORMAT_LINKS),
     };
 
     /**
