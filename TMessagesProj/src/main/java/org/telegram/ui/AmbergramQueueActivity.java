@@ -175,7 +175,7 @@ public class AmbergramQueueActivity extends BaseFragment implements DownloadQueu
         statusView.setTextSize(13);
         statusView.setText(statusText(item));
         statusView.setTextColor(statusColor(item));
-        row.addView(statusView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL, 0, AndroidUtilities.dp(3), 0, 0));
+        row.addView(statusView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL, 0, 3, 0, 0));
 
         if (item.state == DownloadQueueController.STATE_DOWNLOADING && item.size > 0) {
             ProgressBar progressBar = new ProgressBar(context, null, android.R.attr.progressBarStyleHorizontal);
@@ -183,13 +183,13 @@ public class AmbergramQueueActivity extends BaseFragment implements DownloadQueu
             progressBar.setMax(100);
             progressBar.setProgress((int) Math.min(100, item.loadedBytes * 100 / Math.max(1, item.size)));
             progressBar.setProgressTintMode(PorterDuff.Mode.SRC_IN);
-            row.addView(progressBar, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 0, AndroidUtilities.dp(4), 0, 0));
+            row.addView(progressBar, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 0, 4, 0, 0));
         }
 
         if (showDivider) {
             View divider = new View(context);
             divider.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundGray));
-            row.addView(divider, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1, 0, AndroidUtilities.dp(4), 0, 0));
+            row.addView(divider, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1, 0, 4, 0, 0));
         }
         return row;
     }

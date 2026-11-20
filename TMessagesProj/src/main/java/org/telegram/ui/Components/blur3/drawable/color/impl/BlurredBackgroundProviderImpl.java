@@ -3,6 +3,7 @@ package org.telegram.ui.Components.blur3.drawable.color.impl;
 import static org.telegram.messenger.AndroidUtilities.dpf2;
 
 import android.graphics.Color;
+import android.os.Build;
 
 import androidx.core.graphics.ColorUtils;
 import androidx.core.math.MathUtils;
@@ -18,12 +19,19 @@ import org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundProvider
 import org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundProviderBuilder;
 
 public class BlurredBackgroundProviderImpl {
+    // گرد ۱۴: سوییپ مات‌شدن همهٔ مسیرهای «شیشهٔ بی‌بلور» — بازخورد واقعی گوشی بعد از گرد ۱۳:
+    // فقط mainTabs فیکس شده بود و نوار تب پوشه‌ها (topPanel) و بقیهٔ سطوح هنوز با 0.76 شفاف می‌ماندند؛
+    // روی SDK < 31 هم اصلاً RenderNode بلور وجود ندارد (منبع رنگ ثابت) — پس آلفای نیمه‌شفاف = درخشیدن متن زیر نوار.
+    // قاعدهٔ واحد: بلور واقعی (SDK ۳۱+ با شیشهٔ مایع روشن) → 0.85 طراحی؛ بقیهٔ حالت‌ها → تقریباً مات 0.94.
+    private static float readableGlassAlpha() {
+        return LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) && Build.VERSION.SDK_INT >= 31 ? 0.85f : 0.94f;
+    }
+
     public static BlurredBackgroundProvider mainTabs(Theme.ResourcesProvider resourcesProvider) {
         return new BlurredBackgroundProviderBuilder(resourcesProvider)
             .setBackgroundColor((r, isDark) -> {
-                // بدون بلور فعال، پس‌زمینهٔ شفاف باعث درهم‌ریختگی متن زیر نوار می‌شد («12:45» زیر تب پروفایل)
-                // ← بدون شیشهٔ مایع تقریباً مات (0.94)؛ با شیشهٔ مایع بلور فعال است و 0.85 حفظ شد
-                final float alpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0.85f : 0.94f;
+                // بدون بلور واقعی، پس‌زمینهٔ شفاف باعث درهم‌ریختگی متن زیر نوار می‌شد («12:45» زیر تب پروفایل)
+                final float alpha = readableGlassAlpha();
                 final int colorBg = Theme.getColor(Theme.key_windowBackgroundWhite, r);
                 final int colorTarget = Theme.getColor(Theme.key_glass_targetMainTabs, r);
                 return solveSrcColor(colorBg, colorTarget, alpha);
@@ -39,7 +47,9 @@ public class BlurredBackgroundProviderImpl {
     public static BlurredBackgroundProvider topPanel(Theme.ResourcesProvider resourcesProvider) {
         return new BlurredBackgroundProviderBuilder(resourcesProvider)
             .setBackgroundColor((r, isDark) -> {
-                final float alpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0.85f : 0.76f;
+                // نوار تب پوشه‌های صفحهٔ اصلی (filterTabsView) و پنل جست‌وجو این‌جا مصرف می‌شود —
+                // با 0.76 بی‌بلور، اسم چت‌ها و ساعت از زیر تب‌ها بیرون می‌زد («تب فولدرها واضح نیست»)
+                final float alpha = readableGlassAlpha();
                 final int colorBg = Theme.getColor(Theme.key_windowBackgroundWhite, r);
                 final int colorTarget = Theme.getColor(Theme.key_glass_targetMainTopPanel, r);
                 return solveSrcColor(colorBg, colorTarget, alpha);
@@ -55,7 +65,7 @@ public class BlurredBackgroundProviderImpl {
     public static BlurredBackgroundProvider tabsPanelNoShadow(Theme.ResourcesProvider resourcesProvider) {
         return new BlurredBackgroundProviderBuilder(resourcesProvider)
             .setBackgroundColor((r, isDark) ->
-                Theme.multAlpha(Theme.getColor(Theme.key_windowBackgroundWhite, r), 0.88f))
+                Theme.multAlpha(Theme.getColor(Theme.key_windowBackgroundWhite, r), readableGlassAlpha()))
             .setStrokeColorTop(0, 0)
             .setStrokeColorBottom(0, 0)
             .setShadowColor(0, 0)
@@ -65,7 +75,7 @@ public class BlurredBackgroundProviderImpl {
     public static BlurredBackgroundProvider emojiViewButton(Theme.ResourcesProvider resourcesProvider) {
         return new BlurredBackgroundProviderBuilder(resourcesProvider)
                 .setBackgroundColor((r, isDark) -> {
-                    final float alpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0.85f : 0.76f;
+                    final float alpha = readableGlassAlpha();
                     final int colorBg = Theme.getColor(Theme.key_windowBackgroundWhite, r);
                     return Theme.multAlpha(colorBg, alpha);
                 })
@@ -127,7 +137,7 @@ public class BlurredBackgroundProviderImpl {
     public static BlurredBackgroundProvider attachMenuSearch(Theme.ResourcesProvider resourcesProvider) {
         return new BlurredBackgroundProviderBuilder(resourcesProvider)
                 .setBackgroundColor((r, isDark) -> {
-                    final float alpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0.85f : 0.76f;
+                    final float alpha = readableGlassAlpha();
                     final int colorBg = Theme.getColor(Theme.key_windowBackgroundWhite, r);
                     return Theme.multAlpha(colorBg, alpha);
                 })
@@ -156,7 +166,8 @@ public class BlurredBackgroundProviderImpl {
                         return ColorUtils.setAlphaComponent(Theme.getColor(Theme.key_chat_messagePanelBackground, r), 255);
                     }
 
-                    final float alpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0.85f : 0.76f;
+                    // حتی با تنظیم بلور روشن، روی SDK < 31 منبع رندر بلور وجود ندارد — مات 0.94 (گرد ۱۴)
+                    final float alpha = readableGlassAlpha();
                     final int colorBg = Theme.getColor(Theme.key_chat_messagePanelBackground, r);
                     return Theme.multAlpha(colorBg, alpha);
                 })
@@ -217,7 +228,8 @@ public class BlurredBackgroundProviderImpl {
                             Theme.key_actionBarDefault : Theme.key_chat_topPanelBackground, r), 255);
                     }
 
-                    final float alpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0.85f : 0.76f;
+                    // روی SDK < 31 بلور واقعی وجود ندارد — مات 0.94 (گرد ۱۴)
+                    final float alpha = readableGlassAlpha();
                     final int colorBg = Theme.getColor(Theme.key_chat_topPanelBackground, r);
                     return Theme.multAlpha(colorBg, alpha);
                 })
@@ -238,7 +250,7 @@ public class BlurredBackgroundProviderImpl {
     public static BlurredBackgroundProvider simpleActionBar(Theme.ResourcesProvider resourcesProvider) {
         return new BlurredBackgroundProviderBuilder(resourcesProvider)
             .setBackgroundColor((r, isDark) -> {
-                final float alpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0.85f : 0.80f;
+                final float alpha = readableGlassAlpha();
                 final int colorBg = Theme.getColor(Theme.key_windowBackgroundGray, r);
                 final int colorTarget = Theme.getColor(Theme.key_windowBackgroundWhite, r);
                 return solveSrcColor(colorBg, colorTarget, alpha);
@@ -271,7 +283,8 @@ public class BlurredBackgroundProviderImpl {
                             Theme.key_actionBarDefault : Theme.key_chat_topPanelBackground, r), 255);
                 }
 
-                final float alpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0.85f : 0.76f;
+                // روی SDK < 31 بلور واقعی وجود ندارد — مات 0.94 (گرد ۱۴)
+                final float alpha = readableGlassAlpha();
                 final int colorBg = Theme.getColor(Theme.key_chat_topPanelBackground, r);
                 return Theme.multAlpha(colorBg, alpha);
             })
@@ -286,7 +299,8 @@ public class BlurredBackgroundProviderImpl {
     public static BlurredBackgroundProvider topPanelChatActivitySearchListBg(Theme.ResourcesProvider resourcesProvider) {
         return new BlurredBackgroundProviderBuilder(resourcesProvider)
                 .setBackgroundColor((r, isDark) -> {
-                    final float alpha = 0.7f;
+                    // روی SDK < 31 بلور واقعی وجود ندارد — مات 0.94 (گرد ۱۴)
+                    final float alpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) && Build.VERSION.SDK_INT >= 31 ? 0.7f : 0.94f;
                     final int colorBg = Theme.getColor(Theme.key_windowBackgroundWhite, r);
                     return Theme.multAlpha(colorBg, alpha);
                 })
@@ -301,7 +315,8 @@ public class BlurredBackgroundProviderImpl {
     public static BlurredBackgroundProvider bulletin(Theme.ResourcesProvider resourcesProvider) {
         return new BlurredBackgroundProviderBuilder(resourcesProvider)
             .setBackgroundColor((r, isDark) -> {
-                final float alpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0.85f : 0.76f;
+                // بارِ «واگرد» روی محتوای چت شناور است — بی‌بلور واقعی مات 0.94 (گرد ۱۴)
+                final float alpha = readableGlassAlpha();
                 final int colorBg = Theme.getColor(Theme.key_undo_background, r);
                 return Theme.multAlpha(colorBg, alpha);
             })
@@ -317,7 +332,7 @@ public class BlurredBackgroundProviderImpl {
     public static BlurredBackgroundProvider hint(Theme.ResourcesProvider resourcesProvider) {
         return new BlurredBackgroundProviderBuilder(resourcesProvider)
             .setBackgroundColor((r, isDark) -> {
-                final float alpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0.82f : 0.76f;
+                final float alpha = readableGlassAlpha();
                 final int colorBg = Theme.getColor(Theme.key_windowBackgroundWhite, r);
                 final int colorTarget = 0xFF282828;
                 return isDark ? Theme.multAlpha(0xFF111111, 0.9f) : solveSrcColor(colorBg, colorTarget, alpha);
@@ -337,7 +352,7 @@ public class BlurredBackgroundProviderImpl {
     public static BlurredBackgroundProvider inputFieldShareAlert(Theme.ResourcesProvider resourcesProvider) {
         return new BlurredBackgroundProviderBuilder(resourcesProvider)
                 .setBackgroundColor((r, isDark) -> {
-                    final float alpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0.85f : 0.76f;
+                    final float alpha = readableGlassAlpha();
                     final int colorBg = Theme.getColor(Theme.key_windowBackgroundWhite, r);
                     final int colorTarget = Theme.getColor(Theme.key_chat_messagePanelBackground, r);
                     return solveSrcColor(colorBg, colorTarget, alpha);

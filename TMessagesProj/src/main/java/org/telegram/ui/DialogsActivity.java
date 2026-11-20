@@ -3436,12 +3436,16 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 statusDrawable = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(null, dp(26));
                 statusDrawable.center = true;
                 logoDrawable = context.getResources().getDrawable(R.drawable.amber_logo_2).mutate();
-                logoDrawable.setBounds(0, dp(2), logoDrawable.getIntrinsicWidth(), dp(2) + logoDrawable.getIntrinsicHeight());
+                // گرد ۱۴: کلمه‌نگارهٔ «AmberGram» در تیتر صفحهٔ اصلی ~۱٫۲۵ برابر بزرگ‌تر شد
+                // (بازخورد «نوشته ambergram خیلی کوچیک است») — ALIGN_BOTTOM تا داخل ارتفاع خط تیتر (≈26dp) جا شود و کلیپ نخورد
+                final int brandLw = Math.round(logoDrawable.getIntrinsicWidth() * 1.25f);
+                final int brandLh = Math.round(logoDrawable.getIntrinsicHeight() * 1.25f);
+                logoDrawable.setBounds(0, 0, brandLw, brandLh);
                 // a new drawable (also when the view is recreated after a theme switch made elsewhere): remember its tint, the
                 // theme hook only recolors when the color differs from the last one applied
                 logoDrawable.setColorFilter(lastLogoDrawableColor = getThemedColor(Theme.key_telegram_color_dialogsLogo), PorterDuff.Mode.MULTIPLY);
                 SpannableStringBuilder ssb = new SpannableStringBuilder(getString(R.string.AppName));
-                ssb.setSpan(new ImageSpan(logoDrawable), 0, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                ssb.setSpan(new ImageSpan(logoDrawable, ImageSpan.ALIGN_BOTTOM), 0, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 actionBar.setTitle(ssb, statusDrawable);
                 updateStatus(UserConfig.getInstance(currentAccount).getCurrentUser(), false);
             }

@@ -192,12 +192,12 @@ public class AmbergramProxyActivity extends BaseFragment implements AmbergramPro
         statusView.setTextSize(13);
         statusView.setText(itemStatusText(item));
         statusView.setTextColor(itemStatusColor(item));
-        row.addView(statusView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL, 0, AndroidUtilities.dp(3), 0, 0));
+        row.addView(statusView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL, 0, 3, 0, 0));
 
         if (showDivider) {
             View divider = new View(context);
             divider.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundGray));
-            row.addView(divider, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1, 0, AndroidUtilities.dp(4), 0, 0));
+            row.addView(divider, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1, 0, 4, 0, 0));
         }
         return row;
     }
