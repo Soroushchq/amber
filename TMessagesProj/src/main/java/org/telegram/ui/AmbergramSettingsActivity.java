@@ -2,6 +2,7 @@ package org.telegram.ui;
 
 import android.content.Context;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -147,6 +148,21 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
         return fragmentView;
     }
 
+    // آیکون‌ها در کاشی گرد با پس‌زمینهٔ آمبر ملایم — هم‌زبانهٔ کاشی‌های SettingCell صفحهٔ تنظیمات
+    private FrameLayout makeIconTile(Context context, int iconRes) {
+        FrameLayout tile = new FrameLayout(context);
+        GradientDrawable background = new GradientDrawable();
+        background.setColor((BRAND_ORANGE & 0x00FFFFFF) | 0x20000000);
+        background.setCornerRadius(AndroidUtilities.dp(12));
+        tile.setBackground(background);
+        ImageView iconView = new ImageView(context);
+        iconView.setImageResource(iconRes);
+        iconView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        iconView.setColorFilter(BRAND_ORANGE, PorterDuff.Mode.SRC_IN);
+        tile.addView(iconView, LayoutHelper.createFrame(22, 22, Gravity.CENTER));
+        return tile;
+    }
+
     private LinearLayout makeQueueRow(Context context) {
         LinearLayout row = new LinearLayout(context);
         row.setOrientation(LinearLayout.HORIZONTAL);
@@ -155,10 +171,7 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
         row.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector)));
         row.setOnClickListener(v -> presentFragment(new AmbergramQueueActivity()));
 
-        ImageView iconView = new ImageView(context);
-        iconView.setImageResource(R.drawable.msg_download);
-        iconView.setColorFilter(BRAND_ORANGE, PorterDuff.Mode.SRC_IN);
-        row.addView(iconView, LayoutHelper.createLinear(AndroidUtilities.dp(26), AndroidUtilities.dp(26), 0, Gravity.CENTER_VERTICAL, 0, 0, AndroidUtilities.dp(14), 0));
+        row.addView(makeIconTile(context, R.drawable.msg_download), LayoutHelper.createLinear(42, 42, 0, Gravity.CENTER_VERTICAL, 0, 0, 12, 0));
 
         LinearLayout textCol = new LinearLayout(context);
         textCol.setOrientation(LinearLayout.VERTICAL);
@@ -185,7 +198,7 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
         ThemeBind.textColor(chevronView, Theme.key_windowBackgroundWhiteGrayText2, null);
         chevronView.setText(LocaleController.isRTL ? "‹" : "›");
         chevronView.setGravity(Gravity.CENTER);
-        row.addView(chevronView, LayoutHelper.createLinear(AndroidUtilities.dp(28), ViewGroup.LayoutParams.WRAP_CONTENT, 0, Gravity.CENTER_VERTICAL, AndroidUtilities.dp(8), 0, 0, 0));
+        row.addView(chevronView, LayoutHelper.createLinear(28, ViewGroup.LayoutParams.WRAP_CONTENT, 0, Gravity.CENTER_VERTICAL, 8, 0, 0, 0));
 
         return row;
     }
@@ -221,10 +234,7 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
         row.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector)));
         row.setOnClickListener(v -> presentFragment(new AmbergramProxyActivity()));
 
-        ImageView iconView = new ImageView(context);
-        iconView.setImageResource(R.drawable.ic_ambergram_proxy);
-        iconView.setColorFilter(BRAND_ORANGE, PorterDuff.Mode.SRC_IN);
-        row.addView(iconView, LayoutHelper.createLinear(AndroidUtilities.dp(26), AndroidUtilities.dp(26), 0, Gravity.CENTER_VERTICAL, 0, 0, AndroidUtilities.dp(14), 0));
+        row.addView(makeIconTile(context, R.drawable.ic_ambergram_proxy), LayoutHelper.createLinear(42, 42, 0, Gravity.CENTER_VERTICAL, 0, 0, 12, 0));
 
         LinearLayout textCol = new LinearLayout(context);
         textCol.setOrientation(LinearLayout.VERTICAL);
@@ -251,7 +261,7 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
         ThemeBind.textColor(chevronView, Theme.key_windowBackgroundWhiteGrayText2, null);
         chevronView.setText(LocaleController.isRTL ? "‹" : "›");
         chevronView.setGravity(Gravity.CENTER);
-        row.addView(chevronView, LayoutHelper.createLinear(AndroidUtilities.dp(28), ViewGroup.LayoutParams.WRAP_CONTENT, 0, Gravity.CENTER_VERTICAL, AndroidUtilities.dp(8), 0, 0, 0));
+        row.addView(chevronView, LayoutHelper.createLinear(28, ViewGroup.LayoutParams.WRAP_CONTENT, 0, Gravity.CENTER_VERTICAL, 8, 0, 0, 0));
 
         return row;
     }
@@ -271,10 +281,7 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
             }
         });
 
-        ImageView iconView = new ImageView(context);
-        iconView.setImageResource(R.drawable.ghost);
-        iconView.setColorFilter(BRAND_ORANGE, PorterDuff.Mode.SRC_IN);
-        row.addView(iconView, LayoutHelper.createLinear(AndroidUtilities.dp(26), AndroidUtilities.dp(26), 0, Gravity.CENTER_VERTICAL, 0, 0, AndroidUtilities.dp(14), 0));
+        row.addView(makeIconTile(context, R.drawable.ghost), LayoutHelper.createLinear(42, 42, 0, Gravity.CENTER_VERTICAL, 0, 0, 12, 0));
 
         LinearLayout textCol = new LinearLayout(context);
         textCol.setOrientation(LinearLayout.VERTICAL);
@@ -324,10 +331,7 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
             }
         });
 
-        ImageView iconView = new ImageView(context);
-        iconView.setImageResource(iconRes);
-        iconView.setColorFilter(BRAND_ORANGE, PorterDuff.Mode.SRC_IN);
-        row.addView(iconView, LayoutHelper.createLinear(AndroidUtilities.dp(26), AndroidUtilities.dp(26), 0, Gravity.CENTER_VERTICAL, 0, 0, AndroidUtilities.dp(14), 0));
+        row.addView(makeIconTile(context, iconRes), LayoutHelper.createLinear(42, 42, 0, Gravity.CENTER_VERTICAL, 0, 0, 12, 0));
 
         LinearLayout textCol = new LinearLayout(context);
         textCol.setOrientation(LinearLayout.VERTICAL);

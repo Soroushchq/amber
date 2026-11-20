@@ -1060,7 +1060,15 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                     }
                     break;
             }
-            return formatString(R.string.TelegramVersion, String.format(Locale.US, "v%s (%d)\n%s", pInfo.versionName, code, abi));
+            // APP_VERSION_NAME خودش «(کد)» را در بر دارد — دوبار چاپ نشود («(7310) (7310)»)
+            String versionName = pInfo.versionName;
+            String versionPart;
+            if (versionName != null && versionName.contains("(" + code + ")")) {
+                versionPart = "v" + versionName;
+            } else {
+                versionPart = String.format(Locale.US, "v%s (%d)", versionName, code);
+            }
+            return formatString(R.string.TelegramVersion, String.format(Locale.US, "%s\n%s", versionPart, abi));
         } catch (Exception e) {
             FileLog.e(e);
         }

@@ -21,7 +21,9 @@ public class BlurredBackgroundProviderImpl {
     public static BlurredBackgroundProvider mainTabs(Theme.ResourcesProvider resourcesProvider) {
         return new BlurredBackgroundProviderBuilder(resourcesProvider)
             .setBackgroundColor((r, isDark) -> {
-                final float alpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0.85f : 0.76f;
+                // بدون بلور فعال، پس‌زمینهٔ شفاف باعث درهم‌ریختگی متن زیر نوار می‌شد («12:45» زیر تب پروفایل)
+                // ← بدون شیشهٔ مایع تقریباً مات (0.94)؛ با شیشهٔ مایع بلور فعال است و 0.85 حفظ شد
+                final float alpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0.85f : 0.94f;
                 final int colorBg = Theme.getColor(Theme.key_windowBackgroundWhite, r);
                 final int colorTarget = Theme.getColor(Theme.key_glass_targetMainTabs, r);
                 return solveSrcColor(colorBg, colorTarget, alpha);
