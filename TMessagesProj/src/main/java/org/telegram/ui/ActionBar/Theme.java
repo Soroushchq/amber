@@ -1677,9 +1677,9 @@ public class Theme {
             if (isDark != UNKNOWN) {
                 return isDark == DARK;
             }
-            if ("Dark Blue".equals(name) || "Night".equals(name) || "Amber".equals(name)) {
+            if ("Dark Blue".equals(name) || "Night".equals(name) || "Amber".equals(name) || "Aurora".equals(name)) {
                 isDark = DARK;
-            } else if ("Blue".equals(name) || "Arctic Blue".equals(name) || "Day".equals(name) || "Amber Day".equals(name)) {
+            } else if ("Blue".equals(name) || "Arctic Blue".equals(name) || "Day".equals(name) || "Amber Day".equals(name) || "Aurora Day".equals(name)) {
                 isDark = LIGHT;
             }
             if (isDark == UNKNOWN) {
@@ -4098,6 +4098,70 @@ public class Theme {
         themesDict.put("Amber Day", themeInfo);
         currentDayTheme = themeInfo;
 
+        // Amber fork: v0.9.7 — aurora brand («شیشه و نور») — the second visual
+        // identity: icy night #070A10 with three light ribbons (teal #2DE4C4,
+        // violet #8B7CF6, pink #E86BD8, amber #FFB454), glassy bubbles and the
+        // comet logo. The Estedad font follows this family (AndroidUtilities).
+        // Deliberately NOT wired into currentDayTheme/currentNightTheme: the
+        // night toggle keeps the amber pair, aurora is picked manually.
+        themeInfo = new ThemeInfo();
+        themeInfo.name = "Aurora";
+        themeInfo.assetName = "aurora.attheme";
+        themeInfo.previewBackgroundColor = 0xff070a10;
+        themeInfo.previewInColor = 0xff1d232b;
+        themeInfo.previewOutColor = 0xff0e2e2c;
+        themeInfo.sortIndex = 7;
+        // same accent contract as Amber (قدم ۶): seeds from
+        // AmberTokens.ACCENT_AURORA_NIGHT, id 0 renders the authored colors and
+        // leaves the motion-gradient wallpaper untouched (zeroed overrides),
+        // 1/2 recolor organically via Telegram's own engine.
+        themeInfo.firstAccentIsDefault = false;
+        themeInfo.currentAccentId = 0;
+        themeInfo.setAccentColorOptions(
+                AmberTokens.ACCENT_AURORA_NIGHT,
+                null,
+                null,
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0, 1, 2 },
+                new String[] { "", "", "" },
+                new int[]    { 0, 0, 0 },
+                new int[]    { 0, 0, 0 }
+                );
+        sortAccents(themeInfo);
+        themes.add(themeInfo);
+        themesDict.put("Aurora", themeInfo);
+
+        // Amber fork: v0.9.7 — «آئورورای روشن» — daylight companion: spar white
+        // #F5F5FA with pastel ribbons, same glass language.
+        themeInfo = new ThemeInfo();
+        themeInfo.name = "Aurora Day";
+        themeInfo.assetName = "aurora_day.attheme";
+        themeInfo.previewBackgroundColor = 0xfff5f5fa;
+        themeInfo.previewInColor = 0xffffffff;
+        themeInfo.previewOutColor = 0xffdcf7f0;
+        themeInfo.sortIndex = 8;
+        themeInfo.firstAccentIsDefault = false;
+        themeInfo.currentAccentId = 0;
+        themeInfo.setAccentColorOptions(
+                AmberTokens.ACCENT_AURORA_DAY,
+                null,
+                null,
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0, 1, 2 },
+                new String[] { "", "", "" },
+                new int[]    { 0, 0, 0 },
+                new int[]    { 0, 0, 0 }
+                );
+        sortAccents(themeInfo);
+        themes.add(themeInfo);
+        themesDict.put("Aurora Day", themeInfo);
+
         themeInfo = new ThemeInfo();
         themeInfo.name = "Arctic Blue";
         themeInfo.assetName = "arctic.attheme";
@@ -6248,6 +6312,12 @@ public class Theme {
     }
 
     public static void refreshThemeColors(boolean bg, boolean messages) {
+        // Amber fork: aurora brand (v0.9.7) — the UI font follows the theme family
+        // (Estedad for Aurora/Aurora Day, AmberGram UI otherwise). Cheap string
+        // compare; only invalidates the memoized typeface when the family flips.
+        if (currentTheme != null) {
+            AndroidUtilities.updateUIFontForTheme(currentTheme.name);
+        }
         // build the new table aside and publish it at once: getColor() never sees a half-filled table, and the live
         // SparseIntArray is never mutated while it is being read (a concurrent put corrupts its key order)
         final SparseIntArray colors = currentColorsNoAccent.clone();
@@ -10306,6 +10376,12 @@ public class Theme {
             if (accent.parentTheme.getKey().equals("Amber Day") && accent.id == 0) {
                 return true;
             }
+            if (accent.parentTheme.getKey().equals("Aurora") && accent.id == 0) {
+                return true;
+            }
+            if (accent.parentTheme.getKey().equals("Aurora Day") && accent.id == 0) {
+                return true;
+            }
             if (accent.parentTheme.getKey().equals("Day") && accent.id == 9) {
                 return true;
             }
@@ -10314,6 +10390,12 @@ public class Theme {
             }
         }
         return false;
+    }
+
+    // Amber fork: aurora brand (v0.9.7) — header/intro logo and launcher-brand
+    // visuals follow the theme family (comet logo + Estedad for Aurora/Aurora Day)
+    public static boolean currentThemeIsAurora() {
+        return currentTheme != null && AmberTokens.isAuroraName(currentTheme.name);
     }
 
     /**

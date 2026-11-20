@@ -19,18 +19,36 @@ public final class AmberPalette {
 
     private static Map<String, Integer> dayCache;
     private static Map<String, Integer> nightCache;
+    private static Map<String, Integer> auroraDayCache;
+    private static Map<String, Integer> auroraNightCache;
 
     private AmberPalette() {}
 
+    /**
+     * mode: MODE_NIGHT / MODE_DAY (کهربا) و MODE_AURORA_NIGHT / MODE_AURORA_DAY (آئورورا).
+     * برند دوم v0.9.7 — «شیشه و نور». ساخت تنبل و کش‌شده.
+     */
     public static Map<String, Integer> palette(int mode) {
         if (mode == AmberTokens.MODE_NIGHT) {
             if (nightCache == null) {
-                nightCache = build(false);
+                nightCache = build(false, false);
             }
             return nightCache;
         }
+        if (mode == AmberTokens.MODE_AURORA_NIGHT) {
+            if (auroraNightCache == null) {
+                auroraNightCache = build(false, true);
+            }
+            return auroraNightCache;
+        }
+        if (mode == AmberTokens.MODE_AURORA_DAY) {
+            if (auroraDayCache == null) {
+                auroraDayCache = build(true, true);
+            }
+            return auroraDayCache;
+        }
         if (dayCache == null) {
-            dayCache = build(true);
+            dayCache = build(true, false);
         }
         return dayCache;
     }
@@ -53,50 +71,51 @@ public final class AmberPalette {
         return sb.toString();
     }
 
-    private static Map<String, Integer> build(boolean d) {
+    /** d = روز/شب — au = برند آئورورا (شیشه و نور) در برابر برند کهربا */
+    private static Map<String, Integer> build(boolean d, boolean au) {
         HashMap<String, Integer> m = new HashMap<>();
 
         // ── اتم‌ها ───────────────────────────────────────────────────────────
-        final int text = d ? AmberTokens.DAY_TEXT : AmberTokens.NIGHT_TEXT;
-        final int dim = d ? AmberTokens.DAY_TEXT_DIM : AmberTokens.NIGHT_TEXT_DIM;
-        final int navPill = d ? AmberTokens.DAY_NAV_PILL : AmberTokens.NIGHT_NAV_PILL;
-        final int time = d ? AmberTokens.DAY_TIME : AmberTokens.NIGHT_TIME;
-        final int accent = d ? AmberTokens.DAY_ACCENT : AmberTokens.NIGHT_ACCENT;
-        final int accentBright = d ? AmberTokens.DAY_ACCENT_BRIGHT : AmberTokens.NIGHT_ACCENT_BRIGHT;
-        final int onAccent = d ? AmberTokens.DAY_ON_ACCENT : AmberTokens.NIGHT_ON_ACCENT;
-        final int bg = d ? AmberTokens.DAY_BG : AmberTokens.NIGHT_BG;
-        final int white = d ? AmberTokens.DAY_BG : AmberTokens.NIGHT_WALLPAPER_TOP;
-        final int header = d ? AmberTokens.DAY_HEADER : AmberTokens.NIGHT_HEADER;
-        final int headerBorder = d ? AmberTokens.DAY_HEADER_BORDER : AmberTokens.NIGHT_HEADER_BORDER;
-        final int surface = d ? AmberTokens.DAY_SURFACE : AmberTokens.NIGHT_SURFACE;
-        final int outline = d ? AmberTokens.DAY_OUTLINE : AmberTokens.NIGHT_OUTLINE;
-        final int inBubble = d ? AmberTokens.DAY_IN_BUBBLE : AmberTokens.NIGHT_IN_BUBBLE;
-        final int inText = d ? AmberTokens.DAY_IN_TEXT : AmberTokens.NIGHT_IN_TEXT;
-        final int outBubble = d ? AmberTokens.DAY_OUT_BUBBLE : AmberTokens.NIGHT_OUT_BUBBLE;
-        final int outText = d ? AmberTokens.DAY_OUT_TEXT : AmberTokens.NIGHT_OUT_TEXT;
-        final int badgeText = d ? AmberTokens.DAY_BADGE_TEXT : AmberTokens.NIGHT_BADGE_TEXT;
-        final int fieldBg = d ? AmberTokens.DAY_FIELD_BG : AmberTokens.NIGHT_FIELD_BG;
-        final int fieldBorder = d ? AmberTokens.DAY_FIELD_BORDER : AmberTokens.NIGHT_FIELD_BORDER;
+        final int text = au ? (d ? AmberTokens.AURORA_DAY_TEXT : AmberTokens.AURORA_NIGHT_TEXT) : (d ? AmberTokens.DAY_TEXT : AmberTokens.NIGHT_TEXT);
+        final int dim = au ? (d ? AmberTokens.AURORA_DAY_TEXT_DIM : AmberTokens.AURORA_NIGHT_TEXT_DIM) : (d ? AmberTokens.DAY_TEXT_DIM : AmberTokens.NIGHT_TEXT_DIM);
+        final int navPill = au ? (d ? AmberTokens.AURORA_DAY_NAV_PILL : AmberTokens.AURORA_NIGHT_NAV_PILL) : (d ? AmberTokens.DAY_NAV_PILL : AmberTokens.NIGHT_NAV_PILL);
+        final int time = au ? (d ? AmberTokens.AURORA_DAY_TIME : AmberTokens.AURORA_NIGHT_TIME) : (d ? AmberTokens.DAY_TIME : AmberTokens.NIGHT_TIME);
+        final int accent = au ? (d ? AmberTokens.AURORA_DAY_ACCENT : AmberTokens.AURORA_NIGHT_ACCENT) : (d ? AmberTokens.DAY_ACCENT : AmberTokens.NIGHT_ACCENT);
+        final int accentBright = au ? (d ? AmberTokens.AURORA_DAY_ACCENT_BRIGHT : AmberTokens.AURORA_NIGHT_ACCENT_BRIGHT) : (d ? AmberTokens.DAY_ACCENT_BRIGHT : AmberTokens.NIGHT_ACCENT_BRIGHT);
+        final int onAccent = au ? (d ? AmberTokens.AURORA_DAY_ON_ACCENT : AmberTokens.AURORA_NIGHT_ON_ACCENT) : (d ? AmberTokens.DAY_ON_ACCENT : AmberTokens.NIGHT_ON_ACCENT);
+        final int bg = au ? (d ? AmberTokens.AURORA_DAY_BG : AmberTokens.AURORA_NIGHT_BG) : (d ? AmberTokens.DAY_BG : AmberTokens.NIGHT_BG);
+        final int white = au ? (d ? AmberTokens.AURORA_DAY_BG : AmberTokens.AURORA_NIGHT_BG) : (d ? AmberTokens.DAY_BG : AmberTokens.NIGHT_WALLPAPER_TOP);
+        final int header = au ? (d ? AmberTokens.AURORA_DAY_HEADER : AmberTokens.AURORA_NIGHT_HEADER) : (d ? AmberTokens.DAY_HEADER : AmberTokens.NIGHT_HEADER);
+        final int headerBorder = au ? (d ? AmberTokens.AURORA_DAY_HEADER_BORDER : AmberTokens.AURORA_NIGHT_HEADER_BORDER) : (d ? AmberTokens.DAY_HEADER_BORDER : AmberTokens.NIGHT_HEADER_BORDER);
+        final int surface = au ? (d ? AmberTokens.AURORA_DAY_SURFACE : AmberTokens.AURORA_NIGHT_SURFACE) : (d ? AmberTokens.DAY_SURFACE : AmberTokens.NIGHT_SURFACE);
+        final int outline = au ? (d ? AmberTokens.AURORA_DAY_OUTLINE : AmberTokens.AURORA_NIGHT_OUTLINE) : (d ? AmberTokens.DAY_OUTLINE : AmberTokens.NIGHT_OUTLINE);
+        final int inBubble = au ? (d ? AmberTokens.AURORA_DAY_IN_BUBBLE : AmberTokens.AURORA_NIGHT_IN_BUBBLE) : (d ? AmberTokens.DAY_IN_BUBBLE : AmberTokens.NIGHT_IN_BUBBLE);
+        final int inText = au ? (d ? AmberTokens.AURORA_DAY_IN_TEXT : AmberTokens.AURORA_NIGHT_IN_TEXT) : (d ? AmberTokens.DAY_IN_TEXT : AmberTokens.NIGHT_IN_TEXT);
+        final int outBubble = au ? (d ? AmberTokens.AURORA_DAY_OUT_BUBBLE : AmberTokens.AURORA_NIGHT_OUT_BUBBLE) : (d ? AmberTokens.DAY_OUT_BUBBLE : AmberTokens.NIGHT_OUT_BUBBLE);
+        final int outText = au ? (d ? AmberTokens.AURORA_DAY_OUT_TEXT : AmberTokens.AURORA_NIGHT_OUT_TEXT) : (d ? AmberTokens.DAY_OUT_TEXT : AmberTokens.NIGHT_OUT_TEXT);
+        final int badgeText = au ? (d ? AmberTokens.AURORA_DAY_BADGE_TEXT : AmberTokens.AURORA_NIGHT_BADGE_TEXT) : (d ? AmberTokens.DAY_BADGE_TEXT : AmberTokens.NIGHT_BADGE_TEXT);
+        final int fieldBg = au ? (d ? AmberTokens.AURORA_DAY_FIELD_BG : AmberTokens.AURORA_NIGHT_FIELD_BG) : (d ? AmberTokens.DAY_FIELD_BG : AmberTokens.NIGHT_FIELD_BG);
+        final int fieldBorder = au ? (d ? AmberTokens.AURORA_DAY_FIELD_BORDER : AmberTokens.AURORA_NIGHT_FIELD_BORDER) : (d ? AmberTokens.DAY_FIELD_BORDER : AmberTokens.NIGHT_FIELD_BORDER);
 
         // ── مشتق‌ها ──────────────────────────────────────────────────────────
         final int sel = AmberTokens.alpha(text, d ? 0.06f : 0.08f);
         final int selIn = AmberTokens.over(accent, inBubble, d ? 0.14f : 0.16f);
         final int selOut = AmberTokens.over(accent, outBubble, d ? 0.14f : 0.16f);
-        final int divider = d ? AmberTokens.DAY_OUTLINE : AmberTokens.alpha(AmberTokens.NIGHT_OUTLINE, 0.55f);
+        final int divider = au ? (d ? AmberTokens.AURORA_DAY_OUTLINE : AmberTokens.alpha(AmberTokens.AURORA_NIGHT_OUTLINE, 0.55f)) : (d ? AmberTokens.DAY_OUTLINE : AmberTokens.alpha(AmberTokens.NIGHT_OUTLINE, 0.55f));
         // قدم ۲۵ — چیپ سرویس/تاریخ: با «احترام به کلید» در applyChatServiceMessageColor چیپ همیشه از کلید می‌آید؛
         // روز: اسکریم جوهر ۶۵٪ (متن سفید ۵٫۸۸:۱ روی ترکیب با وایپرپ کرم — قبلاً DAY_TEXT_DIM×۷۰٪ فقط ۳٫۰۴:۱)؛ شب بدون تغییر (۱۵٫۱:۱)
-        final int svcBg = AmberTokens.alpha(d ? AmberTokens.DAY_TEXT : AmberTokens.NIGHT_SURFACE, d ? 0.65f : 0.70f);
+        final int svcBg = AmberTokens.alpha(au ? (d ? AmberTokens.AURORA_DAY_TEXT : AmberTokens.AURORA_NIGHT_SURFACE) : (d ? AmberTokens.DAY_TEXT : AmberTokens.NIGHT_SURFACE), d ? 0.65f : 0.70f);
         // انتخاب‌شده/فشرده: روز جوهر ۷۸٪ (تیره‌تر) / شب سطح +۱۲٪ به‌سمت متن (روشن‌تر) — بازخورد محسوس در هر دو (قبلاً همان رنگ عادی بود)
-        final int svcBgSel = AmberTokens.alpha(d ? AmberTokens.DAY_TEXT : AmberTokens.over(AmberTokens.NIGHT_TEXT, AmberTokens.NIGHT_SURFACE, 0.12f), d ? 0.78f : 0.72f);
+        final int svcBgSel = AmberTokens.alpha(au ? (d ? AmberTokens.AURORA_DAY_TEXT : AmberTokens.over(AmberTokens.AURORA_NIGHT_TEXT, AmberTokens.AURORA_NIGHT_SURFACE, 0.12f)) : (d ? AmberTokens.DAY_TEXT : AmberTokens.over(AmberTokens.NIGHT_TEXT, AmberTokens.NIGHT_SURFACE, 0.12f)), d ? 0.78f : 0.72f);
         // ریپل داخل چیپ (دکمه‌های بات): سفید ۱۴٪ روی قرص تیره — قبلاً همان رنگ چیپ بود = ریپل نامرئی
-        final int svcSel = AmberTokens.alpha(d ? 0xFFFFFFFF : AmberTokens.NIGHT_TEXT, 0.14f);
-        final int goDown = AmberTokens.alpha(d ? AmberTokens.DAY_WALLPAPER_TOP : AmberTokens.NIGHT_SURFACE, d ? 0.90f : 0.80f);
-        final int deepFile = d ? 0xFFF7E3C8 : 0xFF2E2618;
+        final int svcSel = AmberTokens.alpha(au ? (d ? 0xFFFFFFFF : AmberTokens.AURORA_NIGHT_TEXT) : (d ? 0xFFFFFFFF : AmberTokens.NIGHT_TEXT), 0.14f);
+        final int goDown = AmberTokens.alpha(au ? (d ? AmberTokens.AURORA_DAY_WALLPAPER_TOP : AmberTokens.AURORA_NIGHT_SURFACE) : (d ? AmberTokens.DAY_WALLPAPER_TOP : AmberTokens.NIGHT_SURFACE), d ? 0.90f : 0.80f);
+        final int deepFile = au ? (d ? 0xFFE9EEF6 : 0xFF1B2430) : (d ? 0xFFF7E3C8 : 0xFF2E2618);
         final int outDim = AmberTokens.alpha(outText, 0.65f);
-        final int outTime = d ? 0xFFA8701E : 0xFFD9BC7A;
+        final int outTime = au ? (d ? 0xFF0E7260 : 0xFF7FE8D0) : (d ? 0xFFA8701E : 0xFFD9BC7A);
         // قدم ۲۱ — تیک خوانده‌شدهٔ حباب خروجی: روز accentBright (E8871E) روی حباب FFDDB8 فقط ۲٫۰۶:۱ بود
         // ← «کهربای برشته» 9C5200 (۴٫۵۰:۱؛ از تیک ارسال اکسنت C25E00 عمیق‌تر و متمایز)؛ شب accentBright سالم است (۵٫۵۸)
-        final int sentCheckRead = d ? 0xFF9C5200 : AmberTokens.NIGHT_ACCENT_BRIGHT;
+        final int sentCheckRead = au ? (d ? 0xFF06503F : AmberTokens.AURORA_NIGHT_ACCENT_BRIGHT) : (d ? 0xFF9C5200 : AmberTokens.NIGHT_ACCENT_BRIGHT);
         final int red = d ? 0xFFB4382C : 0xFFFF6E54;
         // قدم ۲۸ — قرمزِ سمت حباب خروجی (هم‌الگوی تفکیک time/outTime): حباب خروجی شب روشن‌تر است
         // (5C4000) و FF6E54 روی تینت خودش فقط ۲٫۹۶ می‌شد ← سالمون روشن‌تر FF8E78 (۳٫۶۶ روی چیپ)
@@ -126,8 +145,8 @@ public final class AmberPalette {
         m.put("windowBackgroundWhiteGreenText2", green);
         m.put("windowBackgroundWhiteInputField", fieldBorder);
         m.put("windowBackgroundWhiteInputFieldActivated", accent);
-        m.put("windowBackgroundGray", d ? AmberTokens.DAY_SURFACE : AmberTokens.NIGHT_BG);
-        m.put("windowBackgroundGrayShadow", d ? 0x14211A12 : 0x28000000);
+        m.put("windowBackgroundGray", au ? (d ? AmberTokens.AURORA_DAY_SURFACE : AmberTokens.AURORA_NIGHT_BG) : (d ? AmberTokens.DAY_SURFACE : AmberTokens.NIGHT_BG));
+        m.put("windowBackgroundGrayShadow", au ? (d ? 0x14171B26 : 0x28000000) : (d ? 0x14211A12 : 0x28000000));
         m.put("windowBackgroundChecked", accent);
         m.put("windowBackgroundUnchecked", outline);
         m.put("windowBackgroundCheckText", text);
@@ -146,13 +165,13 @@ public final class AmberPalette {
         m.put("actionBarDefaultSearch", text);
         m.put("actionBarDefaultSearchPlaceholder", dim);
         m.put("actionBarDefaultSearchArchivedPlaceholder", dim);
-        m.put("actionBarDefaultArchived", d ? AmberTokens.DAY_SURFACE : AmberTokens.NIGHT_WALLPAPER_TOP);
+        m.put("actionBarDefaultArchived", au ? (d ? AmberTokens.AURORA_DAY_SURFACE : AmberTokens.AURORA_NIGHT_SURFACE) : (d ? AmberTokens.DAY_SURFACE : AmberTokens.NIGHT_WALLPAPER_TOP));
         m.put("actionBarDefaultArchivedIcon", dim);
         m.put("actionBarDefaultArchivedTitle", text);
         m.put("actionBarDefaultArchivedSelector", AmberTokens.alpha(text, 0.08f));
         // قدم ۱۶ — روز سفید هاردکد نشتی رنگ خارج از توکن بود ← سطح گرم DAY_SURFACE؛ شب NIGHT_SURFACE حفظ
         // سایه ۹-پیچ با MULTIPLY توسط همین رنگ تینت می‌شود → سایه گرم روز / تیره شب خودکار
-        m.put("actionBarDefaultSubmenuBackground", d ? AmberTokens.DAY_SURFACE : AmberTokens.NIGHT_SURFACE);
+        m.put("actionBarDefaultSubmenuBackground", au ? (d ? AmberTokens.AURORA_DAY_SURFACE : AmberTokens.AURORA_NIGHT_SURFACE) : (d ? AmberTokens.DAY_SURFACE : AmberTokens.NIGHT_SURFACE));
         m.put("actionBarDefaultSubmenuItem", text);
         m.put("actionBarDefaultSubmenuItemIcon", dim);
         m.put("actionBarDefaultSubmenuSeparator", divider);
@@ -189,7 +208,7 @@ public final class AmberPalette {
         // switch2Track قبلاً در روز قرمز آپستریم (F57480) و شب خاکستری سرد (3A3A3E) بود ← هم‌زبانه switchTrack
         // switch2TrackChecked در روز آبی آپستریم (229AF0) و شب F97316 خارج‌ازتوکن بود ← اکسنت
         // (سوییچ متن‌دار TextCheckCell2/UniversalAdapter/چیپ‌های چک‌باکس)
-        m.put("switch2Track", d ? 0xFFDCCFB8 : AmberTokens.NIGHT_OUTLINE);
+        m.put("switch2Track", au ? (d ? 0xFFDCE0EA : AmberTokens.AURORA_NIGHT_OUTLINE) : (d ? 0xFFDCCFB8 : AmberTokens.NIGHT_OUTLINE));
         m.put("switch2TrackChecked", accent);
         // متن فرعی ردیف‌های منوی اکشن‌مود (ActionBarMenuSubItem.subtextView): خاکستری سرد آپستریم 7C8288 روی
         // کارت گرم قدم ۱۶ ← dim (کنتراست ۴٫۳۴/۶٫۲۰)
@@ -271,21 +290,21 @@ public final class AmberPalette {
         // وایپرپ گرادیانی متحرک (MotionBackgroundDrawable): پایه + سه توقف؛
         // نام‌های عجیب chat_wallpaper_gradient_to / key_..._to2/to3 عمداً
         // همان قرارداد ThemeColors.createColorKeysMap تلگرام است.
-        m.put("chat_wallpaper", d ? AmberTokens.DAY_WALLPAPER_TOP : AmberTokens.NIGHT_WALLPAPER_MID);
-        m.put("chat_wallpaper_gradient_to", d ? AmberTokens.DAY_WALLPAPER_BOTTOM : AmberTokens.NIGHT_WALLPAPER_TOP);
-        m.put("key_chat_wallpaper_gradient_to2", d ? AmberTokens.DAY_BG : AmberTokens.NIGHT_WALLPAPER_BOTTOM);
-        m.put("key_chat_wallpaper_gradient_to3", d ? AmberTokens.DAY_HEADER : AmberTokens.NIGHT_SURFACE);
+        m.put("chat_wallpaper", au ? (d ? AmberTokens.AURORA_DAY_WALLPAPER_TOP : AmberTokens.AURORA_NIGHT_WALLPAPER_MID) : (d ? AmberTokens.DAY_WALLPAPER_TOP : AmberTokens.NIGHT_WALLPAPER_MID));
+        m.put("chat_wallpaper_gradient_to", au ? (d ? AmberTokens.AURORA_DAY_WALLPAPER_BOTTOM : AmberTokens.AURORA_NIGHT_WALLPAPER_TOP) : (d ? AmberTokens.DAY_WALLPAPER_BOTTOM : AmberTokens.NIGHT_WALLPAPER_TOP));
+        m.put("key_chat_wallpaper_gradient_to2", au ? (d ? AmberTokens.AURORA_DAY_BG : AmberTokens.AURORA_NIGHT_WALLPAPER_BOTTOM) : (d ? AmberTokens.DAY_BG : AmberTokens.NIGHT_WALLPAPER_BOTTOM));
+        m.put("key_chat_wallpaper_gradient_to3", au ? (d ? AmberTokens.AURORA_DAY_HEADER : AmberTokens.AURORA_NIGHT_SURFACE) : (d ? AmberTokens.DAY_HEADER : AmberTokens.NIGHT_SURFACE));
         // قدم ۱۹ — کلید پنجم وایپرپ (زاویه گرادیان دومرحله‌ای؛ مسیر موشن از آن استفاده نمی‌کند
         // ولی برای کامل بودن attheme و ثبات ادیتور تم صریح شد؛ پیش‌فرض آپستریم هم ۴۵ است)
         m.put("chat_wallpaper_gradient_rotation", 45);
         // قدم ۱۹ — پس‌زمینه صفحه چت در حالت کم‌حجم (compact/battery-saver): قبلاً از fallback
         // windowBackgroundWhite می‌آمد؛ حالا پایهٔ وایپرپ به‌صورت تخت = «کم‌حجم یعنی وایپرپ بدون گرادیان»
-        m.put("chat_compact_background", d ? AmberTokens.DAY_WALLPAPER_TOP : AmberTokens.NIGHT_WALLPAPER_MID);
+        m.put("chat_compact_background", au ? (d ? AmberTokens.AURORA_DAY_WALLPAPER_TOP : AmberTokens.AURORA_NIGHT_WALLPAPER_MID) : (d ? AmberTokens.DAY_WALLPAPER_TOP : AmberTokens.NIGHT_WALLPAPER_MID));
         // پردهٔ محو لبهٔ پایین: روز جوهر×۳٪ (گرم) / شب مشکی×۳٪ (مثل آپستریم)
-        m.put("chat_compact_backgroundGradient", AmberTokens.alpha(d ? AmberTokens.DAY_TEXT : 0xFF000000, 0.03f));
+        m.put("chat_compact_backgroundGradient", AmberTokens.alpha(au ? (d ? AmberTokens.AURORA_DAY_TEXT : 0xFF000000) : (d ? AmberTokens.DAY_TEXT : 0xFF000000), 0.03f));
         // قرص اکشن روی بوم کم‌حجم (چیپ سرویس/نام استیکر/ریپلای): آپستریم ۵٪ مشکی بود که
         // روی بوم تیرهٔ شب عملاً نامرئی می‌شد ← روز جوهر×۶٪ / شب جوهر روشن×۱۰٪ (پیل تونال)
-        m.put("chat_compact_actionBackground", AmberTokens.alpha(d ? AmberTokens.DAY_TEXT : AmberTokens.NIGHT_TEXT, d ? 0.06f : 0.10f));
+        m.put("chat_compact_actionBackground", AmberTokens.alpha(au ? (d ? AmberTokens.AURORA_DAY_TEXT : AmberTokens.AURORA_NIGHT_TEXT) : (d ? AmberTokens.DAY_TEXT : AmberTokens.NIGHT_TEXT), d ? 0.06f : 0.10f));
         // متن/آیکون قرص: آپستریم مشکی خالص (شب روی پیل تیره نامرئی!) ← جوهر/dim
         m.put("chat_compact_actionText", text);
         m.put("chat_compact_actionIcon", dim);
@@ -319,7 +338,7 @@ public final class AmberPalette {
         // mapCompact همان کلید عادی کپی شد (میراث قدم ۱۹/۲۰):
         // بستر حباب خروجی کم‌حجم: آپستریم 0F000000 (۹٪ مشکی سرد) ← حباب خروجیِ هموار روی بوم تخت؛
         // روز outBubble×۸۵٪ = FFE1BF (جدایی از بوم ۱٫۱۷ ≈ جدایی آپستریم؛ از حباب ورودی ۱٫۰۶) / شب ×۵۵٪ = 3D2C06 (۱٫۲۰ از ورودی)
-        m.put("chat_compact_outBackground", AmberTokens.over(outBubble, d ? AmberTokens.DAY_WALLPAPER_TOP : AmberTokens.NIGHT_WALLPAPER_MID, d ? 0.85f : 0.55f));
+        m.put("chat_compact_outBackground", AmberTokens.over(outBubble, au ? (d ? AmberTokens.AURORA_DAY_WALLPAPER_TOP : AmberTokens.AURORA_NIGHT_WALLPAPER_MID) : (d ? AmberTokens.DAY_WALLPAPER_TOP : AmberTokens.NIGHT_WALLPAPER_MID), d ? 0.85f : 0.55f));
         // ساعت/بازدیدهای خروجی: هم‌صدای chat_outTimeText (روی بستر کم‌حجم ۳٫۵۴/۷٫۳۲)
         m.put("chat_compact_outTimeText", outTime);
         // تیک ارسال: هم‌صدای chat_outSentCheck = اکسنت (۳٫۶۲/۶٫۶۴ روی بستر)
@@ -351,8 +370,8 @@ public final class AmberPalette {
         // و پیش‌فرض‌های سیاه/سفید بی‌سند آپستریم می‌گرفت؛ شب هم مقدارهای قدیمی (121213 نه رنگ بستر) بود ←
         // فید = رنگ بستر کم‌حجم (chat_compact_background قدم ۱۹) تا لبهٔ محتوا در خود بستر محو شود؛
         // محتوا = text/dim هم‌زبان حباب‌ها؛ خط گلس = روز خنثی آپستریم ۲۴٪ / شب صفر (قرارداد گلس قدم ۲۷)
-        m.put("chat_compact_fadeEdge", d ? AmberTokens.DAY_WALLPAPER_TOP : AmberTokens.NIGHT_WALLPAPER_MID);
-        m.put("chat_compact_fadeMiddle", AmberTokens.alpha(d ? AmberTokens.DAY_WALLPAPER_TOP : AmberTokens.NIGHT_WALLPAPER_MID, 0.64f));
+        m.put("chat_compact_fadeEdge", au ? (d ? AmberTokens.AURORA_DAY_WALLPAPER_TOP : AmberTokens.AURORA_NIGHT_WALLPAPER_MID) : (d ? AmberTokens.DAY_WALLPAPER_TOP : AmberTokens.NIGHT_WALLPAPER_MID));
+        m.put("chat_compact_fadeMiddle", AmberTokens.alpha(au ? (d ? AmberTokens.AURORA_DAY_WALLPAPER_TOP : AmberTokens.AURORA_NIGHT_WALLPAPER_MID) : (d ? AmberTokens.DAY_WALLPAPER_TOP : AmberTokens.NIGHT_WALLPAPER_MID), 0.64f));
         m.put("chat_compact_progress", text);
         m.put("chat_compact_pullingDownText", text);
         m.put("chat_compact_topicEmptyText", text);
@@ -430,10 +449,10 @@ public final class AmberPalette {
         m.put("chat_inContactIcon", accent);
         m.put("chat_inLocationBackground", deepFile);
         m.put("chat_inLocationIcon", accent);
-        m.put("chat_inTableBackground", d ? 0xFFFFFDF8 : 0xFF2E2618);
+        m.put("chat_inTableBackground", au ? (d ? 0xFFF4F6FA : 0xFF212A38) : (d ? 0xFFFFFDF8 : 0xFF2E2618));
         m.put("chat_inTableBorder", outline);
-        m.put("chat_inCodeBackground", d ? 0xFFF7EFE4 : 0xFF211B12);
-        m.put("chat_inArticleCodeBackground", d ? 0xFFF7EFE4 : 0xFF211B12);
+        m.put("chat_inCodeBackground", au ? (d ? 0xFFF1F4F9 : 0xFF1B2430) : (d ? 0xFFF7EFE4 : 0xFF211B12));
+        m.put("chat_inArticleCodeBackground", au ? (d ? 0xFFF1F4F9 : 0xFF1B2430) : (d ? 0xFFF7EFE4 : 0xFF211B12));
         m.put("chat_inArticleCodeScrollbar", AmberTokens.alpha(text, 0.25f));
         m.put("chat_inArticleCodeScrollbarBackground", outline);
         m.put("chat_inArticleDetailsArrow", dim);
@@ -514,7 +533,7 @@ public final class AmberPalette {
         m.put("chat_outFileInfoSelectedText", outDim);
         m.put("chat_outFileProgress", accent);
         m.put("chat_outFileProgressSelected", accent);
-        m.put("chat_outFileBackground", d ? 0xFFFBCE8F : 0xFF6E5200);
+        m.put("chat_outFileBackground", au ? (d ? 0xFFBEEBDF : 0xFF17544A) : (d ? 0xFFFBCE8F : 0xFF6E5200));
         m.put("chat_outFileBackgroundSelected", AmberTokens.over(accent, outBubble, d ? 0.08f : 0.10f));
         m.put("chat_outAudioTitleText", outText);
         m.put("chat_outAudioPerfomerText", accent);
@@ -549,21 +568,21 @@ public final class AmberPalette {
         m.put("chat_outVoiceSeekbarSelected", accent);
         m.put("chat_outVenueInfoText", outText);
         m.put("chat_outVenueInfoSelectedText", outText);
-        m.put("chat_outContactBackground", d ? 0xFFFBCE8F : 0xFF6E5200);
+        m.put("chat_outContactBackground", au ? (d ? 0xFFBEEBDF : 0xFF17544A) : (d ? 0xFFFBCE8F : 0xFF6E5200));
         m.put("chat_outContactNameText", outText);
         m.put("chat_outContactPhoneText", outDim);
         m.put("chat_outContactPhoneSelectedText", outDim);
         m.put("chat_outContactIcon", accent);
         m.put("chat_outLocationIcon", accent);
-        m.put("chat_outTableBackground", d ? 0xFFFBF1DD : 0xFF6E5200);
+        m.put("chat_outTableBackground", au ? (d ? 0xFFC4EFE4 : 0xFF17544A) : (d ? 0xFFFBF1DD : 0xFF6E5200));
         m.put("chat_outTableBorder", AmberTokens.alpha(outText, 0.30f));
-        m.put("chat_outCodeBackground", d ? 0xFFF6E3C2 : 0xFF524000);
-        m.put("chat_outArticleCodeBackground", d ? 0xFFF6E3C2 : 0xFF524000);
+        m.put("chat_outCodeBackground", au ? (d ? 0xFFB8E9DC : 0xFF12463E) : (d ? 0xFFF6E3C2 : 0xFF524000));
+        m.put("chat_outArticleCodeBackground", au ? (d ? 0xFFB8E9DC : 0xFF12463E) : (d ? 0xFFF6E3C2 : 0xFF524000));
         m.put("chat_outArticleCodeScrollbar", AmberTokens.alpha(outText, 0.30f));
         m.put("chat_outArticleCodeScrollbarBackground", AmberTokens.alpha(outText, 0.25f));
         m.put("chat_outArticleDetailsArrow", outDim);
         m.put("chat_outArticleDetailsLine", AmberTokens.alpha(outText, 0.30f));
-        m.put("chat_outPollCorrectAnswer", d ? 0xFF3D7A2B : 0xFF9BC77E);
+        m.put("chat_outPollCorrectAnswer", au ? (d ? 0xFF0E8A6E : 0xFF8AD9BC) : (d ? 0xFF3D7A2B : 0xFF9BC77E));
         m.put("chat_outPollWrongAnswer", d ? 0xFFB4382C : 0xFFFF8A75);
         // قدم ۲۱ — رفع هم‌الگوی قدم ۲۰ (سمت خروجی): بسترهٔ چیپ ری‌اکشن خروجی آپستریم «جامد» است (78c272 سبز) و
         // مصرف‌کننده‌ها خودشان آلفا می‌سازند (چیپ غیرانتخاب‌شده ×۰٫۱۵۶ در ReactionsLayoutInBubble، تاپیک آلفا۳۸ در
@@ -662,12 +681,12 @@ public final class AmberPalette {
         // ── اشتراکی صفحه چت ─────────────────────────────────────────────────
         m.put("chat_linkSelectBackground", AmberTokens.alpha(accent, 0.25f));
         m.put("chat_textSelectBackground", AmberTokens.alpha(accent, 0.35f));
-        m.put("chat_serviceText", d ? 0xFFFFFFFF : AmberTokens.NIGHT_TEXT);
+        m.put("chat_serviceText", au ? (d ? 0xFFFFFFFF : AmberTokens.AURORA_NIGHT_TEXT) : (d ? 0xFFFFFFFF : AmberTokens.NIGHT_TEXT));
         m.put("chat_serviceBackground", svcBg);
         m.put("chat_serviceBackgroundSelected", svcBgSel);
         m.put("chat_serviceBackgroundSelector", svcSel);
-        m.put("chat_serviceIcon", d ? 0xFFFFFFFF : AmberTokens.NIGHT_TEXT);
-        m.put("chat_serviceLink", d ? 0xFFFFEFC9 : 0xFFFFDDB8);
+        m.put("chat_serviceIcon", au ? (d ? 0xFFFFFFFF : AmberTokens.AURORA_NIGHT_TEXT) : (d ? 0xFFFFFFFF : AmberTokens.NIGHT_TEXT));
+        m.put("chat_serviceLink", au ? (d ? 0xFFDCF7F0 : 0xFFDCFFF4) : (d ? 0xFFFFEFC9 : 0xFFFFDDB8));
         m.put("chat_goDownButton", goDown);
         m.put("chat_goDownButtonCounter", badgeText);
         m.put("chat_goDownButtonCounterBackground", accent);
@@ -677,16 +696,16 @@ public final class AmberPalette {
         m.put("chat_topPanelMessage", dim);
         m.put("chat_topPanelLine", divider);
         m.put("chat_topPanelClose", dim);
-        m.put("chat_fieldOverlayText", d ? 0xFFFFFFFF : AmberTokens.NIGHT_TEXT);
+        m.put("chat_fieldOverlayText", au ? (d ? 0xFFFFFFFF : AmberTokens.AURORA_NIGHT_TEXT) : (d ? 0xFFFFFFFF : AmberTokens.NIGHT_TEXT));
         m.put("chat_muteIcon", dim);
         m.put("chat_unreadMessagesStartBackground", header);
         m.put("chat_unreadMessagesStartText", accent);
         m.put("chat_unreadMessagesStartArrowIcon", accent);
         m.put("chat_searchPanelText", dim);
         m.put("chat_searchPanelIcons", dim);
-        m.put("chat_stickersHintPanel", d ? 0xFFF7EFE4 : AmberTokens.NIGHT_SURFACE);
+        m.put("chat_stickersHintPanel", au ? (d ? 0xFFF1F4F9 : AmberTokens.AURORA_NIGHT_SURFACE) : (d ? 0xFFF7EFE4 : AmberTokens.NIGHT_SURFACE));
         // قدم ۲۵ — متن دکمه‌های بات روی چیپ سرویس تیره: اکسنت (روز ۱٫۳۷:۱ نامرئی!) ← هم‌زبانهٔ serviceText (۵٫۸۸/۱۵٫۱)
-        m.put("chat_botButtonText", d ? 0xFFFFFFFF : AmberTokens.NIGHT_TEXT);
+        m.put("chat_botButtonText", au ? (d ? 0xFFFFFFFF : AmberTokens.AURORA_NIGHT_TEXT) : (d ? 0xFFFFFFFF : AmberTokens.NIGHT_TEXT));
         m.put("chat_botKeyboardButtonBackground", accent);
         m.put("chat_botKeyboardButtonBackgroundPressed", accentBright);
         m.put("chat_botKeyboardButtonText", onAccent);
@@ -700,7 +719,7 @@ public final class AmberPalette {
         // آپستریم خاکستری 8e959b روی آبی خودش هم ~۲٫۰ بود ← dim گرم (روی کرم ۴٫۹۴ روز / روی پیل شب ۵٫۶۱)
         m.put("chat_recordVoiceCancel", dim);
         // قدم ۲۲ — پیل صدای ضبط‌شده: قبلاً FFEFC9/332717 خارج‌ازتوکن ← توکن هدر (FFE9CF) و بوردر هدر شب (332818)
-        m.put("chat_recordedVoiceBackground", d ? AmberTokens.DAY_HEADER : AmberTokens.NIGHT_HEADER_BORDER);
+        m.put("chat_recordedVoiceBackground", au ? (d ? AmberTokens.AURORA_DAY_HEADER : AmberTokens.AURORA_NIGHT_HEADER_BORDER) : (d ? AmberTokens.DAY_HEADER : AmberTokens.NIGHT_HEADER_BORDER));
         m.put("chat_recordedVoiceDarkerBackground", headerBorder);
         // قدم ۲۳ — نقطهٔ ضبط صوتی: آپستریم قرمز da564d (معنای «در حال ضبط») ولی اکسنت کهربایی بود ← قرمز پالت
         // (روز B4382C روی فیلد سفید ۶٫۵ / شب E2695B روی پیل ۳٫۱ — لایه‌های Cup Red/Box Red لوتّی و بج تقویم)
@@ -709,7 +728,7 @@ public final class AmberPalette {
         m.put("chat_recordedVoiceProgress", accent);
         // قدم ۲۳ — موج پخش‌نشده/دستگیره/مدتِ پیل ضبط‌شده: آپستریم سفید روی آبی بود؛ پیل ما کرم است و روز
         // سفید روی کرم = نامرئی (۱٫۱۸:۱!) ← جوهر روز (۱۲٫۶+) / شب متن روشن (۱۲٫۵۹)
-        m.put("chat_recordedVoiceProgressInner", d ? AmberTokens.DAY_TEXT : AmberTokens.NIGHT_TEXT);
+        m.put("chat_recordedVoiceProgressInner", au ? (d ? AmberTokens.AURORA_DAY_TEXT : AmberTokens.AURORA_NIGHT_TEXT) : (d ? AmberTokens.DAY_TEXT : AmberTokens.NIGHT_TEXT));
         m.put("chat_secretTimeText", dim);
         m.put("chat_secretChatStatusText", d ? 0xFFB4382C : 0xFFE2695B);
         m.put("chat_stickerNameText", accent);
@@ -725,7 +744,7 @@ public final class AmberPalette {
         // قدم ۲۲ — مرز بالای شیت: قبلاً صفر = کاملاً بی‌مرز بود؛ این کلید گرادیان مویی بالای پنل را رنگ می‌کند
         // (MULTIPLY روی compose_panel_shadow) — روز جوهر گرم (ترکیب روی کاغذ ≈ ECE3D7 = خانوادهٔ مرز E9DFD0 نقشه‌راه)
         // / شب مشکی آپستریم (روی بوم تیره نامحسوس؛ جدایی از پلهٔ روشن‌تر فیلد می‌آید)
-        m.put("chat_messagePanelShadow", d ? AmberTokens.DAY_TEXT : 0xFF000000);
+        m.put("chat_messagePanelShadow", au ? (d ? AmberTokens.AURORA_DAY_TEXT : 0xFF000000) : (d ? AmberTokens.DAY_TEXT : 0xFF000000));
         m.put("chat_messagePanelText", text);
         m.put("chat_messagePanelHint", dim);
         m.put("chat_messagePanelCursor", accent);
@@ -747,8 +766,8 @@ public final class AmberPalette {
         m.put("key_chat_messagePanelVoiceLockShadow", 0xFF000000);
 
         // ── پنل پیوست ───────────────────────────────────────────────────────
-        m.put("chat_attachAudioBackground", d ? 0xFFB4382C : 0xFFE2695B);
-        m.put("chat_attachContactBackground", d ? 0xFF8C6A1D : 0xFFC79A3E);
+        m.put("chat_attachAudioBackground", au ? (d ? 0xFFB84A9E : 0xFFE86BD8) : (d ? 0xFFB4382C : 0xFFE2695B));
+        m.put("chat_attachContactBackground", au ? (d ? 0xFFB3651F : 0xFFFFB454) : (d ? 0xFF8C6A1D : 0xFFC79A3E));
         // قدم ۲۲ — متن دکمهٔ مخاطب (کلید مرده در این فورک ولی برای کامل بودن attheme): آپستریم DFA000 طلایی ← «زمان»
         m.put("chat_attachContactText", time);
         m.put("chat_attachGalleryBackground", accent);
@@ -766,12 +785,12 @@ public final class AmberPalette {
         m.put("chat_attachPermissionText", dim);
 
         // ── پنل ایموجی ──────────────────────────────────────────────────────
-        m.put("chat_emojiPanelBackground", d ? 0xFFF7EFE4 : AmberTokens.NIGHT_SURFACE);
+        m.put("chat_emojiPanelBackground", au ? (d ? 0xFFF1F4F9 : AmberTokens.AURORA_NIGHT_SURFACE) : (d ? 0xFFF7EFE4 : AmberTokens.NIGHT_SURFACE));
         m.put("chat_emojiPanelIcon", dim);
         m.put("chat_emojiPanelIconSelected", accent);
         m.put("chat_emojiPanelBackspace", dim);
         m.put("chat_emojiPanelShadowLine", d ? 0x1E000000 : 0x33000000);
-        m.put("chat_emojiPanelStickerPackSelector", d ? 0xFFF7EFE4 : AmberTokens.NIGHT_SURFACE);
+        m.put("chat_emojiPanelStickerPackSelector", au ? (d ? 0xFFF1F4F9 : AmberTokens.AURORA_NIGHT_SURFACE) : (d ? 0xFFF7EFE4 : AmberTokens.NIGHT_SURFACE));
         m.put("chat_emojiPanelStickerPackSelectorLine", accent);
         m.put("chat_emojiSearchBackground", fieldBg);
         m.put("chat_emojiSearchIcon", dim);
@@ -789,7 +808,7 @@ public final class AmberPalette {
 
         // ── دیالوگ‌ها ────────────────────────────────────────────────────────
         m.put("dialogBackground", fieldBg);
-        m.put("dialogBackgroundGray", d ? AmberTokens.DAY_SURFACE : AmberTokens.NIGHT_BG);
+        m.put("dialogBackgroundGray", au ? (d ? AmberTokens.AURORA_DAY_SURFACE : AmberTokens.AURORA_NIGHT_BG) : (d ? AmberTokens.DAY_SURFACE : AmberTokens.NIGHT_BG));
         m.put("dialogTextBlack", text);
         m.put("dialogTextGray", dim);
         m.put("dialogTextGray2", dim);
@@ -852,9 +871,9 @@ public final class AmberPalette {
         // زبان M3: ریل غیرفعال = سطح بلندتر از بستر (ظریف)، ریل فعال = اکسنت،
         // انگشت خاموش = روشن (روز سفید هم‌زبانهٔ M3-light؛ شب dim هم‌زبانهٔ هندل خاکستری M3-dark)،
         // انگشت روشن = onAccent، مرز غیرفعال چک‌باکس/رادیو = onSurfaceVariant (dim).
-        m.put("switchTrack", d ? 0xFFDCCFB8 : AmberTokens.NIGHT_OUTLINE);
+        m.put("switchTrack", au ? (d ? 0xFFDCE0EA : AmberTokens.AURORA_NIGHT_OUTLINE) : (d ? 0xFFDCCFB8 : AmberTokens.NIGHT_OUTLINE));
         m.put("switchTrackChecked", accent);
-        m.put("switchTrackBlue", d ? 0xFFDCCFB8 : AmberTokens.NIGHT_OUTLINE);
+        m.put("switchTrackBlue", au ? (d ? 0xFFDCE0EA : AmberTokens.AURORA_NIGHT_OUTLINE) : (d ? 0xFFDCCFB8 : AmberTokens.NIGHT_OUTLINE));
         m.put("switchTrackBlueChecked", accent);
         m.put("switchTrackBlueSelector", AmberTokens.alpha(accent, 0.12f));
         m.put("switchTrackBlueSelectorChecked", AmberTokens.alpha(accent, 0.12f));
@@ -864,7 +883,7 @@ public final class AmberPalette {
         // — با ضخامت انگشت ۲۰dp و جابه‌جایی مکانی قابل‌تشخیص، هم‌الگوی آپستریم a6adb3/سفید)،
         // شب dim = هندل روشن M3-dark (روی ریل 382C1C: ۵٫۰۶:۱). مصرف‌کننده‌ها: ۸ سایت خانوادهٔ Blue
         // + از این قدم TextCheckCell/NotificationsCheckCell هم انگشت‌شان از این جفت می‌آید.
-        m.put("switchTrackBlueThumb", d ? 0xFFFFF8F1 : AmberTokens.NIGHT_TEXT_DIM);
+        m.put("switchTrackBlueThumb", au ? (d ? 0xFFFFFFFF : AmberTokens.AURORA_NIGHT_TEXT_DIM) : (d ? 0xFFFFF8F1 : AmberTokens.NIGHT_TEXT_DIM));
         m.put("switchTrackBlueThumbChecked", onAccent);
         m.put("checkbox", accent);
         m.put("checkboxCheck", onAccent);
@@ -889,7 +908,7 @@ public final class AmberPalette {
         m.put("profile_tabSelectedText", accent);
         m.put("profile_tabSelectedLine", accent);
         m.put("profile_tabSelector", AmberTokens.alpha(accent, 0.10f));
-        m.put("profile_actionBackground", d ? AmberTokens.DAY_SURFACE : AmberTokens.NIGHT_WALLPAPER_TOP);
+        m.put("profile_actionBackground", au ? (d ? AmberTokens.AURORA_DAY_SURFACE : AmberTokens.AURORA_NIGHT_SURFACE) : (d ? AmberTokens.DAY_SURFACE : AmberTokens.NIGHT_WALLPAPER_TOP));
         m.put("profile_actionIcon", accent);
         m.put("profile_actionPressedBackground", AmberTokens.alpha(text, 0.08f));
         m.put("profile_creatorIcon", accent);
@@ -897,36 +916,37 @@ public final class AmberPalette {
         m.put("profile_verifiedCheck", onAccent);
 
         // ── آواتارها: ۸ رنگ + توقف دوم گرادیان (هویت گرم) ───────────────────
-        m.put("avatar_backgroundBlue", d ? 0xFFFFB25E : 0xFFB45309);
-        m.put("avatar_background2Blue", d ? 0xFFE8871E : 0xFF8A3E06);
-        m.put("avatar_backgroundCyan", d ? 0xFFDD8A5B : 0xFF9E4632);
-        m.put("avatar_background2Cyan", d ? 0xFFB4382C : 0xFF6E2A1E);
-        m.put("avatar_backgroundGreen", d ? 0xFFC2A25E : 0xFF8C6A1D);
-        m.put("avatar_background2Green", d ? 0xFF8C6A1D : 0xFF5E470F);
-        m.put("avatar_backgroundOrange", d ? 0xFFF0C08A : 0xFFB06428);
-        m.put("avatar_background2Orange", d ? 0xFFC25E00 : 0xFF74400E);
-        m.put("avatar_backgroundPink", d ? 0xFFE8871E : 0xFF8A3E06);
-        m.put("avatar_background2Pink", d ? 0xFFFFB25E : 0xFFB45309);
-        m.put("avatar_backgroundRed", d ? 0xFFB4382C : 0xFF6E2A1E);
-        m.put("avatar_background2Red", d ? 0xFFDD8A5B : 0xFF9E4632);
-        m.put("avatar_backgroundViolet", d ? 0xFF8C6A1D : 0xFF5E470F);
-        m.put("avatar_background2Violet", d ? 0xFFC2A25E : 0xFF8C6A1D);
-        m.put("avatar_backgroundSaved", d ? 0xFFC25E00 : 0xFF74400E);
-        m.put("avatar_background2Saved", d ? 0xFFF0C08A : 0xFFB06428);
-        m.put("avatar_nameInMessageBlue", d ? 0xFFB4561A : 0xFFE8A45C);
-        m.put("avatar_nameInMessageCyan", d ? 0xFF9C7A1E : 0xFFD6B25C);
-        m.put("avatar_nameInMessageGreen", d ? 0xFF6E8C2A : 0xFFB6C25E);
-        m.put("avatar_nameInMessageOrange", d ? 0xFFC25E00 : 0xFFF5A623);
-        m.put("avatar_nameInMessagePink", d ? 0xFFB4382C : 0xFFE06A5B);
-        m.put("avatar_nameInMessageRed", d ? 0xFFA03A2A : 0xFFE08573);
-        m.put("avatar_nameInMessageViolet", d ? 0xFF8C5A3C : 0xFFD69A78);
-        m.put("avatar_backgroundArchived", d ? 0xFFA8A094 : 0xFF6B6257);
-        m.put("avatar_backgroundArchivedHidden", d ? 0xFFD8D0C4 : 0xFF3A332A);
-        m.put("avatar_text", d ? 0xFFFFFFFF : 0xFFFFF1DC);
+        // آئورورا: جفت‌های روبانی (فیروزه/ارغوانی/کهربا/بنفش/نقره‌ای/مرجانی)؛ کهربا: جفت‌های گرم
+        m.put("avatar_backgroundBlue", au ? (d ? 0xFF98F2DE : 0xFF2DE4C4) : (d ? 0xFFFFB25E : 0xFFB45309));
+        m.put("avatar_background2Blue", au ? (d ? 0xFF0F9B80 : 0xFF0E8A78) : (d ? 0xFFE8871E : 0xFF8A3E06));
+        m.put("avatar_backgroundCyan", au ? (d ? 0xFF0F9B80 : 0xFF0E8A78) : (d ? 0xFFDD8A5B : 0xFF9E4632));
+        m.put("avatar_background2Cyan", au ? (d ? 0xFF98F2DE : 0xFF2DE4C4) : (d ? 0xFFB4382C : 0xFF6E2A1E));
+        m.put("avatar_backgroundGreen", au ? (d ? 0xFFB9AFF2 : 0xFF8B7CF6) : (d ? 0xFFC2A25E : 0xFF8C6A1D));
+        m.put("avatar_background2Green", au ? (d ? 0xFF6A5CC4 : 0xFF4A3E8C) : (d ? 0xFF8C6A1D : 0xFF5E470F));
+        m.put("avatar_backgroundOrange", au ? (d ? 0xFFFFD08A : 0xFFFFB454) : (d ? 0xFFF0C08A : 0xFFB06428));
+        m.put("avatar_background2Orange", au ? (d ? 0xFFC97A26 : 0xFFB3651F) : (d ? 0xFFC25E00 : 0xFF74400E));
+        m.put("avatar_backgroundPink", au ? (d ? 0xFFF4AFE9 : 0xFFE86BD8) : (d ? 0xFFE8871E : 0xFF8A3E06));
+        m.put("avatar_background2Pink", au ? (d ? 0xFFA8459B : 0xFF7A2F6E) : (d ? 0xFFFFB25E : 0xFFB45309));
+        m.put("avatar_backgroundRed", au ? (d ? 0xFFFFB3A6 : 0xFFFF8A7A) : (d ? 0xFFB4382C : 0xFF6E2A1E));
+        m.put("avatar_background2Red", au ? (d ? 0xFFD4574A : 0xFFC24238) : (d ? 0xFFDD8A5B : 0xFF9E4632));
+        m.put("avatar_backgroundViolet", au ? (d ? 0xFF6A5CC4 : 0xFF4A3E8C) : (d ? 0xFF8C6A1D : 0xFF5E470F));
+        m.put("avatar_background2Violet", au ? (d ? 0xFFB9AFF2 : 0xFF8B7CF6) : (d ? 0xFFC2A25E : 0xFF8C6A1D));
+        m.put("avatar_backgroundSaved", au ? (d ? 0xFFD7E0E8 : 0xFFC9D6DF) : (d ? 0xFFC25E00 : 0xFF74400E));
+        m.put("avatar_background2Saved", au ? (d ? 0xFF6E7E8A : 0xFF5A6B75) : (d ? 0xFFF0C08A : 0xFFB06428));
+        m.put("avatar_nameInMessageBlue", au ? (d ? 0xFF0B8A72 : 0xFF4DE8C8) : (d ? 0xFFB4561A : 0xFFE8A45C));
+        m.put("avatar_nameInMessageCyan", au ? (d ? 0xFF6A5CC4 : 0xFFB9AFF2) : (d ? 0xFF9C7A1E : 0xFFD6B25C));
+        m.put("avatar_nameInMessageGreen", au ? (d ? 0xFF4E8C64 : 0xFF8AE0B0) : (d ? 0xFF6E8C2A : 0xFFB6C25E));
+        m.put("avatar_nameInMessageOrange", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : (d ? 0xFFC25E00 : 0xFFF5A623));
+        m.put("avatar_nameInMessagePink", au ? (d ? 0xFFB84A9E : 0xFFF08BD0) : (d ? 0xFFB4382C : 0xFFE06A5B));
+        m.put("avatar_nameInMessageRed", au ? (d ? 0xFFA8433C : 0xFFFFA08F) : (d ? 0xFFA03A2A : 0xFFE08573));
+        m.put("avatar_nameInMessageViolet", au ? (d ? 0xFF7A6ED0 : 0xFFC9B8F5) : (d ? 0xFF8C5A3C : 0xFFD69A78));
+        m.put("avatar_backgroundArchived", au ? (d ? 0xFF9AA2B2 : 0xFF5E6675) : (d ? 0xFFA8A094 : 0xFF6B6257));
+        m.put("avatar_backgroundArchivedHidden", au ? (d ? 0xFFC9CFDA : 0xFF333A46) : (d ? 0xFFD8D0C4 : 0xFF3A332A));
+        m.put("avatar_text", au ? 0xFFFFFFFF : (d ? 0xFFFFFFFF : 0xFFFFF1DC));
         m.put("avatar_actionBarIconBlue", text);
         m.put("avatar_actionBarSelectorBlue", AmberTokens.alpha(text, 0.10f));
         m.put("avatar_backgroundActionBarBlue", header);
-        m.put("avatar_backgroundInProfileBlue", d ? AmberTokens.DAY_SURFACE : AmberTokens.NIGHT_WALLPAPER_TOP);
+        m.put("avatar_backgroundInProfileBlue", au ? (d ? AmberTokens.AURORA_DAY_SURFACE : AmberTokens.AURORA_NIGHT_SURFACE) : (d ? AmberTokens.DAY_SURFACE : AmberTokens.NIGHT_WALLPAPER_TOP));
         m.put("avatar_subtitleInProfileBlue", dim);
 
         // ── استوری/تاپیک/شیشه/متن قرمز ──────────────────────────────────────
@@ -947,16 +967,116 @@ public final class AmberPalette {
         m.put("glass_tabSelected", AmberTokens.alpha(accent, 0.30f));
         m.put("glass_tabSelectedText", accent);
         m.put("glass_tabUnselected", dim);
-        m.put("glass_targetMainTabs", d ? 0xE6FFF6EA : 0xE6241D14);
-        m.put("glass_targetMainTopPanel", d ? 0xE6FFE9CF : 0xE61F1912);
+        m.put("glass_targetMainTabs", au ? (d ? 0xE6F5F5FA : 0xE60B0F16) : (d ? 0xE6FFF6EA : 0xE6241D14));
+        m.put("glass_targetMainTopPanel", au ? (d ? 0xE6FFFFFF : 0xE612151B) : (d ? 0xE6FFE9CF : 0xE61F1912));
         m.put("text_RedRegular", red);
         m.put("text_RedBold", red);
 
         // ── Instant View ────────────────────────────────────────────────────
         m.put("iv_background", white);
-        m.put("iv_backgroundGray", d ? AmberTokens.DAY_SURFACE : AmberTokens.NIGHT_BG);
+        m.put("iv_backgroundGray", au ? (d ? AmberTokens.AURORA_DAY_SURFACE : AmberTokens.AURORA_NIGHT_BG) : (d ? AmberTokens.DAY_SURFACE : AmberTokens.NIGHT_BG));
         m.put("iv_navigationBackground", header);
         m.put("iv_ab_progress", accent);
+
+
+        // ── برند آئورورا (v0.9.7) — اکسنت‌های مکمل: پوشش کلیدهای برند کهربا خارج از پالت هسته ──
+        // شاخهٔ کهربا = مقدار موروثی فایل شب (ثابت؛ فایل‌های کهربا بازتولید نمی‌شوند و کلیدهای غایب در
+        // فایل روز کهربا به پیش‌فرض آپستریم برمی‌گردند)؛ شاخهٔ آئورورا = خانوادهٔ روبان + تینت‌های سرد.
+        m.put("avatar_actionBarSelectorGreen", au ? (d ? 0xFFC3CFDB : 0xFF1F3B46) : 0xFF703D18);
+        m.put("botKeyboard_button_primary", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("buttonNeutralText", au ? (d ? 0xFF0B6E5C : 0xFF54F1D6) : 0xFFFB923C);
+        m.put("changephoneinfo_image2", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("chat_emojiPanelBadgeBackground", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFFF7716);
+        m.put("chats_tabUnreadActiveBackground", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : (d ? 0xFF66ADE1 : 0xFFF97316));
+        m.put("color_blue", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : (d ? 0xFF327FE5 : 0xFFFF7614));
+        m.put("color_lightblue", au ? (d ? 0xFF6A5CC4 : 0xFF8B7CF6) : (d ? 0xFF58A8ED : 0xFFF57214));
+        m.put("color_orange", au ? (d ? 0xFFC97A26 : 0xFFFFB454) : 0xFFF28C39);
+        m.put("color_yellow", au ? (d ? 0xFFB84A9E : 0xFFE86BD8) : (d ? 0xFFE3B727 : 0xFFDEAC1F));
+        m.put("contacts_inviteBackground", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("contextProgressInner2", au ? (d ? 0xFFDEE5EF : 0xFF1B2430) : (d ? 0xCEC3DDF6 : 0xFF3F2712));
+        m.put("contextProgressInner3", au ? (d ? 0xFF0F9B80 : 0xFF0E8A78) : 0xFFB45309);
+        m.put("contextProgressInner4", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("contextProgressOuter1", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : (d ? 0xFF3BA6F4 : 0xFFFF7E21));
+        m.put("fastScrollActive", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : (d ? 0xFF229AF0 : 0xFFF97316));
+        m.put("featuredStickers_addButton2", au ? (d ? 0xFF0A7A66 : 0xFF0FB89A) : 0xFFEA580C);
+        m.put("featuredStickers_addedIcon", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : (d ? 0xFF32A5F7 : 0xFFF97A20));
+        m.put("featuredStickers_buttonProgress", au ? (d ? 0xFF0B6E5C : 0xFF54F1D6) : 0xFFFB923C);
+        m.put("featuredStickers_unread", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("files_folderIconBackground", au ? (d ? 0xFF0A7A66 : 0xFF0FB89A) : 0xFFF4771D);
+        m.put("fill_RedDark", au ? (d ? 0xFFB4382C : 0xFFCC4A3A) : 0xFFC2410C);
+        m.put("gift_ribbon", au ? (d ? 0xFFCBD6E0 : 0xFF182E3A) : 0xFF844518);
+        m.put("inappPlayerPlayPause", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : (d ? 0xFF229AF0 : 0xFFF97A20));
+        m.put("key_player_progressCachedBackground", au ? (d ? 0xFFC9D4DE : 0xFF1E3B47) : 0xFF874C23);
+        m.put("location_actionBackground", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("location_liveLocationProgress", au ? (d ? 0xFF0B7E6A : 0xFF0FA084) : 0xFFE07325);
+        m.put("location_placeLocationBackground", au ? (d ? 0xFF0B7E6A : 0xFF0FA084) : 0xFFE07325);
+        m.put("location_sendLiveLocationBackground", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("location_sendLiveLocationText", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("location_sendLocationBackground", au ? (d ? 0xFF0B7E6A : 0xFF0FA084) : (d ? 0xFF50A4F5 : 0xFFE07325));
+        m.put("location_sendLocationIcon", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("location_sendLocationText", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("login_progressInner", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("passport_authorizeBackground", au ? (d ? 0xFF0A7A66 : 0xFF0FB89A) : 0xFFC15C13);
+        m.put("passport_authorizeBackgroundSelected", au ? (d ? 0xFF0A7A66 : 0xFF0FB89A) : 0xFFE06A16);
+        m.put("passport_authorizeText", au ? (d ? 0xFF0B6E5C : 0xFF54F1D6) : 0xFFFB923C);
+        m.put("picker_badge", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : (d ? 0xFF35A3F7 : 0xFFFF7817));
+        m.put("picker_enabledButton", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : (d ? 0xFF279EF5 : 0xFFF97316));
+        m.put("player_buttonActive", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : (d ? 0xFF2CA3FE : 0xFFF97A20));
+        m.put("player_progress", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : (d ? 0xFF219DF4 : 0xFFF97A20));
+        m.put("pollCreateIcons", au ? (d ? 0xFF0B6E5C : 0xFF54F1D6) : 0xFFFB923C);
+        m.put("premiumCoinGradient1", au ? (d ? 0xFF0A5F52 : 0xFF0E6E5E) : 0xFFC2410C);
+        m.put("premiumCoinGradient2", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("premiumGradient0", au ? (d ? 0xFF06322B : 0xFF083A32) : 0xFF7C2D12);
+        m.put("premiumGradient1", au ? (d ? 0xFF08423A : 0xFF0A4A40) : 0xFF9A3412);
+        m.put("premiumGradient2", au ? (d ? 0xFF0A5F52 : 0xFF0E6E5E) : 0xFFC2410C);
+        m.put("premiumGradient3", au ? (d ? 0xFF0A7A66 : 0xFF0FB89A) : 0xFFEA580C);
+        m.put("premiumGradient4", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("premiumGradientBottomSheet1", au ? (d ? 0xFF08423A : 0xFF0A4A40) : 0xFF9A3412);
+        m.put("premiumGradientBottomSheet2", au ? (d ? 0xFF0A5F52 : 0xFF0E6E5E) : 0xFFC2410C);
+        m.put("premiumGradientBottomSheet3", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("premiumStarGradient1", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFFF7614);
+        m.put("premiumStartSmallStarsColor", au ? (d ? 0x7108806B : 0x712DE4C4) : 0x71FF7B1C);
+        m.put("progressCircle", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : (d ? 0xFF3FA5FE : 0xFFF97316));
+        m.put("reactionStarSelector", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("returnToCallBackground", au ? (d ? 0xFF0B7E6A : 0xFF0FA084) : (d ? 0xFF50A8ED : 0xFFF0751D));
+        m.put("sessions_devicesImage", au ? (d ? 0xFFDCE2EA : 0xFF10161F) : 0xFF33200E);
+        m.put("sharedMedia_startStopLoadIcon", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97A20);
+        m.put("statisticChartActivePickerChart", au ? (d ? 0xD8B9C8D4 : 0xD82A4A56) : 0xD87E4822);
+        m.put("statisticChartBackZoomColor", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF87314);
+        m.put("statisticChartLine_blue", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : (d ? 0xFF327FE5 : 0xFFF97316));
+        m.put("statisticChartLine_golden", au ? (d ? 0xFFB84A9E : 0xFFE86BD8) : (d ? 0xFFE3B727 : 0xFFDEAC1F));
+        m.put("statisticChartLine_lightblue", au ? (d ? 0xFF6A5CC4 : 0xFF8B7CF6) : (d ? 0xFF58A8ED : 0xFFF57214));
+        m.put("statisticChartLine_orange", au ? (d ? 0xFFC97A26 : 0xFFFFB454) : 0xFFF28C39);
+        m.put("statisticChartRipple", au ? (d ? 0x2C08806B : 0x2C2DE4C4) : 0x2CDA8548);
+        m.put("stickers_menu", au ? (d ? 0xFFCBD6E0 : 0xFF182E3A) : 0xFF844E27);
+        m.put("telegram_color", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("telegram_color_text", au ? (d ? 0xFF0B6E5C : 0xFF54F1D6) : 0xFFFB923C);
+        m.put("undo_cancelColor", au ? (d ? 0xFF0B6E5C : 0xFF54F1D6) : 0xFFFB923C);
+        m.put("voipgroup_checkMenu", au ? (d ? 0xFF0B6E5C : 0xFF54F1D6) : 0xFFFB923C);
+        m.put("voipgroup_connectingProgress", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("voipgroup_listeningText", au ? (d ? 0xFF0B6E5C : 0xFF54F1D6) : 0xFFFB923C);
+        m.put("voipgroup_muteButton", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("voipgroup_muteButton2", au ? (d ? 0xFF0A7A66 : 0xFF0FB89A) : 0xFFEA580C);
+        m.put("voipgroup_muteButton3", au ? (d ? 0xFF0A7A66 : 0xFF0FB89A) : 0xFFEA580C);
+        m.put("voipgroup_overlayBlue1", au ? (d ? 0xFFDEE5EF : 0xFF1B2430) : 0xFF3F2712);
+        m.put("voipgroup_overlayBlue2", au ? (d ? 0xFFE3E8F0 : 0xFF141C28) : 0xFF331F0D);
+        m.put("voipgroup_overlayGreen1", au ? (d ? 0xFFE8ECF2 : 0xFF10161E) : 0xFF2A1A0B);
+        m.put("voipgroup_overlayGreen2", au ? (d ? 0xFFDEE5EF : 0xFF1B2430) : 0xFF3F2712);
+        m.put("voipgroup_rtmpButton", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("voipgroup_soundButtonActive", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("voipgroup_soundButtonActive2", au ? (d ? 0xFF0A7A66 : 0xFF0FB89A) : 0xFFEA580C);
+        m.put("voipgroup_soundButtonActive2Scrolled", au ? (d ? 0xFF0A7A66 : 0xFF0FB89A) : 0xFFEA580C);
+        m.put("voipgroup_soundButtonActiveScrolled", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("voipgroup_speakingText", au ? (d ? 0xFF0B6E5C : 0xFF54F1D6) : 0xFFFB923C);
+        m.put("voipgroup_topPanelBlue1", au ? (d ? 0xFFDEE5EF : 0xFF1B2430) : 0xFF3F2712);
+        m.put("voipgroup_topPanelBlue2", au ? (d ? 0xFFE3E8F0 : 0xFF141C28) : 0xFF331F0D);
+        m.put("voipgroup_topPanelGray", au ? (d ? 0xFFBFCBD8 : 0xFF23414E) : 0xFF865029);
+        m.put("voipgroup_topPanelGreen1", au ? (d ? 0xFFE8ECF2 : 0xFF10161E) : 0xFF2A1A0B);
+        m.put("voipgroup_topPanelGreen2", au ? (d ? 0xFFDEE5EF : 0xFF1B2430) : 0xFF3F2712);
+        m.put("voipgroup_unmuteButton", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("voipgroup_unmuteButton2", au ? (d ? 0xFF0A7A66 : 0xFF0FB89A) : 0xFFEA580C);
+        m.put("voipgroup_windowBackgroundWhiteInputFieldActivated", au ? (d ? 0xFF08806B : 0xFF2DE4C4) : 0xFFF97316);
+        m.put("wallet_out_commentBorder", au ? (d ? 0xFFD8DFE8 : 0xFF17222E) : 0xFF653D20);
 
         return m;
     }

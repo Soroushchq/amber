@@ -6,10 +6,15 @@
 # مصرف:
 #   python3 Tools/generate_amber_theme2.py night  TMessagesProj/src/main/assets/amber.attheme
 #   python3 Tools/generate_amber_theme2.py day    TMessagesProj/src/main/assets/amber_day.attheme [BASE]
+#   python3 Tools/generate_amber_theme2.py aurora-night TMessagesProj/src/main/assets/aurora.attheme
+#   python3 Tools/generate_amber_theme2.py aurora-day   TMessagesProj/src/main/assets/aurora_day.attheme
 #
 # منطق: فایل شب/روز = کلیدهای پایه (فایل تم فعلی برای پوشش کامل) + overlay کامل پالت جدید.
 # کلیدهای پالت بازنویسی می‌شوند؛ بقیه از پایه حفظ می‌شوند تا هیچ صفحه‌ای به
 # پیش‌فرض روشن تلگرام برنگردد (سقوط به defaultColors = فاجعه شب روشن).
+# برند آئورورا (v0.9.7): شاخه au در build(boolean d, boolean au) + کلید برند
+# telegram_color_dialogsLogo که فقط برای فایل‌های آئورورا تزریق می‌شود
+# (کهربا مقدار موروثی از base را حفظ می‌کند تا رفتار فعلی تغییر نکند).
 import re, sys, math, os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -53,12 +58,12 @@ def load_tokens():
 
 # ── ۲) تبدیل عبارت جاوا به پایتون ─────────────────────────────────────────
 def translate_ternaries(s):
-    # فقط یک سطح ternary با شرط d — اسکن دقیق مرزها با ردیابی عمق پرانتز
+    # فقط یک سطح ternary با شرط d یا au — اسکن دقیق مرزها با ردیابی عمق پرانتز
     while True:
-        m = re.search(r"\bd \?", s)
+        m = re.search(r"\b(d|au) \?", s)
         if not m:
             return s
-        i = m.start() + len("d ?")
+        i = m.start() + len(m.group(0))
         # A: تا ' : ' هم‌سطح
         depth = 0
         j = i
@@ -89,7 +94,7 @@ def translate_ternaries(s):
                 break
             k += 1
         b_branch = s[j+3:k]
-        s = s[:m.start()] + f"({a_branch} if d else {b_branch})" + s[k:]
+        s = s[:m.start()] + f"({a_branch} if {m.group(1)} else {b_branch})" + s[k:]
 
 def java_to_py(expr):
     s = translate_ternaries(expr.strip())
@@ -99,12 +104,13 @@ def java_to_py(expr):
     s = re.sub(r"(\d+\.\d+)f", r"\1", s)  # پسوند float
     return s
 
-# ── ۳) ارزیابی build() برای d مشخص ────────────────────────────────────────
-def eval_palette(d_value, tokens):
+# ── ۳) ارزیابی build() برای d/au مشخص ─────────────────────────────────────
+def eval_palette(d_value, au_value, tokens):
     ns = dict(tokens)
     ns["f_alpha"] = f_alpha
     ns["f_over"] = f_over
     ns["d"] = d_value
+    ns["au"] = au_value
     palette = {}
     in_build = False
     with open(os.path.join(SRC, "AmberPalette.java"), encoding="utf-8") as fh:
@@ -118,7 +124,7 @@ def eval_palette(d_value, tokens):
             if t.startswith("return m;"):
                 break
             mloc = re.match(r"final (?:boolean|int) (\w+)\s+= (.*);$", t)
-            if mloc and mloc.group(1) != "d":
+            if mloc and mloc.group(1) not in ("d", "au"):
                 name, expr = mloc.group(1), java_to_py(mloc.group(2))
                 ns[name] = mask32(eval(expr, {"__builtins__": {}}, ns))
                 continue
@@ -154,17 +160,38 @@ def load_base(path):
 # ── ۵) تولید ──────────────────────────────────────────────────────────────
 def main():
     if len(sys.argv) < 3:
-        sys.exit("usage: generate_amber_theme2.py night|day OUT [BASE]")
+        sys.exit("usage: generate_amber_theme2.py night|day|aurora-night|aurora-day OUT [BASE]")
     mode, out_path = sys.argv[1], sys.argv[2]
-    base_path = sys.argv[3] if len(sys.argv) > 3 else os.path.join(ROOT, "TMessagesProj/src/main/assets/amber.attheme")
-    d = (mode == "day")
+    asset_dir = os.path.join(ROOT, "TMessagesProj/src/main/assets")
+    if len(sys.argv) > 3:
+        base_path = sys.argv[3]
+    elif mode == "day":
+        base_path = os.path.join(asset_dir, "amber_day.attheme")
+    elif mode == "aurora-night":
+        base_path = os.path.join(asset_dir, "amber.attheme")
+    elif mode == "aurora-day":
+        base_path = os.path.join(asset_dir, "amber_day.attheme")
+    else:
+        base_path = os.path.join(asset_dir, "amber.attheme")
+    d = mode in ("day", "aurora-day")
+    au = mode.startswith("aurora")
     tokens = load_tokens()
-    palette = eval_palette(d, tokens)
+    palette = eval_palette(d, au, tokens)
     base = load_base(base_path)
+    if not au:
+        # قرارداد برند (v0.9.7): برای فایل‌های کهربا فقط کلیدهای موجود در پایه نوشته
+        # می‌شوند — بخش «اکسنت‌های مکمل» پالت کلیدهای جدیدی دارد که شاخهٔ کهربایشان
+        # مقدار فایل شب است و نباید فایل روز کهربا (که این کلیدها را ندارد و به
+        # پیش‌فرض آپستریم برمی‌گردد) را تغییر دهد. فایل‌های کهربا فrozen هستند.
+        palette = {k: v for k, v in palette.items() if k in base}
     merged = dict(base)
     replaced = sum(1 for k in palette if k in merged)
     added = sum(1 for k in palette if k not in merged)
     merged.update(palette)
+    if au:
+        # کلید برند لوگو — تینت MULTIPLY لوگوی هدر؛ فقط برای فایل‌های آئورورا
+        # (کهربا: مقدار موروثی از base حفظ می‌شود تا رفتار فعلی تغییر نکند)
+        merged["telegram_color_dialogsLogo"] = 0xFF171B26 if d else 0xFFF2F1F7
     lines = [f"{k}={signed(merged[k])}" for k in sorted(merged)]
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as fh:
@@ -175,12 +202,17 @@ def main():
     for k, v in palette.items():
         if k not in back or mask32(back[k]) != mask32(v):
             errs.append(k)
+    if au:
+        k = "telegram_color_dialogsLogo"
+        if k not in back or mask32(back[k]) != mask32(merged[k]):
+            errs.append(k)
     if errs:
         sys.exit(f"FATAL: round-trip mismatch for {len(errs)} keys: {errs[:8]}")
     print(f"OK {mode}: base={len(base)} palette={len(palette)} replaced={replaced} added={added} total={len(merged)}")
-    for k in ("windowBackgroundWhite", "chat_inBubble", "chat_outBubble", "divider", "chats_unreadCounterText"):
-        v = merged[k]
-        print(f"  {k} = 0x{mask32(v):08X}")
+    for k in ("windowBackgroundWhite", "chat_inBubble", "chat_outBubble", "divider", "chats_unreadCounterText", "chat_wallpaper", "chat_wallpaper_gradient_to", "key_chat_wallpaper_gradient_to2", "key_chat_wallpaper_gradient_to3", "avatar_backgroundBlue", "telegram_color_dialogsLogo"):
+        v = merged.get(k)
+        if v is not None:
+            print(f"  {k} = 0x{mask32(v):08X}")
 
 if __name__ == "__main__":
     main()
