@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AmberGram v0.9.7 — پس‌زمینهٔ آیکون آئورورا: شب یخی #070A10 با تینت روبان‌ها -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FF070A10"
+        android:pathData="M0,0 h108 v108 h-108 Z" />
+    <path android:pathData="M0,0 h108 v108 h-108 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="24" android:centerY="18" android:gradientRadius="105">
+                <item android:offset="0.0" android:color="#382DE4C4" />
+                <item android:offset="1.0" android:color="#002DE4C4" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M0,0 h108 v108 h-108 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="88" android:centerY="92" android:gradientRadius="105">
+                <item android:offset="0.0" android:color="#2DE86BD8" />
+                <item android:offset="1.0" android:color="#00E86BD8" />
+            </gradient>
+        </aapt:attr>
+    </path>
+</vector>
