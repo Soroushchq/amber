@@ -260,8 +260,31 @@ public class AndroidUtilities {
     public final static String TYPEFACE_AMBERGRAM_UI_REGULAR = "fonts/ambergramui-regular.ttf";
     public final static String TYPEFACE_AMBERGRAM_UI_MED = "fonts/ambergramui-med.ttf";
     public final static String TYPEFACE_AMBERGRAM_UI_SEMIBOLD = "fonts/ambergramui-semibold.ttf";
+    /** AmberGram v0.9.7 — برند آئورورا: فونت استعداد (Estedad، OFL) — سوییچ همگام با تم */
+    public final static String TYPEFACE_ESTEDAD = "fonts/estedad.ttf";
+    public final static String TYPEFACE_ESTEDAD_REGULAR = "fonts/estedad-regular.ttf";
+    public final static String TYPEFACE_ESTEDAD_MED = "fonts/estedad-med.ttf";
+    public final static String TYPEFACE_ESTEDAD_SEMIBOLD = "fonts/estedad-semibold.ttf";
 
     public static Typeface mediumTypeface;
+    /** برند فونت فعال — فقط از updateUIFontForTheme تغییر می‌کند (همگام با تم) */
+    private static volatile boolean auroraUIFontActive;
+    private static volatile boolean auroraUIFontResolved;
+
+    /**
+     * AmberGram v0.9.7 — همگام‌سازی فونت رابط با خانواده تم فعال:
+     * آئورورا/آئورورای روشن ← استعداد، بقیه ← AmberGram UI.
+     * از refreshThemeColors صدا زده می‌شود؛ فقط وقتی خانواده عوض شد
+     * typeface ضبط‌شده باطل می‌شود (مقایسه رشته ارزان است).
+     */
+    public static void updateUIFontForTheme(String themeName) {
+        boolean aurora = AmberTokens.isAuroraName(themeName);
+        if (aurora != auroraUIFontActive || !auroraUIFontResolved) {
+            auroraUIFontActive = aurora;
+            auroraUIFontResolved = true;
+            mediumTypeface = null;
+        }
+    }
     public static ThreadLocal<byte[]> readBufferLocal = new ThreadLocal<>();
     public static ThreadLocal<byte[]> bufferLocal = new ThreadLocal<>();
 
@@ -269,13 +292,22 @@ public class AndroidUtilities {
      * AmberGram: the app-wide UI typeface. Bold and rounded, used for all
      * Telegram-authored interface texts (headers, buttons, cells, menus).
      * Message content keeps the original Roboto styling via messageBold().
+     * v0.9.7 — follows the active theme family: Estedad for Aurora, AmberGram
+     * UI otherwise.
      */
     public static Typeface bold() {
         if (mediumTypeface == null) {
             if (SharedConfig.useSystemBoldFont && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 mediumTypeface = Typeface.create(null, 500, false);
             } else {
-                mediumTypeface = getTypeface(TYPEFACE_AMBERGRAM_UI);
+                if (auroraUIFontActive) {
+                    mediumTypeface = getTypeface(TYPEFACE_ESTEDAD);
+                    if (mediumTypeface == null) {
+                        mediumTypeface = getTypeface(TYPEFACE_AMBERGRAM_UI);
+                    }
+                } else {
+                    mediumTypeface = getTypeface(TYPEFACE_AMBERGRAM_UI);
+                }
                 if (mediumTypeface == null) {
                     mediumTypeface = getTypeface(TYPEFACE_ROBOTO_MEDIUM);
                 }
@@ -304,17 +336,17 @@ public class AndroidUtilities {
      * غایب بود رفرش برند را نمی‌شکنند.
      */
     public static Typeface brandRegular() {
-        Typeface t = getTypeface(TYPEFACE_AMBERGRAM_UI_REGULAR);
+        Typeface t = getTypeface(auroraUIFontActive ? TYPEFACE_ESTEDAD_REGULAR : TYPEFACE_AMBERGRAM_UI_REGULAR);
         return t != null ? t : bold();
     }
 
     public static Typeface brandMedium() {
-        Typeface t = getTypeface(TYPEFACE_AMBERGRAM_UI_MED);
+        Typeface t = getTypeface(auroraUIFontActive ? TYPEFACE_ESTEDAD_MED : TYPEFACE_AMBERGRAM_UI_MED);
         return t != null ? t : brandRegular();
     }
 
     public static Typeface brandSemibold() {
-        Typeface t = getTypeface(TYPEFACE_AMBERGRAM_UI_SEMIBOLD);
+        Typeface t = getTypeface(auroraUIFontActive ? TYPEFACE_ESTEDAD_SEMIBOLD : TYPEFACE_AMBERGRAM_UI_SEMIBOLD);
         return t != null ? t : bold();
     }
 
@@ -2560,6 +2592,19 @@ public class AndroidUtilities {
                                 builder.setWeight(500);
                             } else if (assetPath.contains("-semibold")) {
                                 builder.setWeight(600);
+                            }
+                        }
+                        if (assetPath.startsWith("fonts/estedad")) {
+                            // v0.9.7: مپ صریح وزن برش‌های استعداد — قبل از قواعد substring عمومی
+                            // (نام کوتاه «med» عمداً تا در تلهٔ contains("medium") نیفتد)
+                            if (assetPath.endsWith("estedad-regular.ttf")) {
+                                builder.setWeight(400);
+                            } else if (assetPath.contains("-med.")) {
+                                builder.setWeight(500);
+                            } else if (assetPath.contains("-semibold")) {
+                                builder.setWeight(600);
+                            } else {
+                                builder.setWeight(700);
                             }
                         }
                         if (assetPath.contains("rextrabold")) {
