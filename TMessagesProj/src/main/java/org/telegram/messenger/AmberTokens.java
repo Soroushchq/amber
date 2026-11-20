@@ -95,6 +95,93 @@ public final class AmberTokens {
     public static final float NIGHT_SHADOW_ALPHA = 0.45f;
 
     // ─────────────────────────────────────────────────────────────────────────
+    // آئورورا — تم «شیشه و نور» (v0.9.7-ui2) — دومین هویت بصری AmberGram
+    //
+    // کانسپت: شبِ عمیق یخی (#070A10) با سه روبان نور — فیروزه (#2DE4C4)،
+    // ارغوانی (#E86BD8) و کهربایی (#FFB454) — حباب‌های بلوری، وایپرپِ گرادیانی
+    // زنده و فونت استعداد (Estedad) که با سوییچ تم عوض می‌شود.
+    // نام‌گذاری دقیقاً هم‌پسوند با اتم‌های Amber (DAY_*/NIGHT_*) تا مبدل
+    // generate_amber_theme2.py بتواند شاخه au را مکانیکی بپیچد.
+    // روز = «آئورورای روشن»: سپیدار (#F5F5FA) با روبان‌های پاستلی.
+    // ─────────────────────────────────────────────────────────────────────────
+
+    public static final int MODE_AURORA_DAY = 2;
+    public static final int MODE_AURORA_NIGHT = 3;
+
+    /** آیا نام تم به خانواده آئورورا تعلق دارد (فونت/لوگوی آئورورا) */
+    public static boolean isAuroraName(String name) {
+        return "Aurora".equals(name) || "Aurora Day".equals(name);
+    }
+
+    // شب
+    public static final int AURORA_NIGHT_BG = 0xFF070A10;
+    public static final int AURORA_NIGHT_WALLPAPER_TOP = 0xFF1B1E3E;
+    public static final int AURORA_NIGHT_WALLPAPER_MID = 0xFF070A10;
+    public static final int AURORA_NIGHT_WALLPAPER_BOTTOM = 0xFF0C3230;
+    public static final int AURORA_NIGHT_HEADER = 0xFF12151B;
+    public static final int AURORA_NIGHT_HEADER_BORDER = 0xFF1E2530;
+    public static final int AURORA_NIGHT_SURFACE = 0xFF0B0F16;
+    public static final int AURORA_NIGHT_OUTLINE = 0xFF232B36;
+    public static final int AURORA_NIGHT_TEXT = 0xFFF2F1F7;
+    public static final int AURORA_NIGHT_TEXT_DIM = 0xFF9BA3B7;
+    public static final int AURORA_NIGHT_TIME = 0xFF767E92;
+    public static final int AURORA_NIGHT_ACCENT = 0xFF2DE4C4;
+    public static final int AURORA_NIGHT_ACCENT_BRIGHT = 0xFF54F1D6;
+    public static final int AURORA_NIGHT_ON_ACCENT = 0xFF04211B;
+    /** حباب ورودی = معادل ماتِ شیشه سفید ۸٫۵٪ روی پس‌زمینه شب */
+    public static final int AURORA_NIGHT_IN_BUBBLE = 0xFF1D232B;
+    public static final int AURORA_NIGHT_IN_TEXT = 0xFFF2F1F7;
+    /** حباب خروجی = معادل ماتِ شیشه فیروزه ۱۵٪ (روبان آئورورا) */
+    public static final int AURORA_NIGHT_OUT_BUBBLE = 0xFF0E2E2C;
+    public static final int AURORA_NIGHT_OUT_TEXT = 0xFFDCFFF4;
+    public static final int AURORA_NIGHT_BADGE_BG = 0xFF2DE4C4;
+    public static final int AURORA_NIGHT_BADGE_TEXT = 0xFF04211B;
+    public static final int AURORA_NIGHT_FIELD_BG = 0xFF10151E;
+    public static final int AURORA_NIGHT_FIELD_BORDER = 0xFF232B36;
+    public static final int AURORA_NIGHT_NAV_PILL = 0xFF0E2E2C;
+    public static final int AURORA_NIGHT_SHADOW_TINT = 0xFF000000;
+    public static final float AURORA_NIGHT_SHADOW_ALPHA = 0.45f;
+
+    // روز — «آئورورای روشن»
+    public static final int AURORA_DAY_BG = 0xFFF5F5FA;
+    public static final int AURORA_DAY_WALLPAPER_TOP = 0xFFF7F8FD;
+    public static final int AURORA_DAY_WALLPAPER_MID = 0xFFF5F5FA;
+    public static final int AURORA_DAY_WALLPAPER_BOTTOM = 0xFFE9F6F1;
+    public static final int AURORA_DAY_HEADER = 0xFFFFFFFF;
+    public static final int AURORA_DAY_HEADER_BORDER = 0xFFE3E6EF;
+    public static final int AURORA_DAY_SURFACE = 0xFFFFFFFF;
+    public static final int AURORA_DAY_OUTLINE = 0xFFD9DDE7;
+    public static final int AURORA_DAY_TEXT = 0xFF171B26;
+    public static final int AURORA_DAY_TEXT_DIM = 0xFF5E6675;
+    public static final int AURORA_DAY_TIME = 0xFF8A92A2;
+    /** اکسنت روز عمیق‌تر از پیش‌نمایش (#0FB89A) تا کنتراست AA روی سپیدار حفظ شود (۴٫۳:۱ مثل کهربای روز) */
+    public static final int AURORA_DAY_ACCENT = 0xFF08806B;
+    public static final int AURORA_DAY_ACCENT_BRIGHT = 0xFF12C9A8;
+    public static final int AURORA_DAY_ON_ACCENT = 0xFFFFFFFF;
+    public static final int AURORA_DAY_IN_BUBBLE = 0xFFFFFFFF;
+    public static final int AURORA_DAY_IN_TEXT = 0xFF171B26;
+    public static final int AURORA_DAY_OUT_BUBBLE = 0xFFDCF7F0;
+    public static final int AURORA_DAY_OUT_TEXT = 0xFF0B3B33;
+    public static final int AURORA_DAY_BADGE_BG = 0xFF08806B;
+    public static final int AURORA_DAY_BADGE_TEXT = 0xFFFFFFFF;
+    public static final int AURORA_DAY_FIELD_BG = 0xFFFFFFFF;
+    public static final int AURORA_DAY_FIELD_BORDER = 0xFFD9DDE7;
+    public static final int AURORA_DAY_NAV_PILL = 0xFFDCF7F0;
+    public static final int AURORA_DAY_SHADOW_TINT = 0xFF08806B;
+    public static final float AURORA_DAY_SHADOW_ALPHA = 0.25f;
+
+    /** روبان‌های آئورورا — هویت رنگی تم (اکسنت‌ها، لوگو و آیکون از این‌ها تغذیه می‌شوند) */
+    public static final int AURORA_RIBBON_TEAL = 0xFF2DE4C4;
+    public static final int AURORA_RIBBON_VIOLET = 0xFF8B7CF6;
+    public static final int AURORA_RIBBON_PINK = 0xFFE86BD8;
+    public static final int AURORA_RIBBON_AMBER = 0xFFFFB454;
+
+    /** ۳ اکسنت شب آئورورا: فیروزه (نوشتار اصلی)، ارغوانی، کهربایی */
+    public static final int[] ACCENT_AURORA_NIGHT = { 0xFF2DE4C4, 0xFFE86BD8, 0xFFFFB454 };
+    /** ۳ اکسنت روز آئورورا: فیروزه عمیق، ارغوانی عمیق، کهربایی عمیق */
+    public static final int[] ACCENT_AURORA_DAY = { 0xFF08806B, 0xFFB84A9E, 0xFFB3651F };
+
+    // ─────────────────────────────────────────────────────────────────────────
     // بذرهای اکسنت — قدم ۶ (سیستم اکسنت) از این‌ها تغذیه می‌شود
     // ─────────────────────────────────────────────────────────────────────────
 
