@@ -154,7 +154,8 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
 
     @Override
     public View createView(Context context) {
-        logoDrawable = context.getResources().getDrawable(R.drawable.amber_logo).mutate();
+        // Amber fork: v0.9.7 — the intro logo follows the theme family (comet for aurora)
+        logoDrawable = context.getResources().getDrawable(Theme.currentThemeIsAurora() ? R.drawable.aurora_logo : R.drawable.amber_logo).mutate();
         logoDrawable.setBounds(0, dp(8.666f), dp(115), dp(35));
         SpannableStringBuilder ssb = new SpannableStringBuilder(LocaleController.getString(R.string.Page1Title));
         ssb.setSpan(new ImageSpan(logoDrawable), 0, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
