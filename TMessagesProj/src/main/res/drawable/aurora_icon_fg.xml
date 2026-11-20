@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AmberGram v0.9.7 — آیکون لانچر برند آئورورا (کومت) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- TR -->
+    <path
+        android:pathData="M54.63,30.01 A24,24 0 0 1 77.99,53.37 L71.20,53.55 A17.2,17.2 0 0 0 54.45,36.81 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="54.63"
+                android:startY="30.01"
+                android:endX="77.99"
+                android:endY="53.37">
+                <item android:offset="0.0" android:color="#FF8B7CF6" />
+                <item android:offset="1.0" android:color="#FFE86BD8" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- RB -->
+    <path
+        android:pathData="M77.99,54.63 A24,24 0 0 1 54.63,77.99 L54.45,71.20 A17.2,17.2 0 0 0 71.20,54.45 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="77.99"
+                android:startY="54.63"
+                android:endX="54.63"
+                android:endY="77.99">
+                <item android:offset="0.0" android:color="#FFE86BD8" />
+                <item android:offset="1.0" android:color="#FFFFB454" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- BL -->
+    <path
+        android:pathData="M53.37,77.99 A24,24 0 0 1 30.01,54.63 L36.81,54.45 A17.2,17.2 0 0 0 53.55,71.20 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="53.37"
+                android:startY="77.99"
+                android:endX="30.01"
+                android:endY="54.63">
+                <item android:offset="0.0" android:color="#FFFFB454" />
+                <item android:offset="1.0" android:color="#FF2DE4C4" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- LT -->
+    <path
+        android:pathData="M30.01,53.37 A24,24 0 0 1 53.37,30.01 L53.55,36.81 A17.2,17.2 0 0 0 36.81,53.55 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="30.01"
+                android:startY="53.37"
+                android:endX="53.37"
+                android:endY="30.01">
+                <item android:offset="0.0" android:color="#FF2DE4C4" />
+                <item android:offset="1.0" android:color="#FF8B7CF6" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- هواپیما در قلب حلقه -->
+    <group
+        android:scaleX="0.76"
+        android:scaleY="0.76"
+        android:pivotX="16.45"
+        android:pivotY="19.15"
+        android:translateX="37.55"
+        android:translateY="34.85">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M29.4,5.4L29.7,5.4L29.4,6L7.8,32.9L12.6,24.5L12.8,24L12.3,24.1L13.3,22.9L3.2,13.6Z" />
+    </group>
+    <!-- دنبالهٔ کومت -->
+    <path
+        android:fillColor="#99FFFFFF"
+        android:pathData="M34.8,77.75 a2.6,2.6 0 1,0 5.2,0 a2.6,2.6 0 1,0 -5.2,0 Z" />
+    <path
+        android:fillColor="#5CFFFFFF"
+        android:pathData="M28.5,75.4 a1.7,1.7 0 1,0 3.4,0 a1.7,1.7 0 1,0 -3.4,0 Z" />
+</vector>
