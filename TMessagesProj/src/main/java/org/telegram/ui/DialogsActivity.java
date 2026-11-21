@@ -3436,7 +3436,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 statusDrawable = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(null, dp(26));
                 statusDrawable.center = true;
                 // Amber fork: v0.9.7 — the header logo follows the theme family (comet for aurora)
-                logoDrawable = context.getResources().getDrawable(Theme.currentThemeIsPremiere() ? R.drawable.premiere_logo_2 : Theme.currentThemeIsAurora() ? R.drawable.aurora_logo_2 : Theme.currentThemeIsMario() ? R.drawable.mario_logo_2 : R.drawable.amber_logo_2).mutate();
+                logoDrawable = context.getResources().getDrawable(Theme.currentThemeIsPremiere() ? R.drawable.premiere_logo_2 : Theme.currentThemeIsAurora() ? R.drawable.aurora_logo_2 : Theme.currentThemeIsMario() ? R.drawable.mario_logo_2 : Theme.currentThemeIsHarmony() ? R.drawable.harmony_logo_2 : Theme.currentThemeIsStarWars() ? R.drawable.sw_logo_2 : Theme.currentThemeIsSling() ? R.drawable.sling_logo_2 : R.drawable.amber_logo_2).mutate();
                 // گرد ۱۴: کلمه‌نگارهٔ «AmberGram» در تیتر صفحهٔ اصلی ~۱٫۲۵ برابر بزرگ‌تر شد
                 // (بازخورد «نوشته ambergram خیلی کوچیک است») — ALIGN_BOTTOM تا داخل ارتفاع خط تیتر (≈26dp) جا شود و کلیپ نخورد
                 // (aurora_logo_2 هم‌اندازهٔ amber_logo_2 است، پس همین مقیاس روی هر دو برند یکسان اعمال می‌شود)

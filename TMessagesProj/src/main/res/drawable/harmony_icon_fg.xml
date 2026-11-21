@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AmberGram v0.9.11 — آیکون لانچر برند «هم‌آهنگ» (اکولایزر سه‌میله‌ای +
+     هواپیمای کاغذی آمبرگرام) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- میلهٔ اکولایزر ۱ — بلوری -->
+    <path
+        android:strokeColor="#FF5865F2"
+        android:strokeWidth="5"
+        android:strokeLineCap="round"
+        android:pathData="M44,49.5 L44,58.5" />
+    <!-- میلهٔ اکولایزر ۲ — بنفش (بلندترین) -->
+    <path
+        android:strokeColor="#FF8A57F0"
+        android:strokeWidth="5"
+        android:strokeLineCap="round"
+        android:pathData="M52,45.5 L52,62.5" />
+    <!-- میلهٔ اکولایزر ۳ — صورتی -->
+    <path
+        android:strokeColor="#FFEB459E"
+        android:strokeWidth="5"
+        android:strokeLineCap="round"
+        android:pathData="M60,48 L60,60" />
+    <!-- هالهٔ نور پشت هواپیما -->
+    <path
+        android:pathData="M61.10,64.90 L84.10,46.50 L75.48,62.03 L78.35,70.65 L69.15,65.48 Z"
+        android:strokeColor="#59F2F3FF"
+        android:strokeWidth="2.8"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000" />
+    <!-- هواپیمای کاغذی آمبرگرام -->
+    <path
+        android:fillColor="#FFF2F3FF"
+        android:strokeColor="#FFF2F3FF"
+        android:strokeWidth="0.7"
+        android:strokeLineJoin="round"
+        android:pathData="M61.10,64.90 L84.10,46.50 L75.48,62.03 L78.35,70.65 L69.15,65.48 Z" />
+</vector>

@@ -12,6 +12,12 @@
 #   python3 Tools/generate_amber_theme2.py premiere-day   TMessagesProj/src/main/assets/premiere_day.attheme
 #   python3 Tools/generate_amber_theme2.py mario-night TMessagesProj/src/main/assets/mario.attheme
 #   python3 Tools/generate_amber_theme2.py mario-day   TMessagesProj/src/main/assets/mario_day.attheme
+#   python3 Tools/generate_amber_theme2.py harmony-night TMessagesProj/src/main/assets/harmony.attheme
+#   python3 Tools/generate_amber_theme2.py harmony-day   TMessagesProj/src/main/assets/harmony_day.attheme
+#   python3 Tools/generate_amber_theme2.py sw-night TMessagesProj/src/main/assets/sw.attheme
+#   python3 Tools/generate_amber_theme2.py sw-day   TMessagesProj/src/main/assets/sw_day.attheme
+#   python3 Tools/generate_amber_theme2.py sling-night TMessagesProj/src/main/assets/sling.attheme
+#   python3 Tools/generate_amber_theme2.py sling-day   TMessagesProj/src/main/assets/sling_day.attheme
 #
 # منطق: فایل شب/روز = کلیدهای پایه (فایل تم فعلی برای پوشش کامل) + overlay کامل پالت جدید.
 # کلیدهای پالت بازنویسی می‌شوند؛ بقیه از پایه حفظ می‌شوند تا هیچ صفحه‌ای به
@@ -64,9 +70,9 @@ def load_tokens():
 
 # ── ۲) تبدیل عبارت جاوا به پایتون ─────────────────────────────────────────
 def translate_ternaries(s):
-    # فقط یک سطح ternary با شرط d یا au یا pr یا ma — اسکن دقیق مرزها با ردیابی عمق پرانتز
+    # فقط یک سطح ternary با شرط d یا au یا pr یا ma یا ha یا sw یا sl — اسکن دقیق مرزها با ردیابی عمق پرانتز
     while True:
-        m = re.search(r"\b(d|au|pr|ma) \?", s)
+        m = re.search(r"\b(d|au|pr|ma|ha|sw|sl) \?", s)
         if not m:
             return s
         i = m.start() + len(m.group(0))
@@ -111,7 +117,7 @@ def java_to_py(expr):
     return s
 
 # ── ۳) ارزیابی build() برای d/au/pr/ma مشخص ──────────────────────────────
-def eval_palette(d_value, au_value, pr_value, ma_value, tokens):
+def eval_palette(d_value, au_value, pr_value, ma_value, sl_value, sw_value, ha_value, tokens):
     ns = dict(tokens)
     ns["f_alpha"] = f_alpha
     ns["f_over"] = f_over
@@ -119,6 +125,9 @@ def eval_palette(d_value, au_value, pr_value, ma_value, tokens):
     ns["au"] = au_value
     ns["pr"] = pr_value
     ns["ma"] = ma_value
+    ns["sl"] = sl_value
+    ns["sw"] = sw_value
+    ns["ha"] = ha_value
     palette = {}
     in_build = False
     with open(os.path.join(SRC, "AmberPalette.java"), encoding="utf-8") as fh:
@@ -132,7 +141,7 @@ def eval_palette(d_value, au_value, pr_value, ma_value, tokens):
             if t.startswith("return m;"):
                 break
             mloc = re.match(r"final (?:boolean|int) (\w+)\s+= (.*);$", t)
-            if mloc and mloc.group(1) not in ("d", "au", "pr", "ma"):
+            if mloc and mloc.group(1) not in ("d", "au", "pr", "ma", "sl", "sw", "ha"):
                 name, expr = mloc.group(1), java_to_py(mloc.group(2))
                 ns[name] = mask32(eval(expr, {"__builtins__": {}}, ns))
                 continue
@@ -168,35 +177,30 @@ def load_base(path):
 # ── ۵) تولید ──────────────────────────────────────────────────────────────
 def main():
     if len(sys.argv) < 3:
-        sys.exit("usage: generate_amber_theme2.py night|day|aurora-night|aurora-day|premiere-night|premiere-day|mario-night|mario-day OUT [BASE]")
+        sys.exit("usage: generate_amber_theme2.py night|day|aurora-night|aurora-day|premiere-night|premiere-day|mario-night|mario-day|harmony-night|harmony-day|sw-night|sw-day|sling-night|sling-day OUT [BASE]")
     mode, out_path = sys.argv[1], sys.argv[2]
     asset_dir = os.path.join(ROOT, "TMessagesProj/src/main/assets")
     if len(sys.argv) > 3:
         base_path = sys.argv[3]
     elif mode == "day":
         base_path = os.path.join(asset_dir, "amber_day.attheme")
-    elif mode == "aurora-night":
+    elif mode.endswith("-night"):
         base_path = os.path.join(asset_dir, "amber.attheme")
-    elif mode == "aurora-day":
-        base_path = os.path.join(asset_dir, "amber_day.attheme")
-    elif mode == "premiere-night":
-        base_path = os.path.join(asset_dir, "amber.attheme")
-    elif mode == "premiere-day":
-        base_path = os.path.join(asset_dir, "amber_day.attheme")
-    elif mode == "mario-night":
-        base_path = os.path.join(asset_dir, "amber.attheme")
-    elif mode == "mario-day":
+    elif mode.endswith("-day"):
         base_path = os.path.join(asset_dir, "amber_day.attheme")
     else:
         base_path = os.path.join(asset_dir, "amber.attheme")
-    d = mode in ("day", "aurora-day", "premiere-day", "mario-day")
+    d = mode.endswith("-day") or mode == "day"
     au = mode.startswith("aurora")
     pr = mode.startswith("premiere")
     ma = mode.startswith("mario")
+    sl = mode.startswith("sling")
+    sw = mode.startswith("sw-")
+    ha = mode.startswith("harmony")
     tokens = load_tokens()
-    palette = eval_palette(d, au, pr, ma, tokens)
+    palette = eval_palette(d, au, pr, ma, sl, sw, ha, tokens)
     base = load_base(base_path)
-    if not au and not pr and not ma:
+    if not (au or pr or ma or sl or sw or ha):
         # قرارداد برند (v0.9.7): برای فایل‌های کهربا فقط کلیدهای موجود در پایه نوشته
         # می‌شوند — بخش «اکسنت‌های مکمل» پالت کلیدهای جدیدی دارد که شاخهٔ کهربایشان
         # مقدار فایل شب است و نباید فایل روز کهربا (که این کلیدها را ندارد و به
@@ -206,6 +210,15 @@ def main():
     replaced = sum(1 for k in palette if k in merged)
     added = sum(1 for k in palette if k not in merged)
     merged.update(palette)
+    if ha:
+        # کلید برند لوگو برای هم‌آهنگ — جوهر بنفش‌عمیق در روز / عاج یخی در شب
+        merged["telegram_color_dialogsLogo"] = 0xFF2E3050 if d else 0xFFE7E9FA
+    if sw:
+        # کلید برند لوگو برای سمت تاریک/روشن — جوهر شنی در روز / عاج ستاره‌ای در شب
+        merged["telegram_color_dialogsLogo"] = 0xFF2B283A if d else 0xFFEAF0FF
+    if sl:
+        # کلید برند لوگو برای اسلینگ‌شات/حملهٔ شبانه — جوهر برگ در روز / عاج مه‌آلود در شب
+        merged["telegram_color_dialogsLogo"] = 0xFF233A28 if d else 0xFFEAF4F0
     if au:
         # کلید برند لوگو — تینت MULTIPLY لوگوی هدر؛ فقط برای فایل‌های آئورورا
         # (کهربا: مقدار موروثی از base حفظ می‌شود تا رفتار فعلی تغییر نکند)
@@ -226,7 +239,7 @@ def main():
     for k, v in palette.items():
         if k not in back or mask32(back[k]) != mask32(v):
             errs.append(k)
-    if au or pr or ma:
+    if au or pr or ma or ha or sw or sl:
         k = "telegram_color_dialogsLogo"
         if k not in back or mask32(back[k]) != mask32(merged[k]):
             errs.append(k)

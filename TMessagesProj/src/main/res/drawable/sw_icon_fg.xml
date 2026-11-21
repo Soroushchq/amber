@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AmberGram v0.9.11 — آیکون لانچر برند «سمت تاریک» (ستارهٔ مرگ + شمشیر نوری +
+     هواپیمای کاغذی آمبرگرام) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- گوی ستارهٔ مرگ — هایلایت بالا-چپ -->
+    <path android:pathData="M54,47 m-22,0 a22,22 0 1,1 44,0 a22,22 0 1,1 -44,0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="46" android:centerY="39" android:gradientRadius="34">
+                <item android:offset="0.0" android:color="#FF9BA3B8" />
+                <item android:offset="0.55" android:color="#FF5E6478" />
+                <item android:offset="1.0" android:color="#FF3E4356" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- ترنچ استوایی -->
+    <path android:fillColor="#FF2E3346" android:pathData="M32.1,45.75 h43.8 v2.5 h-43.8 Z" />
+    <!-- بشقاب ابرتوزیع -->
+    <path android:fillColor="#FF474E60" android:pathData="M47,40 m-6,0 a6,6 0 1,1 12,0 a6,6 0 1,1 -12,0 Z" />
+    <path android:fillColor="#FF333949" android:pathData="M47,40 m-3,0 a3,3 0 1,1 6,0 a3,3 0 1,1 -6,0 Z" />
+    <!-- شمشیر نوری سرخ -->
+    <path
+        android:strokeColor="#FFE5484D"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:pathData="M66,58 L84,30" />
+    <path
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:pathData="M66,58 L84,30" />
+    <!-- ستاره‌های پراکنده -->
+    <path android:fillColor="#FFFFE81F" android:pathData="M28,22 m-1,0 a1,1 0 1,1 2,0 a1,1 0 1,1 -2,0 Z" />
+    <path android:fillColor="#FFEAF0FF" android:pathData="M48,14 m-1,0 a1,1 0 1,1 2,0 a1,1 0 1,1 -2,0 Z" />
+    <path android:fillColor="#FFF2C14E" android:pathData="M86,16 m-1,0 a1,1 0 1,1 2,0 a1,1 0 1,1 -2,0 Z" />
+    <!-- هالهٔ نور پشت هواپیما -->
+    <path
+        android:pathData="M61.10,64.90 L84.10,46.50 L75.48,62.03 L78.35,70.65 L69.15,65.48 Z"
+        android:strokeColor="#59EAF0FF"
+        android:strokeWidth="2.8"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000" />
+    <!-- هواپیمای کاغذی آمبرگرام -->
+    <path
+        android:fillColor="#FFEAF0FF"
+        android:strokeColor="#FFEAF0FF"
+        android:strokeWidth="0.7"
+        android:strokeLineJoin="round"
+        android:pathData="M61.10,64.90 L84.10,46.50 L75.48,62.03 L78.35,70.65 L69.15,65.48 Z" />
+</vector>
