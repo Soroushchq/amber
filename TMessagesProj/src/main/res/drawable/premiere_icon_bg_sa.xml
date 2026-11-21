@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AmberGram v0.9.9 — پس‌زمینهٔ آیکون «شب اکران»: تاریکی تالار با هالهٔ طلای مارکی و ولت کریمسون -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FF0C0A12"
+        android:pathData="M0,0 h108 v108 h-108 Z" />
+    <path android:pathData="M0,0 h108 v108 h-108 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="34" android:centerY="12" android:gradientRadius="105">
+                <item android:offset="0.0" android:color="#40F0B449" />
+                <item android:offset="1.0" android:color="#00F0B449" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M0,0 h108 v108 h-108 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="90" android:centerY="94" android:gradientRadius="105">
+                <item android:offset="0.0" android:color="#2DD63852" />
+                <item android:offset="1.0" android:color="#00D63852" />
+            </gradient>
+        </aapt:attr>
+    </path>
+</vector>

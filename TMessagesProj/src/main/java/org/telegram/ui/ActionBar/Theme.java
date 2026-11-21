@@ -1677,9 +1677,9 @@ public class Theme {
             if (isDark != UNKNOWN) {
                 return isDark == DARK;
             }
-            if ("Dark Blue".equals(name) || "Night".equals(name) || "Amber".equals(name) || "Aurora".equals(name)) {
+            if ("Dark Blue".equals(name) || "Night".equals(name) || "Amber".equals(name) || "Aurora".equals(name) || "Premiere".equals(name)) {
                 isDark = DARK;
-            } else if ("Blue".equals(name) || "Arctic Blue".equals(name) || "Day".equals(name) || "Amber Day".equals(name) || "Aurora Day".equals(name)) {
+            } else if ("Blue".equals(name) || "Arctic Blue".equals(name) || "Day".equals(name) || "Amber Day".equals(name) || "Aurora Day".equals(name) || "Premiere Day".equals(name)) {
                 isDark = LIGHT;
             }
             if (isDark == UNKNOWN) {
@@ -4161,6 +4161,72 @@ public class Theme {
         sortAccents(themeInfo);
         themes.add(themeInfo);
         themesDict.put("Aurora Day", themeInfo);
+
+        // Amber fork: v0.9.9 — premiere brand («شب اکران») — the third visual
+        // identity: golden-age Hollywood premiere night — hall-dark velvet
+        // #0C0A12 with purple-tinged #1F1930 in-bubbles, trophy-gold #E9A93A
+        // out-bubbles, red-carpet crimson #D63852 badges, marquee-gold #F0B449
+        // accent and the «پرتوهای افکتور» spotlight-beams gradient wallpaper.
+        // Deliberately NOT wired into currentDayTheme/currentNightTheme: the
+        // night toggle keeps the amber pair, premiere is picked manually.
+        themeInfo = new ThemeInfo();
+        themeInfo.name = "Premiere";
+        themeInfo.assetName = "premiere.attheme";
+        themeInfo.previewBackgroundColor = 0xff0c0a12;
+        themeInfo.previewInColor = 0xff1f1930;
+        themeInfo.previewOutColor = 0xffe9a93a;
+        themeInfo.sortIndex = 9;
+        // same accent contract as Aurora (قدم ۶): seeds from
+        // AmberTokens.ACCENT_PREMIERE_NIGHT, id 0 renders the authored colors and
+        // leaves the motion-gradient wallpaper untouched (zeroed overrides),
+        // 1/2 recolor organically via Telegram's own engine.
+        themeInfo.firstAccentIsDefault = false;
+        themeInfo.currentAccentId = 0;
+        themeInfo.setAccentColorOptions(
+                AmberTokens.ACCENT_PREMIERE_NIGHT,
+                null,
+                null,
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0, 1, 2 },
+                new String[] { "", "", "" },
+                new int[]    { 0, 0, 0 },
+                new int[]    { 0, 0, 0 }
+                );
+        sortAccents(themeInfo);
+        themes.add(themeInfo);
+        themesDict.put("Premiere", themeInfo);
+
+        // Amber fork: v0.9.9 — «ماتینه» — daylight companion: poster-paper cream
+        // #F8F1E3 with deep gold #A76F0F and print crimson #C42B4B — the same
+        // theater in daylight.
+        themeInfo = new ThemeInfo();
+        themeInfo.name = "Premiere Day";
+        themeInfo.assetName = "premiere_day.attheme";
+        themeInfo.previewBackgroundColor = 0xfff8f1e3;
+        themeInfo.previewInColor = 0xfffff3d9;
+        themeInfo.previewOutColor = 0xfff2ce7f;
+        themeInfo.sortIndex = 10;
+        themeInfo.firstAccentIsDefault = false;
+        themeInfo.currentAccentId = 0;
+        themeInfo.setAccentColorOptions(
+                AmberTokens.ACCENT_PREMIERE_DAY,
+                null,
+                null,
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0, 1, 2 },
+                new String[] { "", "", "" },
+                new int[]    { 0, 0, 0 },
+                new int[]    { 0, 0, 0 }
+                );
+        sortAccents(themeInfo);
+        themes.add(themeInfo);
+        themesDict.put("Premiere Day", themeInfo);
 
         themeInfo = new ThemeInfo();
         themeInfo.name = "Arctic Blue";
@@ -10382,6 +10448,12 @@ public class Theme {
             if (accent.parentTheme.getKey().equals("Aurora Day") && accent.id == 0) {
                 return true;
             }
+            if (accent.parentTheme.getKey().equals("Premiere") && accent.id == 0) {
+                return true;
+            }
+            if (accent.parentTheme.getKey().equals("Premiere Day") && accent.id == 0) {
+                return true;
+            }
             if (accent.parentTheme.getKey().equals("Day") && accent.id == 9) {
                 return true;
             }
@@ -10396,6 +10468,13 @@ public class Theme {
     // visuals follow the theme family (comet logo + Estedad for Aurora/Aurora Day)
     public static boolean currentThemeIsAurora() {
         return currentTheme != null && AmberTokens.isAuroraName(currentTheme.name);
+    }
+
+    // Amber fork: premiere brand (v0.9.9) — header/intro logo and launcher-brand
+    // visuals follow the theme family (star-of-the-premiere logo + Estedad for
+    // Premiere/Premiere Day)
+    public static boolean currentThemeIsPremiere() {
+        return currentTheme != null && AmberTokens.isPremiereName(currentTheme.name);
     }
 
     /**

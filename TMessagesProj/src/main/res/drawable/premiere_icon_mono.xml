@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AmberGram v0.9.9 — آیکون لانچر برند «شب اکران» — لایهٔ monochrome -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="3.2"
+        android:strokeLineJoin="round"
+        android:pathData="M54.00,32.15 L60.22,47.74 L76.97,48.84 L64.06,59.57 L68.19,75.84 L54.00,66.88 L39.81,75.84 L43.94,59.57 L31.03,48.84 L47.78,47.74 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M31.1,71.25 Q40.2,67.8 48.25,62.05" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M28.7,75.85 Q39.05,72.4 47.1,66.65" />
+    <!-- هالهٔ نور پشت هواپیما -->
+    <path
+        android:pathData="M47.10,60.90 L70.10,42.50 L61.48,58.03 L64.35,66.65 L55.15,61.48 Z"
+        android:strokeColor="#59FFFFFF"
+        android:strokeWidth="2.8"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000" />
+    <!-- هواپیمای کاغذی آمبرگرام -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="0.7"
+        android:strokeLineJoin="round"
+        android:pathData="M47.10,60.90 L70.10,42.50 L61.48,58.03 L64.35,66.65 L55.15,61.48 Z" />
+</vector>
