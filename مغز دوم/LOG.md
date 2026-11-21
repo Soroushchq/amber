@@ -248,3 +248,10 @@
   - ممیزی کنتراست: بج روی کریمسون ۴٫۳۲ (نیاز ۴٫۵) → متن بج سفید خالص؛ زمان روز ۲٫۸۸ → 94855E.
 - **نسخه:** 0.9.9-ui2 (7314) + changelog NEW in 0.9.9 در release.yml (pyyaml VALID، بدون `"`)
 - **نکتهٔ گزارش‌دهی:** LOG.md فقط تا نوبت ۱۰ بود درحالی‌که STATE نوبت ۲۹ را می‌گفت — فاصلهٔ ثبت؛ این نوبت با شمارهٔ ۳۰ ادامهٔ شماره‌گذاری STATE است.
+
+### ادامهٔ نوبت ۳۰ — نتیجهٔ CI و ریلیز
+- ci/master (کامپایل validate): **SUCCESS** (~۲۸ دقیقه؛ پوش ۳ کامیت 9120638e1/40c6db2ac/957749b47)
+- ریلیز: تگ `v0.9.9-ui2-alpha` → workflow android-release **SUCCESS** (~۵۰ دقیقه)
+- آرتیفکت‌ها: universal 79.6MB / arm64 43.2MB / armv7 42.0MB + SHA256SUMS
+- راستی‌آزمایی: sha256 arm64 دانلودشده با SHA256SUMS منطبق (`e8013ed9…`) + `assets/premiere.attheme` و `premiere_day.attheme` داخل APK تأیید شد (خط اول اکشن‌بار = 0xFFE9A93A طلای اکران ✓)
+- ریلیز در GitHub Pages صفحه: https://github.com/Soroushchq/amber/releases/tag/v0.9.9-ui2-alpha
