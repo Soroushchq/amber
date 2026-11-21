@@ -44,84 +44,84 @@ public final class AmberPalette {
     public static Map<String, Integer> palette(int mode) {
         if (mode == AmberTokens.MODE_HARMONY_NIGHT) {
             if (harmonyNightCache == null) {
-                harmonyNightCache = build(false, false, false, false, false, false, false, true);
+                harmonyNightCache = build(false, false, false, false, false, false, true);
             }
             return harmonyNightCache;
         }
         if (mode == AmberTokens.MODE_HARMONY_DAY) {
             if (harmonyDayCache == null) {
-                harmonyDayCache = build(true, false, false, false, false, false, false, true);
+                harmonyDayCache = build(true, false, false, false, false, false, true);
             }
             return harmonyDayCache;
         }
         if (mode == AmberTokens.MODE_SW_NIGHT) {
             if (swNightCache == null) {
-                swNightCache = build(false, false, false, false, false, false, true, false);
+                swNightCache = build(false, false, false, false, false, true, false);
             }
             return swNightCache;
         }
         if (mode == AmberTokens.MODE_SW_DAY) {
             if (swDayCache == null) {
-                swDayCache = build(true, false, false, false, false, false, true, false);
+                swDayCache = build(true, false, false, false, false, true, false);
             }
             return swDayCache;
         }
         if (mode == AmberTokens.MODE_SLING_NIGHT) {
             if (slingNightCache == null) {
-                slingNightCache = build(false, false, false, false, false, true, false, false);
+                slingNightCache = build(false, false, false, false, true, false, false);
             }
             return slingNightCache;
         }
         if (mode == AmberTokens.MODE_SLING_DAY) {
             if (slingDayCache == null) {
-                slingDayCache = build(true, false, false, false, false, true, false, false);
+                slingDayCache = build(true, false, false, false, true, false, false);
             }
             return slingDayCache;
         }
         if (mode == AmberTokens.MODE_NIGHT) {
             if (nightCache == null) {
-                nightCache = build(false, false, false, false, false, false, false, false);
+                nightCache = build(false, false, false, false, false, false, false);
             }
             return nightCache;
         }
         if (mode == AmberTokens.MODE_AURORA_NIGHT) {
             if (auroraNightCache == null) {
-                auroraNightCache = build(false, true, false, false, false, false, false, false);
+                auroraNightCache = build(false, true, false, false, false, false, false);
             }
             return auroraNightCache;
         }
         if (mode == AmberTokens.MODE_AURORA_DAY) {
             if (auroraDayCache == null) {
-                auroraDayCache = build(true, true, false, false, false, false, false, false);
+                auroraDayCache = build(true, true, false, false, false, false, false);
             }
             return auroraDayCache;
         }
         if (mode == AmberTokens.MODE_PREMIERE_NIGHT) {
             if (premiereNightCache == null) {
-                premiereNightCache = build(false, false, true, false, false, false, false, false);
+                premiereNightCache = build(false, false, true, false, false, false, false);
             }
             return premiereNightCache;
         }
         if (mode == AmberTokens.MODE_PREMIERE_DAY) {
             if (premiereDayCache == null) {
-                premiereDayCache = build(true, false, true, false, false, false, false, false);
+                premiereDayCache = build(true, false, true, false, false, false, false);
             }
             return premiereDayCache;
         }
         if (mode == AmberTokens.MODE_MARIO_NIGHT) {
             if (marioNightCache == null) {
-                marioNightCache = build(false, false, false, true, false, false, false, false);
+                marioNightCache = build(false, false, false, true, false, false, false);
             }
             return marioNightCache;
         }
         if (mode == AmberTokens.MODE_MARIO_DAY) {
             if (marioDayCache == null) {
-                marioDayCache = build(true, false, false, true, false, false, false, false);
+                marioDayCache = build(true, false, false, true, false, false, false);
             }
             return marioDayCache;
         }
         if (dayCache == null) {
-            dayCache = build(true, false, false, false, false, false, false, false);
+            dayCache = build(true, false, false, false, false, false, false);
         }
         return dayCache;
     }
