@@ -278,7 +278,8 @@ public class AndroidUtilities {
      * typeface ضبط‌شده باطل می‌شود (مقایسه رشته ارزان است).
      */
     public static void updateUIFontForTheme(String themeName) {
-        boolean aurora = AmberTokens.isAuroraName(themeName);
+        // v0.9.9 — Estedad follows the Aurora AND Premiere families
+        boolean aurora = AmberTokens.isAuroraName(themeName) || AmberTokens.isPremiereName(themeName);
         if (aurora != auroraUIFontActive || !auroraUIFontResolved) {
             auroraUIFontActive = aurora;
             auroraUIFontResolved = true;
