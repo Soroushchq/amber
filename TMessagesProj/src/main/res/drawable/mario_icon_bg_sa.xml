@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AmberGram v0.9.10 — پس‌زمینهٔ آیکون «دنیای ماریو»: آسمان NES با هالهٔ طلای سکه،
+     تپهٔ سبز لوله و نوار تپه‌های پایین -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path android:pathData="M0,0 h108 v108 h-108 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="54" android:startY="0" android:endX="54" android:endY="108">
+                <item android:offset="0.0" android:color="#FF5C94FC" />
+                <item android:offset="1.0" android:color="#FF8FB4FF" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- هالهٔ طلای سکه — بالا-راست -->
+    <path android:pathData="M0,0 h108 v108 h-108 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="78" android:centerY="24" android:gradientRadius="55">
+                <item android:offset="0.0" android:color="#4DFFE063" />
+                <item android:offset="1.0" android:color="#00FFE063" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- هالهٔ سبز لوله — پایین-چپ -->
+    <path android:pathData="M0,0 h108 v108 h-108 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="26" android:centerY="96" android:gradientRadius="62">
+                <item android:offset="0.0" android:color="#4D43B047" />
+                <item android:offset="1.0" android:color="#0043B047" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- تپه‌های سبز پایین -->
+    <path android:fillColor="#4D43B047" android:pathData="M0,86 Q27,74 54,86 Q81,98 108,86 L108,108 L0,108 Z" />
+    <path android:fillColor="#662E9E3E" android:pathData="M0,94 Q36,84 72,94 Q90,98 108,94 L108,108 L0,108 Z" />
+</vector>

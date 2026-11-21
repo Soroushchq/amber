@@ -3436,7 +3436,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 statusDrawable = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(null, dp(26));
                 statusDrawable.center = true;
                 // Amber fork: v0.9.7 — the header logo follows the theme family (comet for aurora)
-                logoDrawable = context.getResources().getDrawable(Theme.currentThemeIsPremiere() ? R.drawable.premiere_logo_2 : Theme.currentThemeIsAurora() ? R.drawable.aurora_logo_2 : R.drawable.amber_logo_2).mutate();
+                logoDrawable = context.getResources().getDrawable(Theme.currentThemeIsPremiere() ? R.drawable.premiere_logo_2 : Theme.currentThemeIsAurora() ? R.drawable.aurora_logo_2 : Theme.currentThemeIsMario() ? R.drawable.mario_logo_2 : R.drawable.amber_logo_2).mutate();
                 // گرد ۱۴: کلمه‌نگارهٔ «AmberGram» در تیتر صفحهٔ اصلی ~۱٫۲۵ برابر بزرگ‌تر شد
                 // (بازخورد «نوشته ambergram خیلی کوچیک است») — ALIGN_BOTTOM تا داخل ارتفاع خط تیتر (≈26dp) جا شود و کلیپ نخورد
                 // (aurora_logo_2 هم‌اندازهٔ amber_logo_2 است، پس همین مقیاس روی هر دو برند یکسان اعمال می‌شود)
@@ -3449,6 +3449,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 SpannableStringBuilder ssb = new SpannableStringBuilder(getString(R.string.AppName));
                 ssb.setSpan(new ImageSpan(logoDrawable, ImageSpan.ALIGN_BOTTOM), 0, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 actionBar.setTitle(ssb, statusDrawable);
+                // Amber fork: v0.9.10 — ایست‌راگ ماریو: تپ روی لوگوی هدر ← پرش قارچ (کی‌فریم اسکواش-استرچ)
+                if (Theme.currentThemeIsMario()) {
+                    actionBar.getTitleTextView().setOnClickListener(v -> AndroidUtilities.playMarioJump(v));
+                }
                 updateStatus(UserConfig.getInstance(currentAccount).getCurrentUser(), false);
             }
             if (folderId == 0) {

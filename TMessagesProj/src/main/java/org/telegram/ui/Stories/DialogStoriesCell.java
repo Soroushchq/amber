@@ -337,10 +337,14 @@ public class DialogStoriesCell extends FrameLayout implements NotificationCenter
         telegramLogoView.setContentDescription(getString(R.string.AppName));
         telegramLogoView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         // Amber fork: v0.9.7 — the header logo follows the theme family (comet for aurora)
-        telegramLogoView.setImageResource(Theme.currentThemeIsPremiere() ? R.drawable.premiere_logo_2 : Theme.currentThemeIsAurora() ? R.drawable.aurora_logo_2 : R.drawable.amber_logo_2);
+        telegramLogoView.setImageResource(Theme.currentThemeIsPremiere() ? R.drawable.premiere_logo_2 : Theme.currentThemeIsAurora() ? R.drawable.aurora_logo_2 : Theme.currentThemeIsMario() ? R.drawable.mario_logo_2 : R.drawable.amber_logo_2);
         telegramLogoView.setColorFilter(getTextLogoColor(), PorterDuff.Mode.MULTIPLY);
         telegramLogoView.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
         telegramLogoView.setFocusableInTouchMode(true);
+        // Amber fork: v0.9.10 — ایست‌راگ ماریو: تپ روی لوگوی نوار استوری ← پرش قارچ
+        if (Theme.currentThemeIsMario()) {
+            telegramLogoView.setOnClickListener(v -> AndroidUtilities.playMarioJump(v));
+        }
         addView(telegramLogoView, LayoutHelper.createFrame(90, 22));
 
         statusDrawable = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(null, dp(26));
