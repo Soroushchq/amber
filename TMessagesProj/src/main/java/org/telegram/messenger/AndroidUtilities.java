@@ -14,6 +14,9 @@ import static org.telegram.messenger.LocaleController.getString;
 import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.Keyframe;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -108,6 +111,7 @@ import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
@@ -285,6 +289,46 @@ public class AndroidUtilities {
             auroraUIFontResolved = true;
             mediumTypeface = null;
         }
+    }
+
+    /**
+     * AmberGram v0.9.10 — انیمیشن «پرش ماریویی» — ایست‌راگ بانمک تم دنیای ماریو.
+     * کی‌فریم اسکواش-استرچ کلاسیک پلتفرمر: فروپاشی پیش‌پرش، کش‌شدن در شتاب‌گیری،
+     * فرود با اسکواش و بازگشت نرم — با PropertyValuesHolder.ofKeyframe (کی‌فریم واقعی).
+     * فقط با تپ روی لوگوی برند وقتی تم ماریو فعال است اجرا می‌شود.
+     */
+    public static void playMarioJump(View v) {
+        if (v == null) return;
+        float d = v.getResources().getDisplayMetrics().density;
+        if (v.getWidth() > 0) {
+            v.setPivotX(v.getWidth() / 2f);
+            v.setPivotY(v.getHeight());
+        }
+        PropertyValuesHolder sx = PropertyValuesHolder.ofKeyframe(View.SCALE_X,
+                Keyframe.ofFloat(0f, 1f),
+                Keyframe.ofFloat(0.14f, 1.16f),
+                Keyframe.ofFloat(0.36f, 0.84f),
+                Keyframe.ofFloat(0.62f, 0.94f),
+                Keyframe.ofFloat(0.72f, 1.12f),
+                Keyframe.ofFloat(1f, 1f));
+        PropertyValuesHolder sy = PropertyValuesHolder.ofKeyframe(View.SCALE_Y,
+                Keyframe.ofFloat(0f, 1f),
+                Keyframe.ofFloat(0.14f, 0.80f),
+                Keyframe.ofFloat(0.36f, 1.22f),
+                Keyframe.ofFloat(0.62f, 1.06f),
+                Keyframe.ofFloat(0.72f, 0.86f),
+                Keyframe.ofFloat(1f, 1f));
+        PropertyValuesHolder ty = PropertyValuesHolder.ofKeyframe(View.TRANSLATION_Y,
+                Keyframe.ofFloat(0f, 0f),
+                Keyframe.ofFloat(0.14f, 0f),
+                Keyframe.ofFloat(0.36f, -18f * d),
+                Keyframe.ofFloat(0.62f, 0f),
+                Keyframe.ofFloat(0.72f, 1.5f * d),
+                Keyframe.ofFloat(1f, 0f));
+        ObjectAnimator jump = ObjectAnimator.ofPropertyValuesHolder(v, sx, sy, ty);
+        jump.setDuration(550);
+        jump.setInterpolator(new AccelerateDecelerateInterpolator());
+        jump.start();
     }
     public static ThreadLocal<byte[]> readBufferLocal = new ThreadLocal<>();
     public static ThreadLocal<byte[]> bufferLocal = new ThreadLocal<>();

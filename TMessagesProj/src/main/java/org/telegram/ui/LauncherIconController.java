@@ -37,6 +37,7 @@ public class LauncherIconController {
         DEFAULT("DefaultIcon", R.drawable.icon_background_sa, R.mipmap.icon_foreground_sa, R.string.AppIconDefault),
         AURORA("AuroraIcon", R.drawable.aurora_icon_bg_sa, R.drawable.aurora_icon_fg_sa, R.string.AppIconAurora),
         PREMIERE("PremiereIcon", R.drawable.premiere_icon_bg_sa, R.drawable.premiere_icon_fg_sa, R.string.AppIconPremiere),
+        MARIO("MarioIcon", R.drawable.mario_icon_bg_sa, R.drawable.mario_icon_fg_sa, R.string.AppIconMario),
         VINTAGE("VintageIcon", R.drawable.icon_6_background_sa, R.mipmap.icon_6_foreground_sa, R.string.AppIconVintage),
         AQUA("AquaIcon", R.drawable.icon_4_background_sa, R.mipmap.icon_foreground_sa, R.string.AppIconAqua),
         PREMIUM("PremiumIcon", R.drawable.icon_3_background_sa, R.mipmap.icon_3_foreground_sa, R.string.AppIconPremium, true),

@@ -1677,9 +1677,9 @@ public class Theme {
             if (isDark != UNKNOWN) {
                 return isDark == DARK;
             }
-            if ("Dark Blue".equals(name) || "Night".equals(name) || "Amber".equals(name) || "Aurora".equals(name) || "Premiere".equals(name)) {
+            if ("Dark Blue".equals(name) || "Night".equals(name) || "Amber".equals(name) || "Aurora".equals(name) || "Premiere".equals(name) || "Mario".equals(name)) {
                 isDark = DARK;
-            } else if ("Blue".equals(name) || "Arctic Blue".equals(name) || "Day".equals(name) || "Amber Day".equals(name) || "Aurora Day".equals(name) || "Premiere Day".equals(name)) {
+            } else if ("Blue".equals(name) || "Arctic Blue".equals(name) || "Day".equals(name) || "Amber Day".equals(name) || "Aurora Day".equals(name) || "Premiere Day".equals(name) || "Mario Day".equals(name)) {
                 isDark = LIGHT;
             }
             if (isDark == UNKNOWN) {
@@ -4227,6 +4227,72 @@ public class Theme {
         sortAccents(themeInfo);
         themes.add(themeInfo);
         themesDict.put("Premiere Day", themeInfo);
+
+        // Amber fork: v0.9.10 — mario brand («دنیای ماریو») — the fourth visual
+        // identity: the cheerful classic platformer land — underground-cave navy
+        // #0B0F1E with brick-blue #141B3C in-bubbles, pipe-green #43B047 out-bubbles,
+        // mushroom-red #DC2418 badges, coin-gold #FBD000 accent and the
+        // «زیرزمین سکه‌ها» cave-and-lava gradient wallpaper. Deliberately NOT wired
+        // into currentDayTheme/currentNightTheme: the night toggle keeps the amber
+        // pair, mario is picked manually.
+        themeInfo = new ThemeInfo();
+        themeInfo.name = "Mario";
+        themeInfo.assetName = "mario.attheme";
+        themeInfo.previewBackgroundColor = 0xff0b0f1e;
+        themeInfo.previewInColor = 0xff141b3c;
+        themeInfo.previewOutColor = 0xff43b047;
+        themeInfo.sortIndex = 11;
+        // same accent contract as Aurora (قدم ۶): seeds from
+        // AmberTokens.ACCENT_MARIO_NIGHT, id 0 renders the authored colors and
+        // leaves the motion-gradient wallpaper untouched (zeroed overrides),
+        // 1/2 recolor organically via Telegram's own engine.
+        themeInfo.firstAccentIsDefault = false;
+        themeInfo.currentAccentId = 0;
+        themeInfo.setAccentColorOptions(
+                AmberTokens.ACCENT_MARIO_NIGHT,
+                null,
+                null,
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0, 1, 2 },
+                new String[] { "", "", "" },
+                new int[]    { 0, 0, 0 },
+                new int[]    { 0, 0, 0 }
+                );
+        sortAccents(themeInfo);
+        themes.add(themeInfo);
+        themesDict.put("Mario", themeInfo);
+
+        // Amber fork: v0.9.10 — «سرزمین ماریو» — daylight companion: sky-paper
+        // #F2F7FF with sky-to-hills wallpaper, deep mario-red #C6281C accent and
+        // soft coin-gold #FFE382 out-bubbles — the same land in daylight.
+        themeInfo = new ThemeInfo();
+        themeInfo.name = "Mario Day";
+        themeInfo.assetName = "mario_day.attheme";
+        themeInfo.previewBackgroundColor = 0xfff2f7ff;
+        themeInfo.previewInColor = 0xffffffff;
+        themeInfo.previewOutColor = 0xffffe382;
+        themeInfo.sortIndex = 12;
+        themeInfo.firstAccentIsDefault = false;
+        themeInfo.currentAccentId = 0;
+        themeInfo.setAccentColorOptions(
+                AmberTokens.ACCENT_MARIO_DAY,
+                null,
+                null,
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0, 1, 2 },
+                new String[] { "", "", "" },
+                new int[]    { 0, 0, 0 },
+                new int[]    { 0, 0, 0 }
+                );
+        sortAccents(themeInfo);
+        themes.add(themeInfo);
+        themesDict.put("Mario Day", themeInfo);
 
         themeInfo = new ThemeInfo();
         themeInfo.name = "Arctic Blue";
@@ -10454,6 +10520,12 @@ public class Theme {
             if (accent.parentTheme.getKey().equals("Premiere Day") && accent.id == 0) {
                 return true;
             }
+            if (accent.parentTheme.getKey().equals("Mario") && accent.id == 0) {
+                return true;
+            }
+            if (accent.parentTheme.getKey().equals("Mario Day") && accent.id == 0) {
+                return true;
+            }
             if (accent.parentTheme.getKey().equals("Day") && accent.id == 9) {
                 return true;
             }
@@ -10475,6 +10547,13 @@ public class Theme {
     // Premiere/Premiere Day)
     public static boolean currentThemeIsPremiere() {
         return currentTheme != null && AmberTokens.isPremiereName(currentTheme.name);
+    }
+
+    // Amber fork: mario brand (v0.9.10) — header/intro logo and the jump
+    // easter egg follow the theme family (super-mushroom logo + keyframe jump
+    // animation for Mario/Mario Day)
+    public static boolean currentThemeIsMario() {
+        return currentTheme != null && AmberTokens.isMarioName(currentTheme.name);
     }
 
     /**

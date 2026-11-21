@@ -155,7 +155,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
     @Override
     public View createView(Context context) {
         // Amber fork: v0.9.7 — the intro logo follows the theme family (comet for aurora)
-        logoDrawable = context.getResources().getDrawable(Theme.currentThemeIsPremiere() ? R.drawable.premiere_logo : Theme.currentThemeIsAurora() ? R.drawable.aurora_logo : R.drawable.amber_logo).mutate();
+        logoDrawable = context.getResources().getDrawable(Theme.currentThemeIsPremiere() ? R.drawable.premiere_logo : Theme.currentThemeIsAurora() ? R.drawable.aurora_logo : Theme.currentThemeIsMario() ? R.drawable.mario_logo : R.drawable.amber_logo).mutate();
         logoDrawable.setBounds(0, dp(8.666f), dp(115), dp(35));
         SpannableStringBuilder ssb = new SpannableStringBuilder(LocaleController.getString(R.string.Page1Title));
         ssb.setSpan(new ImageSpan(logoDrawable), 0, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -605,6 +605,10 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
             container.addView(frameLayout, 0);
 
             headerTextView.setText(titles[position]);
+            // Amber fork: v0.9.10 — ایست‌راگ ماریو: تپ روی تیتر صفحهٔ اول ← پرش قارچ
+            if (position == 0 && Theme.currentThemeIsMario()) {
+                headerTextView.setOnClickListener(v -> AndroidUtilities.playMarioJump(v));
+            }
             messageTextView.setText(AndroidUtilities.replaceTags(messages[position]));
 
             return frameLayout;
