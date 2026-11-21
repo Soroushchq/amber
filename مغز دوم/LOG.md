@@ -255,3 +255,25 @@
 - آرتیفکت‌ها: universal 79.6MB / arm64 43.2MB / armv7 42.0MB + SHA256SUMS
 - راستی‌آزمایی: sha256 arm64 دانلودشده با SHA256SUMS منطبق (`e8013ed9…`) + `assets/premiere.attheme` و `premiere_day.attheme` داخل APK تأیید شد (خط اول اکشن‌بار = 0xFFE9A93A طلای اکران ✓)
 - ریلیز در GitHub Pages صفحه: https://github.com/Soroushchq/amber/releases/tag/v0.9.9-ui2-alpha
+
+## نوبت ۳۱ — تم «دنیای ماریو» (Mario) — چهارمین هویت بصری (0.9.10-ui2، کد 7315)
+- **ورودی کاربر:** «برای برنامه یه تم بانمک Super Mario بساز با کی انیمیشن و غیره» + «اضافه کن» — تم شاد ماریو با انیمیشن کی‌فریم.
+- **کشف مهم:** سندباکس ریست شده بود؛ ریپو از نو کلون شد — وضعیت واقعی: v0.9.9-ui2 (7314) منتشرشده با تم «شب اکران» کامل (نه 0.9.5 که در خلاصه نشست قبلی بود).
+- **پیاده‌سازی (الگوی عیناً شب اکران):**
+  1. `AmberTokens.java` — بلوک MARIO_* با همان پسوند اتم‌ها + MODE_MARIO_DAY=6/NIGHT=7 + isMarioName + روبان‌های سرزمین ماریو (سکه/قارچ/لوله/آسمان NES/گل آتش/وارپ) + بذرهای ACCENT_MARIO_NIGHT/DAY؛ DESIGN_VERSION → 2.0-c-mario
+  2. `Tools/transform_palette_mario.py` (یک‌بارمصرف، ماندگار): ۲۲ پیچ مکانیکی هم‌پسوند + موتور تزریق سطح‌بالا با split_top (ردیابی عمق پرانتز) برای ۱۶۶ کلید صریح (۵ لوکال + ۴۰ m.put + ۲۶ آواتار + ۹۵ اکسنت مکمل) + ۷ خط تو‌در‌تو (svcBg/svcBgSel/svcSel/goDown + compact gradient/out/fadeMiddle) — قرارداد FATAL-on-mismatch + تأیید نهایی «هیچ زنجیرهٔ pr بدون ma نماند»
+  3. `AmberPalette.build(d, au, pr, ma)` — چهاربرند؛ **صحت‌سنجی رفت‌وبرگشتی: کهربا/آئورورا/شب اکران بعد از بازتولید بایت‌به‌بایت identical ✓**
+  4. مولد `generate_amber_theme2.py` — حالت‌های mario-night/day + کلید برند telegram_color_dialogsLogo (شب عاج سکه F6F2E6 / روز جوهر اورال 16243E) + شرط فrozen سه‌برند
+  5. خروجی: `mario.attheme` (۸۶۸ کلید — ست مو‌به‌مو برابر premiere) و `mario_day.attheme` (۷۵۲ کلید — ست مو‌به‌مو برابر premiere_day)
+  6. `Theme.java` — ثبت ThemeInfo «Mario» (sortIndex 11) و «Mario Day» (12) با قرارداد اکسنت سه‌بذری + currentThemeIsMario() + جفت شب/روز در isDark/isHome + دو شاخهٔ fallback اکسنت-صفر
+  7. لوگوی «قارچ سوپر»: `mario_logo.xml`/`_2.xml` (کلاهک گرادیان قرمز + ۵ لکهٔ سفید + ساقهٔ کرم با چشم‌های بانمک + سکهٔ حکاکی‌دار + جرقه‌ها + هواپیما — هم‌اندازهٔ amber_logo، واریانت _2 با group scale 1.08032) + جایگزینی پویا در IntroActivity/DialogsActivity/DialogStoriesCell
+  8. **انیمیشن کی‌فریم «پرش ماریویی»**: `AndroidUtilities.playMarioJump(View)` — PropertyValuesHolder.ofKeyframe سه‌ویژگی (SCALE_X/SCALE_Y/TRANSLATION_Y، ۶ کی‌فریم، ۵۵۰ms، pivot پایین) — اسکواش پیش‌پرش ۰٫۸۰، کش‌شدن پرش ۱٫۲۲ با -۱۸dp، فرود اسکواش ۰٫۸۶ + هوک تپ روی لوگوی هدر/استوری/اینرو فقط وقتی currentThemeIsMario()
+  9. آیکون لانچر «Mario» (icon_15): ۶ درا‌بل + adaptive anydpi + PNG legacy پنج تراکم با `Tools/generate_mario_icons.py` (فوق‌نمونه‌برداری ۴×، آسمان NES + تپه‌های بِزیه + کلاهک بِزیه با گرادیان ماسک‌دار) + alias MarioIcon + ردیف MARIO در LauncherIconController + رشتهٔ AppIconMario
+  10. ممیزی کنتراست `Tools/audit_mario_contrast.py`: ۲۶ جفت معنایی — همهٔ AA ✓ (بدترین شب: بج ۴٫۸۷، بدترین روز: زمان ۳٫۷۱)
+- **باگ‌های شکارشده در این نوبت:**
+  - موتور تزریق به لوکال‌های final int هم «);» می‌داد → فیکس با ending جدا برای m.put/local؛ سپس رِجکس فیکس اولیه بیش از حد گشاد بود و پرانتز قانونی ۱۹ لوکال مکانیکی را هم می‌خورد → بازگشت از بکاپ + فیکس درست در اسکریپت (درس: فیکس را در مولد بزن نه با رِجکس روی خروجی)
+  - «کلید جاافتاده»: chat_outFileBackground/outContactBackground در مپ صریح نبودند → FATAL موتور گرفتش (قرارداد FATAL کار کرد)
+  - گرادیان عمودی PIL با ضرب مستقیم y×size بدون تقسیم بر ۱۰۸ همه‌چیز را بیرون بوم می‌کشید (همان درس «مختصات بستر ۱۰۸» نوبت ۳۰!) → عامل k=size/108 در vgrad
+- **نسخه:** 0.9.10-ui2 (7315) + changelog NEW in 0.9.10 در release.yml (pyyaml VALID، بدون `"`)
+- **فونت:** عمداً بدون تغییر — ماریو با فونت گرد AmberGram UI (Baloo) هم‌خانوادهٔ بانمکی است؛ استعداد فقط برای آئورورا/شب اکران می‌ماند
+
