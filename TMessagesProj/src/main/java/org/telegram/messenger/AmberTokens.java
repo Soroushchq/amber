@@ -16,7 +16,7 @@ public final class AmberTokens {
     private AmberTokens() {}
 
     /** نسخه سند توکن — با هر تغییر ناپایه‌ای bump می‌شود */
-    public static final String DESIGN_VERSION = "2.0-c-premiere";
+    public static final String DESIGN_VERSION = "2.0-c-mario";
 
     /** رژیم تم — قدم ۴ روز/شب را در ThemeInfo جدا می‌کند */
     public static final int MODE_DAY = 0;
@@ -289,6 +289,118 @@ public final class AmberTokens {
     public static final int[] ACCENT_PREMIERE_NIGHT = { 0xFFF0B449, 0xFFE8445E, 0xFF3FD2C7 };
     /** ۳ اکسنت روز ماتینه: طلای عمیق، کریمسون پوستر، فیروزه چاپی */
     public static final int[] ACCENT_PREMIERE_DAY = { 0xFFA76F0F, 0xFFC42B4B, 0xFF0FA397 };
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // دنیای ماریو — تم «دنیای ماریو» (v0.9.10-ui2) — چهارمین هویت بصری AmberGram
+    //
+    // کانسپت: سرزمین شاد پلتفرمر کلاسیک — بانمک، پرانرژی و پُر سکه.
+    // شب = «دنیای زیرزمینی» (مرحلهٔ ۱-۲): آبی‌نفتیِ غار (#0B0F1E) با گنبد آبی
+    // بریکی (#18265C) در بالا و تابش گدازهٔ قهوه‌ای‌سوخته (#3A1B0A) در پایین،
+    // حباب خروجی سبزِ لولهٔ پُرشتاب (#43B047 با متن سایهٔ لوله)، بج قرمزِ قارچ
+    // (#DC2418) و اکسنت طلای سکه (#FBD000) — کاغذدیوار «زیرزمین سکه‌ها» با
+    // گرادیان غار و گدازه.
+    // نام‌گذاری دقیقاً هم‌پسوند با اتم‌های Amber (DAY_*/NIGHT_*)، آئورورا و
+    // شب اکران تا مبدل generate_amber_theme2.py شاخه ma را مکانیکی بپیچد.
+    // روز = «سرزمین ماریو» (مرحلهٔ ۱-۱): کاغذ آسمان (#F2F7FF) با وایپرپِ
+    // آسمان-تپه (آبی آسمان روشن → سبز پاستلی لوله)، اکسنت قرمز عمیق ماریو
+    // (#C6281C، AA روی کاغذ آسمان) و حباب خروجی طلای سکهٔ ملایم (#FFE382).
+    // ─────────────────────────────────────────────────────────────────────────
+
+    public static final int MODE_MARIO_DAY = 6;
+    public static final int MODE_MARIO_NIGHT = 7;
+
+    /** آیا نام تم به خانواده دنیای ماریو تعلق دارد (لوگوی قارچ/انیمیشن پرش) */
+    public static boolean isMarioName(String name) {
+        return "Mario".equals(name) || "Mario Day".equals(name);
+    }
+
+    // شب — «دنیای زیرزمینی»
+    public static final int MARIO_NIGHT_BG = 0xFF0B0F1E;
+    /** گنبد آبی بریکی غار — توقف بالای وایپرپ */
+    public static final int MARIO_NIGHT_WALLPAPER_TOP = 0xFF18265C;
+    public static final int MARIO_NIGHT_WALLPAPER_MID = 0xFF0B0F1E;
+    /** تابش گدازه — توقف پایین وایپرپ */
+    public static final int MARIO_NIGHT_WALLPAPER_BOTTOM = 0xFF3A1B0A;
+    /** آجر آبی تیره — هدر/اکشن‌بار */
+    public static final int MARIO_NIGHT_HEADER = 0xFF0D1226;
+    public static final int MARIO_NIGHT_HEADER_BORDER = 0xFF20305C;
+    /** بلوک بریکی پنلی — سطح کارت‌ها */
+    public static final int MARIO_NIGHT_SURFACE = 0xFF111731;
+    /** آبی خفته — خطوط مرئی */
+    public static final int MARIO_NIGHT_OUTLINE = 0xFF253260;
+    /** عاج سکه — متن اصلی */
+    public static final int MARIO_NIGHT_TEXT = 0xFFF6F2E6;
+    public static final int MARIO_NIGHT_TEXT_DIM = 0xFF9BA7C8;
+    public static final int MARIO_NIGHT_TIME = 0xFF7C88A8;
+    /** طلای سکه — اکسنت اصلی */
+    public static final int MARIO_NIGHT_ACCENT = 0xFFFBD000;
+    /** سکهٔ براق — اکسنت روشن */
+    public static final int MARIO_NIGHT_ACCENT_BRIGHT = 0xFFFFDF60;
+    public static final int MARIO_NIGHT_ON_ACCENT = 0xFF332200;
+    /** بلوک آبی بریکی — حباب ورودی */
+    public static final int MARIO_NIGHT_IN_BUBBLE = 0xFF141B3C;
+    public static final int MARIO_NIGHT_IN_TEXT = 0xFFF6F2E6;
+    /** سبز لوله — حباب خروجی (متن = سایهٔ لوله) */
+    public static final int MARIO_NIGHT_OUT_BUBBLE = 0xFF43B047;
+    public static final int MARIO_NIGHT_OUT_TEXT = 0xFF0C2A12;
+    /** قرمز قارچ — بج/شمارنده */
+    public static final int MARIO_NIGHT_BADGE_BG = 0xFFDC2418;
+    public static final int MARIO_NIGHT_BADGE_TEXT = 0xFFFFFFFF;  // سفید خالص — کنتراست ۴٫۸۶ روی قرمز قارچ
+    public static final int MARIO_NIGHT_FIELD_BG = 0xFF111731;
+    public static final int MARIO_NIGHT_FIELD_BORDER = 0xFF253260;
+    /** طلای عمیق — پیل فعال ناوبری */
+    public static final int MARIO_NIGHT_NAV_PILL = 0xFF5E4A04;
+    public static final int MARIO_NIGHT_SHADOW_TINT = 0xFF000000;
+    public static final float MARIO_NIGHT_SHADOW_ALPHA = 0.45f;
+
+    // روز — «سرزمین ماریو»
+    /** کاغذ آسمان */
+    public static final int MARIO_DAY_BG = 0xFFF2F7FF;
+    public static final int MARIO_DAY_WALLPAPER_TOP = 0xFFB9D6FF;
+    public static final int MARIO_DAY_WALLPAPER_MID = 0xFFF2F7FF;
+    /** تپهٔ پاستلی لوله — توقف پایین وایپرپ */
+    public static final int MARIO_DAY_WALLPAPER_BOTTOM = 0xFFD3EFC9;
+    /** آسمان روشن */
+    public static final int MARIO_DAY_HEADER = 0xFFE7F0FF;
+    public static final int MARIO_DAY_HEADER_BORDER = 0xFFCBDCF5;
+    public static final int MARIO_DAY_SURFACE = 0xFFF5F8FF;
+    public static final int MARIO_DAY_OUTLINE = 0xFFD5E1F4;
+    /** جوهر اورال — متن اصلی */
+    public static final int MARIO_DAY_TEXT = 0xFF16243E;
+    public static final int MARIO_DAY_TEXT_DIM = 0xFF5C6E90;
+    public static final int MARIO_DAY_TIME = 0xFF70819E;  // ≥۳٫۰ روی کاغذ آسمان
+    /** قرمز عمیق ماریو — اکسنت روز (AA روی کاغذ آسمان: ۵٫۸۷) */
+    public static final int MARIO_DAY_ACCENT = 0xFFC6281C;
+    public static final int MARIO_DAY_ACCENT_BRIGHT = 0xFFE52521;
+    public static final int MARIO_DAY_ON_ACCENT = 0xFFFFFFFF;
+    public static final int MARIO_DAY_IN_BUBBLE = 0xFFFFFFFF;
+    public static final int MARIO_DAY_IN_TEXT = 0xFF16243E;
+    /** طلای سکهٔ ملایم — حباب خروجی روز */
+    public static final int MARIO_DAY_OUT_BUBBLE = 0xFFFFE382;
+    public static final int MARIO_DAY_OUT_TEXT = 0xFF3D2E00;
+    /** قرمز قارچ — بج روز */
+    public static final int MARIO_DAY_BADGE_BG = 0xFFC6281C;
+    public static final int MARIO_DAY_BADGE_TEXT = 0xFFFFFFFF;
+    public static final int MARIO_DAY_FIELD_BG = 0xFFFFFFFF;
+    public static final int MARIO_DAY_FIELD_BORDER = 0xFFD5E1F4;
+    public static final int MARIO_DAY_NAV_PILL = 0xFFFFE382;
+    public static final int MARIO_DAY_SHADOW_TINT = 0xFFC6281C;
+    public static final float MARIO_DAY_SHADOW_ALPHA = 0.25f;
+
+    /** روبان‌های سرزمین ماریو — هویت رنگی تم (اکسنت‌ها، لوگو و آیکون از این‌ها تغذیه می‌شوند) */
+    public static final int MARIO_COIN_GOLD = 0xFFFBD000;
+    public static final int MARIO_MUSHROOM_RED = 0xFFE52521;
+    public static final int MARIO_PIPE_GREEN = 0xFF43B047;
+    public static final int MARIO_SKY_BLUE = 0xFF5C94FC;
+    public static final int MARIO_FIRE_HOT = 0xFFFF8A3C;
+    public static final int MARIO_WARP_PURPLE = 0xFFA077E8;
+    public static final int MARIO_CLOUD_WHITE = 0xFFF8F8F8;
+    public static final int MARIO_GROUND_BROWN = 0xFFC84C0C;
+
+    /** ۳ اکسنت شب دنیای ماریو: طلای سکه (نوشتار اصلی)، گدازهٔ آتش، سبز لوله */
+    public static final int[] ACCENT_MARIO_NIGHT = { 0xFFFBD000, 0xFFFF8A3C, 0xFF43B047 };
+    /** ۳ اکسنت روز سرزمین ماریو: قرمز عمیق، سبز عمیق لوله، طلای عمیق سکه */
+    public static final int[] ACCENT_MARIO_DAY = { 0xFFC6281C, 0xFF2E7D32, 0xFFB3651F };
 
     // ─────────────────────────────────────────────────────────────────────────
     // بذرهای اکسنت — قدم ۶ (سیستم اکسنت) از این‌ها تغذیه می‌شود
