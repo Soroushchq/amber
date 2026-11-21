@@ -224,3 +224,27 @@
   - راستی‌آزمایی: هر ۳ APK دانلود شد؛ sha256 با SHA256SUMS مطابق (۳×OK)؛ apksigner همه v1+v2 Verified؛ badging: universal=73049، arm64=73042، armv7=73043، همه versionName «0.8.0 (7304)».
   - حجم‌ها: universal=82.4MB، arm64=44.2MB، armv7=43.0MB.
 - **نتیجه:** v0.8.0-alpha منتشر شد؛ چهار شکایت کاربر (اسپانسری، صف، تم، لوگو) هر کدام با پچ مشخص و ریشه مستند شده.
+
+---
+
+## نوبت ۳۰ — تم «شب اکران» (Premiere) — سومین هویت بصری (0.9.9-ui2، کد 7314)
+- **ورودی کاربر:** طرح تعاملی HTML تم «شب اکران» (عصر طلایی هالیوود + انیمیشن کلاسیک) پیش‌تر تایید شده بود («بدنیست اضافه ش کن به برنامه») + توکن GitHub جدید بعد از ریست سندباکس فرستاد شد.
+- **کشف مهم:** سندباکس ریست شده بود و ریپو/توکن از بین رفته بودند؛ توکن جدید به‌همهٔ مکان‌های قراردادی (۶ جا) بازگشت. ریپو `Soroushchq/amber` (شاخهٔ master) کلون شد — وضعیت واقعی: v0.9.8-ui2 (7313) منتشرشده با تم آئورورا کامل.
+- **پیاده‌سازی (الگوی عیناً آئورورا):**
+  1. `AmberTokens.java` — بلوک PREMIERE_* با همان پسوند اتم‌ها (BG/WALLPAPER_*/HEADER/SURFACE/OUTLINE/TEXT/TEXT_DIM/TIME/ACCENT*/ON_ACCENT/IN_BUBBLE*/OUT_BUBBLE*/BADGE*/FIELD*/NAV_PILL/SHADOW_*) + MODE_PREMIERE_DAY=4/NIGHT=5 + isPremiereName + روبان‌های سینمایی + بذرهای ACCENT_PREMIERE_NIGHT/DAY؛ DESIGN_VERSION → 2.0-c-premiere
+  2. `Tools/transform_palette_premiere.py` (یک‌بارمصرف، ماندگار در Tools): پیچ مکانیکی ۲۲ ترنری هم‌پسوند + ۵۴ جایگزینی صریح + ۲۶ خط آواتار + ۹۵ کلید اکسنت مکمل با مپ سینمایی (اکسنت طلای مارکی/متن روی اکسنت/بنفش رگالی/کریمسون) — همان قرارداد FATAL-on-mismatch
+  3. `AmberPalette.build(d, au, pr)` — سه‌برند؛ **صحت‌سنجی رفت‌وبرگشتی: آئورورا و کهربا بعد از بازتولید بایت‌به‌بایت identical ✓** (اثبات بی‌اثری تغییر برای تم‌های موجود)
+  4. مولد `generate_amber_theme2.py` — حالت‌های premiere-night/day + کلید برند telegram_color_dialogsLogo (شب عاج F7F0E1 / روز جوهر 2E2513)
+  5. خروجی: `premiere.attheme` (۸۶۸ کلید — هم‌سنخ آئورورا) و `premiere_day.attheme` (۷۵۲ کلید — ست کلیدها مو‌به‌مو برابر aurora_day)
+  6. `Theme.java` — ثبت ThemeInfo «Premiere» (sortIndex 9) و «Premiere Day» (10) با قرارداد اکسنت سه‌بذری + currentThemeIsPremiere() + isHome() + جفت شب/روز در isDark()
+  7. فونت: `updateUIFontForTheme` — استعداد حالا خانوادهٔ Premiere را هم پوشش می‌دهد
+  8. لوگوی «ستارهٔ اکران»: `premiere_logo.xml`/`_2.xml` (ستارهٔ گرادیانی + بولت‌های مارکی نوک + دنبالهٔ نگاتیو + هواپیما + وردمارک، هم‌اندازهٔ الگو) + جایگزینی پویا در IntroActivity/DialogsActivity/DialogStoriesCell
+  9. آیکون لانچر «Premiere» (icon_14): ۶ درا‌بل + adaptive anydpi + PNG legacy پنج تراکم با `Tools/generate_premiere_icons.py` (فوق‌نمونه‌برداری ۴×، هالهٔ شعاعی درجه‌۲) + alias PremiereIcon + ردیف PREMIERE در LauncherIconController + رشتهٔ AppIconPremiere
+  10. ممیزی کنتراست `Tools/audit_premiere_contrast.py`: ۲۶ جفت معنایی — همهٔ AA ✓ (بج شب ۴٫۶۲، سرویس روز ۵٫۱۸، زمان روز ۳٫۵۱)
+- **باگ‌های شکارشده در این نوبت:**
+  - پرانتز بستهٔ m.put در جایگزینی pat_B/pat_D حذف می‌شد (کد جاوا خراب می‌شد) — کشف از راه «تغییر در بازتولید آئورورا»! درس: بازتولید فایل‌های مرجعِ دست‌نخورده، آزمون رگرسیون طلایی است.
+  - هالهٔ شعاعی PIL با آلفای جامد حلقه‌ها مرکز را انباشته می‌کرد → آلفای حاشیه‌ای (تفاضلی) حلقه‌ها.
+  - مختصات بستر ۱۰۸ بدون تقسیم بر ۱۰۸ همه‌چیز را بیرون از بوم می‌کشید.
+  - ممیزی کنتراست: بج روی کریمسون ۴٫۳۲ (نیاز ۴٫۵) → متن بج سفید خالص؛ زمان روز ۲٫۸۸ → 94855E.
+- **نسخه:** 0.9.9-ui2 (7314) + changelog NEW in 0.9.9 در release.yml (pyyaml VALID، بدون `"`)
+- **نکتهٔ گزارش‌دهی:** LOG.md فقط تا نوبت ۱۰ بود درحالی‌که STATE نوبت ۲۹ را می‌گفت — فاصلهٔ ثبت؛ این نوبت با شمارهٔ ۳۰ ادامهٔ شماره‌گذاری STATE است.
