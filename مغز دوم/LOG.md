@@ -277,3 +277,11 @@
 - **نسخه:** 0.9.10-ui2 (7315) + changelog NEW in 0.9.10 در release.yml (pyyaml VALID، بدون `"`)
 - **فونت:** عمداً بدون تغییر — ماریو با فونت گرد AmberGram UI (Baloo) هم‌خانوادهٔ بانمکی است؛ استعداد فقط برای آئورورا/شب اکران می‌ماند
 
+### ادامهٔ نوبت ۳۱ — نتیجهٔ CI و ریلیز
+- ci/master (کامپایل validate): **SUCCESS** (پوش ۳ کامیت 55db91502/ccc528941/1df757eb4)
+- ریلیز: تگ `v0.9.10-ui2-alpha` → workflow android-release **SUCCESS** (~۵۳ دقیقه)
+- آرتیفکت‌ها: universal 79.9MB / arm64 43.5MB / armv7 42.3MB + SHA256SUMS
+- راستی‌آزمایی: sha256 arm64 دانلودشده با SHA256SUMS منطبق (`e6cbfe76…`) + universal/armv7 پاسخ ۲۰۶ + `assets/mario.attheme` و `mario_day.attheme` داخل APK تأیید شد (chat_outBubble روز = 0xFFFFE382 طلای سکه، dialogsLogo = 0xFF16243E جوهر اورال ✓) — نام‌های res فلت شده‌اند ولی کامپایل سبز یعنی همهٔ رفرنس‌های icon_15/mario_icon موجودند
+- داشبورد همگام شد (گرد ۱۵): page.tsx + build-status-card.tsx + implementation-tab.tsx + amber-tokens.ts — lint سبز، agent-browser دسکتاپ/موبایل (overflow=0، کنسول پاک)
+- ریلیز در: https://github.com/Soroushchq/amber/releases/tag/v0.9.10-ui2-alpha
+
