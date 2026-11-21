@@ -16,7 +16,7 @@ public final class AmberTokens {
     private AmberTokens() {}
 
     /** نسخه سند توکن — با هر تغییر ناپایه‌ای bump می‌شود */
-    public static final String DESIGN_VERSION = "2.0-c-step16";
+    public static final String DESIGN_VERSION = "2.0-c-premiere";
 
     /** رژیم تم — قدم ۴ روز/شب را در ThemeInfo جدا می‌کند */
     public static final int MODE_DAY = 0;
@@ -180,6 +180,115 @@ public final class AmberTokens {
     public static final int[] ACCENT_AURORA_NIGHT = { 0xFF2DE4C4, 0xFFE86BD8, 0xFFFFB454 };
     /** ۳ اکسنت روز آئورورا: فیروزه عمیق، ارغوانی عمیق، کهربایی عمیق */
     public static final int[] ACCENT_AURORA_DAY = { 0xFF08806B, 0xFFB84A9E, 0xFFB3651F };
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // شب اکران — تم «شب اکران» (v0.9.9-ui2) — سومین هویت بصری AmberGram
+    //
+    // کانسپت: تالارِ سینما در شبِ اکران — عصر طلایی هالیوود و انیمیشن کلاسیک.
+    // تاریکی تالار (#0C0A12) با مخمل بنفش‌فام (#1F1930)، حباب خروجی طلای اکران
+    // (#E9A93A با گرادیان تندیس)، فرش قرمز ولت کریمسون (#D63852) برای بج‌ها و
+    // طلای مارکی (#F0B449) به‌عنوان اکسنت — کاغذدیوار «پرتوهای افکتور» با
+    // گرادیان چهاررنگ رسمی و نقش ستاره‌های چشمک‌زن.
+    // نام‌گذاری دقیقاً هم‌پسوند با اتم‌های Amber (DAY_*/NIGHT_*) و آئورورا تا
+    // مبدل generate_amber_theme2.py شاخه pr را مکانیکی بپیچد.
+    // روز = «ماتینه»: نمایش بعدازظهر — کاغذ پوستر کرم (#F8F1E3)، طلای عمیق
+    // (#A76F0F) و کریمسون چاپی (#C42B4B)؛ همان تئاتر در نور روز.
+    // ─────────────────────────────────────────────────────────────────────────
+
+    public static final int MODE_PREMIERE_DAY = 4;
+    public static final int MODE_PREMIERE_NIGHT = 5;
+
+    /** آیا نام تم به خانواده شب اکران تعلق دارد (فونت استعداد/لوگوی ستاره) */
+    public static boolean isPremiereName(String name) {
+        return "Premiere".equals(name) || "Premiere Day".equals(name);
+    }
+
+    // شب — «شب اکران»
+    public static final int PREMIERE_NIGHT_BG = 0xFF0C0A12;
+    /** پرتو بنفش مخمل — توقف بالای وایپرپ (پرتو افکتور چپ) */
+    public static final int PREMIERE_NIGHT_WALLPAPER_TOP = 0xFF2A1230;
+    public static final int PREMIERE_NIGHT_WALLPAPER_MID = 0xFF0C0A12;
+    /** پرتو کریمسون گرم — توقف پایین وایپرپ (پرتو افکتور راست) */
+    public static final int PREMIERE_NIGHT_WALLPAPER_BOTTOM = 0xFF471B2C;
+    /** مخمل شب — هدر/اکشن‌بار */
+    public static final int PREMIERE_NIGHT_HEADER = 0xFF120F1B;
+    public static final int PREMIERE_NIGHT_HEADER_BORDER = 0xFF2E2440;
+    /** مخمل پنلی — سطح کارت‌ها */
+    public static final int PREMIERE_NIGHT_SURFACE = 0xFF181326;
+    /** بنفش خفته — خطوط مرئی */
+    public static final int PREMIERE_NIGHT_OUTLINE = 0xFF38304E;
+    /** عاج تیتراژ — متن اصلی */
+    public static final int PREMIERE_NIGHT_TEXT = 0xFFF7F0E1;
+    public static final int PREMIERE_NIGHT_TEXT_DIM = 0xFF9C92AF;
+    public static final int PREMIERE_NIGHT_TIME = 0xFF8B80A0;
+    /** طلای مارکی — اکسنت اصلی */
+    public static final int PREMIERE_NIGHT_ACCENT = 0xFFF0B449;
+    /** شمع مارکی — اکسنت روشن */
+    public static final int PREMIERE_NIGHT_ACCENT_BRIGHT = 0xFFF7C96B;
+    public static final int PREMIERE_NIGHT_ON_ACCENT = 0xFF241303;
+    /** مخمل بنفش‌فام — حباب ورودی */
+    public static final int PREMIERE_NIGHT_IN_BUBBLE = 0xFF1F1930;
+    public static final int PREMIERE_NIGHT_IN_TEXT = 0xFFF7F0E1;
+    /** طلای اکران — حباب خروجی (پایهٔ گرادیان تندیس) */
+    public static final int PREMIERE_NIGHT_OUT_BUBBLE = 0xFFE9A93A;
+    public static final int PREMIERE_NIGHT_OUT_TEXT = 0xFF2A1704;
+    /** ولت کریمسون — بج/فرش قرمز */
+    public static final int PREMIERE_NIGHT_BADGE_BG = 0xFFD63852;
+    public static final int PREMIERE_NIGHT_BADGE_TEXT = 0xFFFFFFFF;  // سفید خالص — کنتراست ۵٫۹۷ روی ولت کریمسون
+    public static final int PREMIERE_NIGHT_FIELD_BG = 0xFF120F1B;
+    public static final int PREMIERE_NIGHT_FIELD_BORDER = 0xFF33294A;
+    /** طلای عمیق — پیل فعال ناوبری */
+    public static final int PREMIERE_NIGHT_NAV_PILL = 0xFF6B4A08;
+    public static final int PREMIERE_NIGHT_SHADOW_TINT = 0xFF000000;
+    public static final float PREMIERE_NIGHT_SHADOW_ALPHA = 0.45f;
+
+    // روز — «ماتینه»
+    /** سپیده‌ی پوستر */
+    public static final int PREMIERE_DAY_BG = 0xFFF8F1E3;
+    public static final int PREMIERE_DAY_WALLPAPER_TOP = 0xFFFBEFD6;
+    public static final int PREMIERE_DAY_WALLPAPER_MID = 0xFFF8F1E3;
+    public static final int PREMIERE_DAY_WALLPAPER_BOTTOM = 0xFFF7E3C2;
+    /** کاغذ روشن */
+    public static final int PREMIERE_DAY_HEADER = 0xFFFFFBEF;
+    public static final int PREMIERE_DAY_HEADER_BORDER = 0xFFEBDCC0;
+    public static final int PREMIERE_DAY_SURFACE = 0xFFFFFBEF;
+    public static final int PREMIERE_DAY_OUTLINE = 0xFFE2D5B8;
+    /** جوهری پوستر */
+    public static final int PREMIERE_DAY_TEXT = 0xFF2E2513;
+    public static final int PREMIERE_DAY_TEXT_DIM = 0xFF8A7B5C;
+    public static final int PREMIERE_DAY_TIME = 0xFF94855E;  // ≥۳٫۰ روی کاغذ روشن
+    /** طلای عمیق — اکسنت روز (AA روی کرم) */
+    public static final int PREMIERE_DAY_ACCENT = 0xFFA76F0F;
+    public static final int PREMIERE_DAY_ACCENT_BRIGHT = 0xFFC88A1E;
+    public static final int PREMIERE_DAY_ON_ACCENT = 0xFFFFFFFF;
+    public static final int PREMIERE_DAY_IN_BUBBLE = 0xFFFFF3D9;
+    public static final int PREMIERE_DAY_IN_TEXT = 0xFF2E2513;
+    /** طلایی ملایم — حباب خروجی روز */
+    public static final int PREMIERE_DAY_OUT_BUBBLE = 0xFFF2CE7F;
+    public static final int PREMIERE_DAY_OUT_TEXT = 0xFF3A2A08;
+    /** کریمسون پوستر — بج روز */
+    public static final int PREMIERE_DAY_BADGE_BG = 0xFFC42B4B;
+    public static final int PREMIERE_DAY_BADGE_TEXT = 0xFFFFFFFF;
+    public static final int PREMIERE_DAY_FIELD_BG = 0xFFFFFBEF;
+    public static final int PREMIERE_DAY_FIELD_BORDER = 0xFFE2D5B8;
+    public static final int PREMIERE_DAY_NAV_PILL = 0xFFF2CE7F;
+    public static final int PREMIERE_DAY_SHADOW_TINT = 0xFFA76F0F;
+    public static final float PREMIERE_DAY_SHADOW_ALPHA = 0.25f;
+
+    /** روبان‌های سینمایی — هویت رنگی تم (اکسنت‌ها، لوگو و آیکون از این‌ها تغذیه می‌شوند) */
+    public static final int PREMIERE_GOLD_MARQUEE = 0xFFF0B449;
+    public static final int PREMIERE_GOLD_TROPHY = 0xFFE9A93A;
+    public static final int PREMIERE_CARPET_CRIMSON = 0xFFD63852;
+    public static final int PREMIERE_CRIMSON_HOT = 0xFFE8445E;
+    public static final int PREMIERE_MARQUEE_TEAL = 0xFF3FD2C7;
+    public static final int PREMIERE_ROYAL_PURPLE = 0xFF8C5ADC;
+    public static final int PREMIERE_BULB_WARM = 0xFFF7D488;
+    public static final int PREMIERE_TROPHY_BRONZE = 0xFFC77E14;
+
+    /** ۳ اکسنت شب شب اکران: طلای مارکی (نوشتار اصلی)، کریمسون، فیروزه مارکی */
+    public static final int[] ACCENT_PREMIERE_NIGHT = { 0xFFF0B449, 0xFFE8445E, 0xFF3FD2C7 };
+    /** ۳ اکسنت روز ماتینه: طلای عمیق، کریمسون پوستر، فیروزه چاپی */
+    public static final int[] ACCENT_PREMIERE_DAY = { 0xFFA76F0F, 0xFFC42B4B, 0xFF0FA397 };
 
     // ─────────────────────────────────────────────────────────────────────────
     // بذرهای اکسنت — قدم ۶ (سیستم اکسنت) از این‌ها تغذیه می‌شود

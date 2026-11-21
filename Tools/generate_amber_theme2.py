@@ -8,13 +8,16 @@
 #   python3 Tools/generate_amber_theme2.py day    TMessagesProj/src/main/assets/amber_day.attheme [BASE]
 #   python3 Tools/generate_amber_theme2.py aurora-night TMessagesProj/src/main/assets/aurora.attheme
 #   python3 Tools/generate_amber_theme2.py aurora-day   TMessagesProj/src/main/assets/aurora_day.attheme
+#   python3 Tools/generate_amber_theme2.py premiere-night TMessagesProj/src/main/assets/premiere.attheme
+#   python3 Tools/generate_amber_theme2.py premiere-day   TMessagesProj/src/main/assets/premiere_day.attheme
 #
 # منطق: فایل شب/روز = کلیدهای پایه (فایل تم فعلی برای پوشش کامل) + overlay کامل پالت جدید.
 # کلیدهای پالت بازنویسی می‌شوند؛ بقیه از پایه حفظ می‌شوند تا هیچ صفحه‌ای به
 # پیش‌فرض روشن تلگرام برنگردد (سقوط به defaultColors = فاجعه شب روشن).
-# برند آئورورا (v0.9.7): شاخه au در build(boolean d, boolean au) + کلید برند
+# برند آئورورا (v0.9.7): شاخه au در build(boolean d, boolean au, boolean pr) + کلید برند
 # telegram_color_dialogsLogo که فقط برای فایل‌های آئورورا تزریق می‌شود
 # (کهربا مقدار موروثی از base را حفظ می‌کند تا رفتار فعلی تغییر نکند).
+# برند شب اکران (v0.9.9): شاخه pr + همان کلید برند (عاج تیتراژ/جوهر پوستر).
 import re, sys, math, os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -58,9 +61,9 @@ def load_tokens():
 
 # ── ۲) تبدیل عبارت جاوا به پایتون ─────────────────────────────────────────
 def translate_ternaries(s):
-    # فقط یک سطح ternary با شرط d یا au — اسکن دقیق مرزها با ردیابی عمق پرانتز
+    # فقط یک سطح ternary با شرط d یا au یا pr — اسکن دقیق مرزها با ردیابی عمق پرانتز
     while True:
-        m = re.search(r"\b(d|au) \?", s)
+        m = re.search(r"\b(d|au|pr) \?", s)
         if not m:
             return s
         i = m.start() + len(m.group(0))
@@ -104,13 +107,14 @@ def java_to_py(expr):
     s = re.sub(r"(\d+\.\d+)f", r"\1", s)  # پسوند float
     return s
 
-# ── ۳) ارزیابی build() برای d/au مشخص ─────────────────────────────────────
-def eval_palette(d_value, au_value, tokens):
+# ── ۳) ارزیابی build() برای d/au/pr مشخص ───────────────────────────────────
+def eval_palette(d_value, au_value, pr_value, tokens):
     ns = dict(tokens)
     ns["f_alpha"] = f_alpha
     ns["f_over"] = f_over
     ns["d"] = d_value
     ns["au"] = au_value
+    ns["pr"] = pr_value
     palette = {}
     in_build = False
     with open(os.path.join(SRC, "AmberPalette.java"), encoding="utf-8") as fh:
@@ -124,7 +128,7 @@ def eval_palette(d_value, au_value, tokens):
             if t.startswith("return m;"):
                 break
             mloc = re.match(r"final (?:boolean|int) (\w+)\s+= (.*);$", t)
-            if mloc and mloc.group(1) not in ("d", "au"):
+            if mloc and mloc.group(1) not in ("d", "au", "pr"):
                 name, expr = mloc.group(1), java_to_py(mloc.group(2))
                 ns[name] = mask32(eval(expr, {"__builtins__": {}}, ns))
                 continue
@@ -160,7 +164,7 @@ def load_base(path):
 # ── ۵) تولید ──────────────────────────────────────────────────────────────
 def main():
     if len(sys.argv) < 3:
-        sys.exit("usage: generate_amber_theme2.py night|day|aurora-night|aurora-day OUT [BASE]")
+        sys.exit("usage: generate_amber_theme2.py night|day|aurora-night|aurora-day|premiere-night|premiere-day OUT [BASE]")
     mode, out_path = sys.argv[1], sys.argv[2]
     asset_dir = os.path.join(ROOT, "TMessagesProj/src/main/assets")
     if len(sys.argv) > 3:
@@ -171,14 +175,19 @@ def main():
         base_path = os.path.join(asset_dir, "amber.attheme")
     elif mode == "aurora-day":
         base_path = os.path.join(asset_dir, "amber_day.attheme")
+    elif mode == "premiere-night":
+        base_path = os.path.join(asset_dir, "amber.attheme")
+    elif mode == "premiere-day":
+        base_path = os.path.join(asset_dir, "amber_day.attheme")
     else:
         base_path = os.path.join(asset_dir, "amber.attheme")
-    d = mode in ("day", "aurora-day")
+    d = mode in ("day", "aurora-day", "premiere-day")
     au = mode.startswith("aurora")
+    pr = mode.startswith("premiere")
     tokens = load_tokens()
-    palette = eval_palette(d, au, tokens)
+    palette = eval_palette(d, au, pr, tokens)
     base = load_base(base_path)
-    if not au:
+    if not au and not pr:
         # قرارداد برند (v0.9.7): برای فایل‌های کهربا فقط کلیدهای موجود در پایه نوشته
         # می‌شوند — بخش «اکسنت‌های مکمل» پالت کلیدهای جدیدی دارد که شاخهٔ کهربایشان
         # مقدار فایل شب است و نباید فایل روز کهربا (که این کلیدها را ندارد و به
@@ -192,6 +201,9 @@ def main():
         # کلید برند لوگو — تینت MULTIPLY لوگوی هدر؛ فقط برای فایل‌های آئورورا
         # (کهربا: مقدار موروثی از base حفظ می‌شود تا رفتار فعلی تغییر نکند)
         merged["telegram_color_dialogsLogo"] = 0xFF171B26 if d else 0xFFF2F1F7
+    if pr:
+        # کلید برند لوگو برای شب اکران — عاج تیتراژ در شب / جوهر پوستر در روز
+        merged["telegram_color_dialogsLogo"] = 0xFF2E2513 if d else 0xFFF7F0E1
     lines = [f"{k}={signed(merged[k])}" for k in sorted(merged)]
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as fh:
@@ -202,7 +214,7 @@ def main():
     for k, v in palette.items():
         if k not in back or mask32(back[k]) != mask32(v):
             errs.append(k)
-    if au:
+    if au or pr:
         k = "telegram_color_dialogsLogo"
         if k not in back or mask32(back[k]) != mask32(merged[k]):
             errs.append(k)
