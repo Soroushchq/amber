@@ -337,7 +337,7 @@ public class DialogStoriesCell extends FrameLayout implements NotificationCenter
         telegramLogoView.setContentDescription(getString(R.string.AppName));
         telegramLogoView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         // Amber fork: v0.9.7 — the header logo follows the theme family (comet for aurora)
-        telegramLogoView.setImageResource(Theme.currentThemeIsPremiere() ? R.drawable.premiere_logo_2 : Theme.currentThemeIsAurora() ? R.drawable.aurora_logo_2 : Theme.currentThemeIsMario() ? R.drawable.mario_logo_2 : R.drawable.amber_logo_2);
+        telegramLogoView.setImageResource(Theme.currentThemeIsPremiere() ? R.drawable.premiere_logo_2 : Theme.currentThemeIsAurora() ? R.drawable.aurora_logo_2 : Theme.currentThemeIsMario() ? R.drawable.mario_logo_2 : Theme.currentThemeIsHarmony() ? R.drawable.harmony_logo_2 : Theme.currentThemeIsStarWars() ? R.drawable.sw_logo_2 : Theme.currentThemeIsSling() ? R.drawable.sling_logo_2 : R.drawable.amber_logo_2);
         telegramLogoView.setColorFilter(getTextLogoColor(), PorterDuff.Mode.MULTIPLY);
         telegramLogoView.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
         telegramLogoView.setFocusableInTouchMode(true);

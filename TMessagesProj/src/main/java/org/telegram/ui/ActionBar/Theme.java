@@ -1677,9 +1677,9 @@ public class Theme {
             if (isDark != UNKNOWN) {
                 return isDark == DARK;
             }
-            if ("Dark Blue".equals(name) || "Night".equals(name) || "Amber".equals(name) || "Aurora".equals(name) || "Premiere".equals(name) || "Mario".equals(name)) {
+            if ("Dark Blue".equals(name) || "Night".equals(name) || "Amber".equals(name) || "Aurora".equals(name) || "Premiere".equals(name) || "Mario".equals(name) || "Harmony".equals(name) || "Dark Side".equals(name) || "Night Raid".equals(name)) {
                 isDark = DARK;
-            } else if ("Blue".equals(name) || "Arctic Blue".equals(name) || "Day".equals(name) || "Amber Day".equals(name) || "Aurora Day".equals(name) || "Premiere Day".equals(name) || "Mario Day".equals(name)) {
+            } else if ("Blue".equals(name) || "Arctic Blue".equals(name) || "Day".equals(name) || "Amber Day".equals(name) || "Aurora Day".equals(name) || "Premiere Day".equals(name) || "Mario Day".equals(name) || "Harmony Day".equals(name) || "Light Side".equals(name) || "Slingshot".equals(name)) {
                 isDark = LIGHT;
             }
             if (isDark == UNKNOWN) {
@@ -4293,6 +4293,194 @@ public class Theme {
         sortAccents(themeInfo);
         themes.add(themeInfo);
         themesDict.put("Mario Day", themeInfo);
+
+        // Amber fork: v0.9.11 — harmony brand («هم‌آهنگ») — the fifth visual
+        // identity: Discord-inspired candy window — candy-dark #0D0E1A with panel
+        // #232438 in-bubbles, blurple #5865F2 out-bubbles, DND-red #ED4245 badges,
+        // blurple accent and the «موج هم‌آهنگی» nitro gradient wallpaper.
+        // Deliberately NOT wired into currentDayTheme/currentNightTheme: the
+        // night toggle keeps the amber pair, harmony is picked manually.
+        themeInfo = new ThemeInfo();
+        themeInfo.name = "Harmony";
+        themeInfo.assetName = "harmony.attheme";
+        themeInfo.previewBackgroundColor = 0xff0d0e1a;
+        themeInfo.previewInColor = 0xff323452;
+        themeInfo.previewOutColor = 0xff5865f2;
+        themeInfo.sortIndex = 13;
+        // same accent contract as Aurora (قدم ۶): seeds from
+        // AmberTokens.ACCENT_HARMONY_NIGHT, id 0 renders the authored colors and
+        // leaves the motion-gradient wallpaper untouched (zeroed overrides),
+        // 1/2 recolor organically via Telegram's own engine.
+        themeInfo.firstAccentIsDefault = false;
+        themeInfo.currentAccentId = 0;
+        themeInfo.setAccentColorOptions(
+                AmberTokens.ACCENT_HARMONY_NIGHT,
+                null,
+                null,
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0, 1, 2 },
+                new String[] { "", "", "" },
+                new int[]    { 0, 0, 0 },
+                new int[]    { 0, 0, 0 }
+                );
+        sortAccents(themeInfo);
+        themes.add(themeInfo);
+        themesDict.put("Harmony", themeInfo);
+
+        // Amber fork: v0.9.11 — «هم‌آهنگ روشن» — daylight companion: ice-paper
+        // #F4F5FB with white panels, nitro-pastel wallpaper and deep-blurple
+        // #4453D6 accent — the same window in daylight.
+        themeInfo = new ThemeInfo();
+        themeInfo.name = "Harmony Day";
+        themeInfo.assetName = "harmony_day.attheme";
+        themeInfo.previewBackgroundColor = 0xfff4f5fb;
+        themeInfo.previewInColor = 0xffffffff;
+        themeInfo.previewOutColor = 0xff5865f2;
+        themeInfo.sortIndex = 14;
+        themeInfo.firstAccentIsDefault = false;
+        themeInfo.currentAccentId = 0;
+        themeInfo.setAccentColorOptions(
+                AmberTokens.ACCENT_HARMONY_DAY,
+                null,
+                null,
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0, 1, 2 },
+                new String[] { "", "", "" },
+                new int[]    { 0, 0, 0 },
+                new int[]    { 0, 0, 0 }
+                );
+        sortAccents(themeInfo);
+        themes.add(themeInfo);
+        themesDict.put("Harmony Day", themeInfo);
+
+        // Amber fork: v0.9.11 — star-wars brand («سمت تاریک») — the sixth visual
+        // identity: deep-space #05070D with imperial-station #0B1120 in-bubbles,
+        // sith-crimson #C02636 out-bubbles, medal-gold #F2C14E badges, saber-red
+        // #E5484D accent and the «سحابی تاریک» nebula gradient wallpaper.
+        // Deliberately NOT wired into currentDayTheme/currentNightTheme: the
+        // night toggle keeps the amber pair, dark side is picked manually.
+        themeInfo = new ThemeInfo();
+        themeInfo.name = "Dark Side";
+        themeInfo.assetName = "sw.attheme";
+        themeInfo.previewBackgroundColor = 0xff05070d;
+        themeInfo.previewInColor = 0xff151e32;
+        themeInfo.previewOutColor = 0xffc02636;
+        themeInfo.sortIndex = 15;
+        themeInfo.firstAccentIsDefault = false;
+        themeInfo.currentAccentId = 0;
+        themeInfo.setAccentColorOptions(
+                AmberTokens.ACCENT_SW_NIGHT,
+                null,
+                null,
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0, 1, 2 },
+                new String[] { "", "", "" },
+                new int[]    { 0, 0, 0 },
+                new int[]    { 0, 0, 0 }
+                );
+        sortAccents(themeInfo);
+        themes.add(themeInfo);
+        themesDict.put("Dark Side", themeInfo);
+
+        // Amber fork: v0.9.11 — «سمت روشن» — daylight companion: Tatooine sand
+        // #F6F3E7 with jedi-blue #2E77C4 out-bubbles, crawl-yellow nav pill and
+        // the «غروب دوقلو» twin-sunset wallpaper — the same saga in daylight.
+        themeInfo = new ThemeInfo();
+        themeInfo.name = "Light Side";
+        themeInfo.assetName = "sw_day.attheme";
+        themeInfo.previewBackgroundColor = 0xfff6f3e7;
+        themeInfo.previewInColor = 0xffffffff;
+        themeInfo.previewOutColor = 0xff2e77c4;
+        themeInfo.sortIndex = 16;
+        themeInfo.firstAccentIsDefault = false;
+        themeInfo.currentAccentId = 0;
+        themeInfo.setAccentColorOptions(
+                AmberTokens.ACCENT_SW_DAY,
+                null,
+                null,
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0, 1, 2 },
+                new String[] { "", "", "" },
+                new int[]    { 0, 0, 0 },
+                new int[]    { 0, 0, 0 }
+                );
+        sortAccents(themeInfo);
+        themes.add(themeInfo);
+        themesDict.put("Light Side", themeInfo);
+
+        // Amber fork: v0.9.11 — sling brand («حملهٔ شبانه») — the seventh visual
+        // identity: angry-birds night raid — teal-bunker #0E2430 with in-bubbles
+        // of the same family, red-bird #D42B1F out-bubbles, pig-green #7DBB42
+        // badges, torch-gold #FFB03A accent and the «حملهٔ شبانه» torch-glow
+        // wallpaper. Deliberately NOT wired into currentDayTheme/currentNightTheme:
+        // the night toggle keeps the amber pair, night raid is picked manually.
+        themeInfo = new ThemeInfo();
+        themeInfo.name = "Night Raid";
+        themeInfo.assetName = "sling.attheme";
+        themeInfo.previewBackgroundColor = 0xff0e2430;
+        themeInfo.previewInColor = 0xff16303f;
+        themeInfo.previewOutColor = 0xffd42b1f;
+        themeInfo.sortIndex = 17;
+        themeInfo.firstAccentIsDefault = false;
+        themeInfo.currentAccentId = 0;
+        themeInfo.setAccentColorOptions(
+                AmberTokens.ACCENT_SLING_NIGHT,
+                null,
+                null,
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0, 1, 2 },
+                new String[] { "", "", "" },
+                new int[]    { 0, 0, 0 },
+                new int[]    { 0, 0, 0 }
+                );
+        sortAccents(themeInfo);
+        themes.add(themeInfo);
+        themesDict.put("Night Raid", themeInfo);
+
+        // Amber fork: v0.9.11 — «اسلینگ‌شات» — daylight companion: sky-paper
+        // #F4FAFF with chuck-gold #FFB03A out-bubbles, deep-red #C23A28 accent
+        // and the «تپه‌های فلاخن» sky-to-hills wallpaper — the same island in
+        // daylight.
+        themeInfo = new ThemeInfo();
+        themeInfo.name = "Slingshot";
+        themeInfo.assetName = "sling_day.attheme";
+        themeInfo.previewBackgroundColor = 0xfff4faff;
+        themeInfo.previewInColor = 0xffffffff;
+        themeInfo.previewOutColor = 0xffffb03a;
+        themeInfo.sortIndex = 18;
+        themeInfo.firstAccentIsDefault = false;
+        themeInfo.currentAccentId = 0;
+        themeInfo.setAccentColorOptions(
+                AmberTokens.ACCENT_SLING_DAY,
+                null,
+                null,
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0x00000000, 0x00000000, 0x00000000 },
+                new int[]    { 0, 1, 2 },
+                new String[] { "", "", "" },
+                new int[]    { 0, 0, 0 },
+                new int[]    { 0, 0, 0 }
+                );
+        sortAccents(themeInfo);
+        themes.add(themeInfo);
+        themesDict.put("Slingshot", themeInfo);
 
         themeInfo = new ThemeInfo();
         themeInfo.name = "Arctic Blue";
@@ -10554,6 +10742,20 @@ public class Theme {
     // animation for Mario/Mario Day)
     public static boolean currentThemeIsMario() {
         return currentTheme != null && AmberTokens.isMarioName(currentTheme.name);
+    }
+
+    // Amber fork: v0.9.11 — harmony/star-wars/sling brands — header/intro logo
+    // follows the theme family (equalizer+plane, death-star and slingshot logos)
+    public static boolean currentThemeIsHarmony() {
+        return currentTheme != null && AmberTokens.isHarmonyName(currentTheme.name);
+    }
+
+    public static boolean currentThemeIsStarWars() {
+        return currentTheme != null && AmberTokens.isSwName(currentTheme.name);
+    }
+
+    public static boolean currentThemeIsSling() {
+        return currentTheme != null && AmberTokens.isSlingName(currentTheme.name);
     }
 
     /**

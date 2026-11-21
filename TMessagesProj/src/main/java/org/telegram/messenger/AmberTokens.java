@@ -403,6 +403,298 @@ public final class AmberTokens {
     public static final int[] ACCENT_MARIO_DAY = { 0xFFC6281C, 0xFF2E7D32, 0xFFB3651F };
 
     // ─────────────────────────────────────────────────────────────────────────
+    // برند پنجم v0.9.11 — «هم‌آهنگ» (Harmony) — الهام از دیسکورد.
+    // شب: پنجرهٔ #0D0E1A با پنل #232438، حباب خروجی بلورپل #5865F2، بج قرمز
+    // DND #ED4245، اکسنت بلورپل و کاغذدیوار «موج هم‌آهنگی» (بنفش → نیترو پینک).
+    // روز: کاغذ #F4F5FB با پنل سفید و همان گرادیان نیترو با اکسنت بلورپل عمیق.
+    // نام‌گذاری هم‌پسوند با سایر برندها تا مبدل generate_amber_theme2.py شاخهٔ
+    // ha را مکانیکی بپیچد.
+    // ─────────────────────────────────────────────────────────────────────────
+
+    public static final int MODE_HARMONY_DAY = 8;
+    public static final int MODE_HARMONY_NIGHT = 9;
+
+    /** آیا نام تم به خانوادهٔ هم‌آهنگ تعلق دارد (لوگوی اکولایزر/هواپیما) */
+    public static boolean isHarmonyName(String name) {
+        return "Harmony".equals(name) || "Harmony Day".equals(name);
+    }
+
+    // شب — «پنجرهٔ هم‌آهنگی»
+    public static final int HARMONY_NIGHT_BG = 0xFF0D0E1A;
+    /** درخشش بلورپل بالای وایپرپ */
+    public static final int HARMONY_NIGHT_WALLPAPER_TOP = 0xFF23233E;
+    public static final int HARMONY_NIGHT_WALLPAPER_MID = 0xFF0D0E1A;
+    /** درخشش نیتروپینک پایین وایپرپ */
+    public static final int HARMONY_NIGHT_WALLPAPER_BOTTOM = 0xFF3A1F45;
+    /** پنجرهٔ اصلی — هدر */
+    public static final int HARMONY_NIGHT_HEADER = 0xFF191A26;
+    public static final int HARMONY_NIGHT_HEADER_BORDER = 0xFF2E3048;
+    /** پنل کارت‌ها */
+    public static final int HARMONY_NIGHT_SURFACE = 0xFF232438;
+    /** مرزهای مرئی */
+    public static final int HARMONY_NIGHT_OUTLINE = 0xFF383A55;
+    /** عاج یخی — متن اصلی */
+    public static final int HARMONY_NIGHT_TEXT = 0xFFE7E9FA;
+    public static final int HARMONY_NIGHT_TEXT_DIM = 0xFFA0A3C0;
+    public static final int HARMONY_NIGHT_TIME = 0xFF8C8FB5;
+    /** بلورپل — اکسنت اصلی */
+    public static final int HARMONY_NIGHT_ACCENT = 0xFF5865F2;
+    public static final int HARMONY_NIGHT_ACCENT_BRIGHT = 0xFF7983F5;
+    public static final int HARMONY_NIGHT_ON_ACCENT = 0xFFFFFFFF;
+    /** حباب ورودی */
+    public static final int HARMONY_NIGHT_IN_BUBBLE = 0xFF323452;
+    public static final int HARMONY_NIGHT_IN_TEXT = 0xFFE7E9FA;
+    /** بلورپل — حباب خروجی */
+    public static final int HARMONY_NIGHT_OUT_BUBBLE = 0xFF5865F2;
+    public static final int HARMONY_NIGHT_OUT_TEXT = 0xFFFFFFFF;
+    /** قرمز DND — بج/شمارنده */
+    public static final int HARMONY_NIGHT_BADGE_BG = 0xFFED4245;
+    public static final int HARMONY_NIGHT_BADGE_TEXT = 0xFFFFFFFF;
+    public static final int HARMONY_NIGHT_FIELD_BG = 0xFF1F2032;
+    public static final int HARMONY_NIGHT_FIELD_BORDER = 0xFF383A55;
+    /** پیل فعال ناوبری */
+    public static final int HARMONY_NIGHT_NAV_PILL = 0xFF3C3E63;
+    public static final int HARMONY_NIGHT_SHADOW_TINT = 0xFF000000;
+    public static final float HARMONY_NIGHT_SHADOW_ALPHA = 0.45f;
+
+    // روز — «هم‌آهنگ روشن»
+    /** کاغذ یخی */
+    public static final int HARMONY_DAY_BG = 0xFFF4F5FB;
+    public static final int HARMONY_DAY_WALLPAPER_TOP = 0xFFE4E6F7;
+    public static final int HARMONY_DAY_WALLPAPER_MID = 0xFFF4F5FB;
+    /** پاستل نیتروپینک — توقف پایین وایپرپ */
+    public static final int HARMONY_DAY_WALLPAPER_BOTTOM = 0xFFF7DCEF;
+    public static final int HARMONY_DAY_HEADER = 0xFFFFFFFF;
+    public static final int HARMONY_DAY_HEADER_BORDER = 0xFFE3E5F2;
+    public static final int HARMONY_DAY_SURFACE = 0xFFFFFFFF;
+    public static final int HARMONY_DAY_OUTLINE = 0xFFDCDEEE;
+    /** جوهر بنفش‌عمیق — متن اصلی */
+    public static final int HARMONY_DAY_TEXT = 0xFF2E3050;
+    public static final int HARMONY_DAY_TEXT_DIM = 0xFF6E7195;
+    public static final int HARMONY_DAY_TIME = 0xFF8C8FB5;
+    /** بلورپل عمیق — اکسنت روز (AA روی کاغذ یخی) */
+    public static final int HARMONY_DAY_ACCENT = 0xFF4453D6;
+    public static final int HARMONY_DAY_ACCENT_BRIGHT = 0xFF5865F2;
+    public static final int HARMONY_DAY_ON_ACCENT = 0xFFFFFFFF;
+    public static final int HARMONY_DAY_IN_BUBBLE = 0xFFFFFFFF;
+    public static final int HARMONY_DAY_IN_TEXT = 0xFF2E3050;
+    /** بلورپل — حباب خروجی روز */
+    public static final int HARMONY_DAY_OUT_BUBBLE = 0xFF5865F2;
+    public static final int HARMONY_DAY_OUT_TEXT = 0xFFFFFFFF;
+    public static final int HARMONY_DAY_BADGE_BG = 0xFFED4245;
+    public static final int HARMONY_DAY_BADGE_TEXT = 0xFFFFFFFF;
+    public static final int HARMONY_DAY_FIELD_BG = 0xFFFFFFFF;
+    public static final int HARMONY_DAY_FIELD_BORDER = 0xFFDCDEEE;
+    public static final int HARMONY_DAY_NAV_PILL = 0xFFDDE0FA;
+    public static final int HARMONY_DAY_SHADOW_TINT = 0xFF5865F2;
+    public static final float HARMONY_DAY_SHADOW_ALPHA = 0.25f;
+
+    /** روبان‌های هم‌آهنگ — هویت رنگی تم */
+    public static final int HARMONY_BLURPLE = 0xFF5865F2;
+    public static final int HARMONY_FLOW_VIOLET = 0xFF8A57F0;
+    public static final int HARMONY_NITRO_PINK = 0xFFEB459E;
+    public static final int HARMONY_ON_GREEN = 0xFF3BA55D;
+    public static final int HARMONY_IDLE_GOLD = 0xFFFAA61A;
+
+    /** ۳ اکسنت شب هم‌آهنگ: بلورپل (نوشتار اصلی)، بنفش جریان، نیتروپینک */
+    public static final int[] ACCENT_HARMONY_NIGHT = { 0xFF5865F2, 0xFF8A57F0, 0xFFEB459E };
+    /** ۳ اکسنت روز هم‌آهنگ: بلورپل عمیق، بنفش عمیق، پینک عمیق */
+    public static final int[] ACCENT_HARMONY_DAY = { 0xFF4453D6, 0xFF5C3494, 0xFFC93D93 };
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // برند ششم v0.9.11 — «سمت تاریک / سمت روشن» (Star Wars).
+    // شب: ابرفضای عمیق #05070D با سطح امپراتوری #0B1120، حباب خروجی قرمز سیث
+    // #C02636، بج طلای مدال #F2C14E، اکسنت تیغهٔ لیزری #E5484D و کاغذدیوار
+    // «سحابی تاریک» (آبی → زرشکی). روز: تاتوئین — کاغذ شنی #F6F3E7، حباب
+    // خروجی آبی جدای #2E77C4، پیل کرال #FFE81F و والپیپر «غروب دوقلو».
+    // ─────────────────────────────────────────────────────────────────────────
+
+    public static final int MODE_SW_DAY = 10;
+    public static final int MODE_SW_NIGHT = 11;
+
+    /** آیا نام تم به خانوادهٔ جنگ ستاره‌ها تعلق دارد (لوگوی مرگ‌ستاره) */
+    public static boolean isSwName(String name) {
+        return "Dark Side".equals(name) || "Light Side".equals(name);
+    }
+
+    // شب — «سمت تاریک»
+    public static final int SW_NIGHT_BG = 0xFF05070D;
+    /** سحابی آبی بالای وایپرپ */
+    public static final int SW_NIGHT_WALLPAPER_TOP = 0xFF101A38;
+    public static final int SW_NIGHT_WALLPAPER_MID = 0xFF05070D;
+    /** سحابی زرشکی پایین وایپرپ */
+    public static final int SW_NIGHT_WALLPAPER_BOTTOM = 0xFF3A0E1C;
+    /** ایستگاه امپراتوری — هدر */
+    public static final int SW_NIGHT_HEADER = 0xFF0B1120;
+    public static final int SW_NIGHT_HEADER_BORDER = 0xFF1E2A4A;
+    public static final int SW_NIGHT_SURFACE = 0xFF0B1120;
+    public static final int SW_NIGHT_OUTLINE = 0xFF1E2A4A;
+    /** عاج ستاره‌ای — متن اصلی */
+    public static final int SW_NIGHT_TEXT = 0xFFEAF0FF;
+    public static final int SW_NIGHT_TEXT_DIM = 0xFF8B95B5;
+    public static final int SW_NIGHT_TIME = 0xFF6B7796;
+    /** تیغهٔ لیزری قرمز — اکسنت اصلی */
+    public static final int SW_NIGHT_ACCENT = 0xFFE5484D;
+    public static final int SW_NIGHT_ACCENT_BRIGHT = 0xFFFF6B70;
+    public static final int SW_NIGHT_ON_ACCENT = 0xFFFFFFFF;
+    /** حباب ورودی */
+    public static final int SW_NIGHT_IN_BUBBLE = 0xFF151E32;
+    public static final int SW_NIGHT_IN_TEXT = 0xFFEAF0FF;
+    /** قرمز سیث عمیق — حباب خروجی (کنتراست ۵٫۹ برای سفید) */
+    public static final int SW_NIGHT_OUT_BUBBLE = 0xFFC02636;
+    public static final int SW_NIGHT_OUT_TEXT = 0xFFFFFFFF;
+    /** طلای مدال — بج (متن جوهری) */
+    public static final int SW_NIGHT_BADGE_BG = 0xFFF2C14E;
+    public static final int SW_NIGHT_BADGE_TEXT = 0xFF2E1A08;
+    public static final int SW_NIGHT_FIELD_BG = 0xFF0B1120;
+    public static final int SW_NIGHT_FIELD_BORDER = 0xFF1E2A4A;
+    /** پیل فعال ناوبری — ته‌مایهٔ زرشکی */
+    public static final int SW_NIGHT_NAV_PILL = 0xFF3A1420;
+    public static final int SW_NIGHT_SHADOW_TINT = 0xFF000000;
+    public static final float SW_NIGHT_SHADOW_ALPHA = 0.45f;
+
+    // روز — «سمت روشن» (تاتوئین)
+    /** کاغذ شنی */
+    public static final int SW_DAY_BG = 0xFFF6F3E7;
+    public static final int SW_DAY_WALLPAPER_TOP = 0xFF9EC9EC;
+    public static final int SW_DAY_WALLPAPER_MID = 0xFFF6F3E7;
+    /** تپهٔ شنی — توقف پایین وایپرپ */
+    public static final int SW_DAY_WALLPAPER_BOTTOM = 0xFFE8C89A;
+    public static final int SW_DAY_HEADER = 0xFFFBF8EE;
+    public static final int SW_DAY_HEADER_BORDER = 0xFFE5DFC9;
+    public static final int SW_DAY_SURFACE = 0xFFFBF8EE;
+    public static final int SW_DAY_OUTLINE = 0xFFE0D9BF;
+    /** جوهر شنی — متن اصلی */
+    public static final int SW_DAY_TEXT = 0xFF2B283A;
+    public static final int SW_DAY_TEXT_DIM = 0xFF6E6C80;
+    public static final int SW_DAY_TIME = 0xFF8B85A0;
+    /** قرمز عمیق جدای — اکسنت روز (AA روی کاغذ شنی) */
+    public static final int SW_DAY_ACCENT = 0xFF9E1B2E;
+    public static final int SW_DAY_ACCENT_BRIGHT = 0xFFE5484D;
+    public static final int SW_DAY_ON_ACCENT = 0xFFFFFFFF;
+    public static final int SW_DAY_IN_BUBBLE = 0xFFFFFFFF;
+    public static final int SW_DAY_IN_TEXT = 0xFF2B283A;
+    /** آبی جدای — حباب خروجی روز (کنتراست ۴٫۶ برای سفید) */
+    public static final int SW_DAY_OUT_BUBBLE = 0xFF2E77C4;
+    public static final int SW_DAY_OUT_TEXT = 0xFFFFFFFF;
+    public static final int SW_DAY_BADGE_BG = 0xFFC02636;
+    public static final int SW_DAY_BADGE_TEXT = 0xFFFFFFFF;
+    public static final int SW_DAY_FIELD_BG = 0xFFFFFFFF;
+    public static final int SW_DAY_FIELD_BORDER = 0xFFE0D9BF;
+    /** پیل کرال — طلایی تیتراژ */
+    public static final int SW_DAY_NAV_PILL = 0xFFFFE81F;
+    public static final int SW_DAY_SHADOW_TINT = 0xFF9E1B2E;
+    public static final float SW_DAY_SHADOW_ALPHA = 0.22f;
+
+    /** روبان‌های جنگ ستاره‌ها — هویت رنگی تم */
+    public static final int SW_CRAWL_YELLOW = 0xFFFFE81F;
+    public static final int SW_SABER_RED = 0xFFE5484D;
+    public static final int SW_JEDI_BLUE = 0xFF3E8EDE;
+    public static final int SW_YODA_GREEN = 0xFF3BDA7C;
+    public static final int SW_MEDAL_GOLD = 0xFFF2C14E;
+
+    /** ۳ اکسنت شب سمت تاریک: تیغهٔ قرمز، طلای مدال، آبی جدای */
+    public static final int[] ACCENT_SW_NIGHT = { 0xFFE5484D, 0xFFF2C14E, 0xFF3E8EDE };
+    /** ۳ اکسنت روز سمت روشن: قرمز عمیق، آبی عمیق، طلای عمیق */
+    public static final int[] ACCENT_SW_DAY = { 0xFF9E1B2E, 0xFF2E77C4, 0xFFB3651F };
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // برند هفتم v0.9.11 — «اسلینگ‌شات / حملهٔ شبانه» (Angry Birds).
+    // شب: سنگر دریایی #0E2430 با حباب خروجی قرمز رِد #D42B1F، بج سبز خوک
+    // #7DBB42، اکسنت مشعل #FFB03A و کاغذدیوار «حملهٔ شبانه» (شب → تابش مشعل).
+    // روز: کاغذ آسمان #F4FAFF با حباب خروجی طلای چاک #FFB03A، اکسنت قرمز عمیق
+    // رِدآنگ و والپیپر «تپه‌های فلاخن» (آسمان → تپهٔ سبز).
+    // ─────────────────────────────────────────────────────────────────────────
+
+    public static final int MODE_SLING_DAY = 12;
+    public static final int MODE_SLING_NIGHT = 13;
+
+    /** آیا نام تم به خانوادهٔ انگری بردز تعلق دارد (لوگوی فلاخن) */
+    public static boolean isSlingName(String name) {
+        return "Slingshot".equals(name) || "Night Raid".equals(name);
+    }
+
+    // شب — «حملهٔ شبانه»
+    public static final int SLING_NIGHT_BG = 0xFF0E2430;
+    /** آسمان شب بالای وایپرپ */
+    public static final int SLING_NIGHT_WALLPAPER_TOP = 0xFF123043;
+    public static final int SLING_NIGHT_WALLPAPER_MID = 0xFF0E2430;
+    /** تابش مشعل پایین وایپرپ */
+    public static final int SLING_NIGHT_WALLPAPER_BOTTOM = 0xFF3A2A12;
+    /** سنگر — هدر */
+    public static final int SLING_NIGHT_HEADER = 0xFF0B1D27;
+    public static final int SLING_NIGHT_HEADER_BORDER = 0xFF1C3A4A;
+    public static final int SLING_NIGHT_SURFACE = 0xFF10293A;
+    public static final int SLING_NIGHT_OUTLINE = 0xFF1C3A4A;
+    /** عاج مه‌آلود — متن اصلی */
+    public static final int SLING_NIGHT_TEXT = 0xFFEAF4F0;
+    public static final int SLING_NIGHT_TEXT_DIM = 0xFF9FB6AC;
+    public static final int SLING_NIGHT_TIME = 0xFF7E958B;
+    /** طلای مشعل — اکسنت اصلی (متن جوهری) */
+    public static final int SLING_NIGHT_ACCENT = 0xFFFFB03A;
+    public static final int SLING_NIGHT_ACCENT_BRIGHT = 0xFFFFC55C;
+    public static final int SLING_NIGHT_ON_ACCENT = 0xFF3A2000;
+    /** حباب ورودی */
+    public static final int SLING_NIGHT_IN_BUBBLE = 0xFF16303F;
+    public static final int SLING_NIGHT_IN_TEXT = 0xFFEAF4F0;
+    /** قرمز رِد — حباب خروجی (کنتراست ۴٫۹ برای سفید) */
+    public static final int SLING_NIGHT_OUT_BUBBLE = 0xFFD42B1F;
+    public static final int SLING_NIGHT_OUT_TEXT = 0xFFFFF4EC;
+    /** سبز خوک — بج (متن جوهری) */
+    public static final int SLING_NIGHT_BADGE_BG = 0xFF7DBB42;
+    public static final int SLING_NIGHT_BADGE_TEXT = 0xFF0A1E12;
+    public static final int SLING_NIGHT_FIELD_BG = 0xFF10293A;
+    public static final int SLING_NIGHT_FIELD_BORDER = 0xFF1C3A4A;
+    /** پیل فعال ناوبری — سبز سنگری عمیق */
+    public static final int SLING_NIGHT_NAV_PILL = 0xFF2E4A20;
+    public static final int SLING_NIGHT_SHADOW_TINT = 0xFF000000;
+    public static final float SLING_NIGHT_SHADOW_ALPHA = 0.45f;
+
+    // روز — «اسلینگ‌شات»
+    /** کاغذ آسمان */
+    public static final int SLING_DAY_BG = 0xFFF4FAFF;
+    public static final int SLING_DAY_WALLPAPER_TOP = 0xFF8FD1F5;
+    public static final int SLING_DAY_WALLPAPER_MID = 0xFFF4FAFF;
+    /** تپهٔ پاستلی — توقف پایین وایپرپ */
+    public static final int SLING_DAY_WALLPAPER_BOTTOM = 0xFFC8ECB0;
+    public static final int SLING_DAY_HEADER = 0xFFEDF7FF;
+    public static final int SLING_DAY_HEADER_BORDER = 0xFFCFE4F5;
+    public static final int SLING_DAY_SURFACE = 0xFFFFFFFF;
+    public static final int SLING_DAY_OUTLINE = 0xFFD8E8F2;
+    /** جوهر برگ — متن اصلی */
+    public static final int SLING_DAY_TEXT = 0xFF233A28;
+    public static final int SLING_DAY_TEXT_DIM = 0xFF5E7264;
+    public static final int SLING_DAY_TIME = 0xFF7E958B;
+    /** قرمز عمیق — اکسنت روز (AA روی کاغذ آسمان: ۵٫۴) */
+    public static final int SLING_DAY_ACCENT = 0xFFC23A28;
+    public static final int SLING_DAY_ACCENT_BRIGHT = 0xFFE8443A;
+    public static final int SLING_DAY_ON_ACCENT = 0xFFFFFFFF;
+    public static final int SLING_DAY_IN_BUBBLE = 0xFFFFFFFF;
+    public static final int SLING_DAY_IN_TEXT = 0xFF233A28;
+    /** طلای چاک — حباب خروجی روز (متن جوهری) */
+    public static final int SLING_DAY_OUT_BUBBLE = 0xFFFFB03A;
+    public static final int SLING_DAY_OUT_TEXT = 0xFF3A2000;
+    public static final int SLING_DAY_BADGE_BG = 0xFFC23A28;
+    public static final int SLING_DAY_BADGE_TEXT = 0xFFFFFFFF;
+    public static final int SLING_DAY_FIELD_BG = 0xFFFFFFFF;
+    public static final int SLING_DAY_FIELD_BORDER = 0xFFD8E8F2;
+    public static final int SLING_DAY_NAV_PILL = 0xFFFFD98C;
+    public static final int SLING_DAY_SHADOW_TINT = 0xFFC23A28;
+    public static final float SLING_DAY_SHADOW_ALPHA = 0.22f;
+
+    /** روبان‌های انگری بردز — هویت رنگی تم */
+    public static final int SLING_RED = 0xFFE8443A;
+    public static final int SLING_CHUCK_GOLD = 0xFFFFB03A;
+    public static final int SLING_PIG_GREEN = 0xFF7DBB42;
+    public static final int SLING_SKY_BLUE = 0xFF8FD1F5;
+    public static final int SLING_MATILDA_CREAM = 0xFFF7F0DC;
+
+    /** ۳ اکسنت شب حملهٔ شبانه: طلای مشعل (نوشتار اصلی)، قرمز رِد، سبز خوک */
+    public static final int[] ACCENT_SLING_NIGHT = { 0xFFFFB03A, 0xFFE8443A, 0xFF7DBB42 };
+    /** ۳ اکسنت روز اسلینگ‌شات: قرمز عمیق، سبز عمیق خوک، طلای عمیق */
+    public static final int[] ACCENT_SLING_DAY = { 0xFFC23A28, 0xFF5E8C36, 0xFFB3651F };
+
+    // ─────────────────────────────────────────────────────────────────────────
     // بذرهای اکسنت — قدم ۶ (سیستم اکسنت) از این‌ها تغذیه می‌شود
     // ─────────────────────────────────────────────────────────────────────────
 

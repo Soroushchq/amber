@@ -277,13 +277,13 @@ public class AndroidUtilities {
 
     /**
      * AmberGram v0.9.7 — همگام‌سازی فونت رابط با خانواده تم فعال:
-     * آئورورا/آئورورای روشن ← استعداد، بقیه ← AmberGram UI.
+     * آئورورا، پریمیر، هم‌آهنگ، سمت تاریک و اسلینگ‌شات ← استعداد، بقیه ← AmberGram UI.
      * از refreshThemeColors صدا زده می‌شود؛ فقط وقتی خانواده عوض شد
      * typeface ضبط‌شده باطل می‌شود (مقایسه رشته ارزان است).
      */
     public static void updateUIFontForTheme(String themeName) {
-        // v0.9.9 — Estedad follows the Aurora AND Premiere families
-        boolean aurora = AmberTokens.isAuroraName(themeName) || AmberTokens.isPremiereName(themeName);
+        // v0.9.9 — Estedad follows the Aurora, Premiere, Harmony, StarWars and Sling brand families
+        boolean aurora = AmberTokens.isAuroraName(themeName) || AmberTokens.isPremiereName(themeName) || AmberTokens.isHarmonyName(themeName) || AmberTokens.isSwName(themeName) || AmberTokens.isSlingName(themeName);
         if (aurora != auroraUIFontActive || !auroraUIFontResolved) {
             auroraUIFontActive = aurora;
             auroraUIFontResolved = true;

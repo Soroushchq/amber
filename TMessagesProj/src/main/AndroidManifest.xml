@@ -181,6 +181,62 @@
             <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
         </activity-alias>
 
+        <!-- Amber fork: v0.9.11 — harmony brand launcher icon (equalizer + plane),
+             selectable from Settings → Themes → App icons (free, no premium) -->
+        <activity-alias
+            android:enabled="false"
+            android:name="org.telegram.messenger.HarmonyIcon"
+            android:targetActivity="org.telegram.ui.LaunchActivity"
+            android:icon="@mipmap/icon_16_launcher"
+            android:roundIcon="@mipmap/icon_16_launcher_round"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
+            </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
+        </activity-alias>
+
+        <!-- Amber fork: v0.9.11 — galaxy brand launcher icon (death star + lightsaber
+             beam + plane), selectable from Settings → Themes →
+             App icons (free, no premium) -->
+        <activity-alias
+            android:enabled="false"
+            android:name="org.telegram.messenger.GalaxyIcon"
+            android:targetActivity="org.telegram.ui.LaunchActivity"
+            android:icon="@mipmap/icon_17_launcher"
+            android:roundIcon="@mipmap/icon_17_launcher_round"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
+            </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
+        </activity-alias>
+
+        <!-- Amber fork: v0.9.11 — slingshot brand launcher icon (wooden slingshot +
+             angry red bird + gold stars), selectable from Settings → Themes →
+             App icons (free, no premium) -->
+        <activity-alias
+            android:enabled="false"
+            android:name="org.telegram.messenger.SlingIcon"
+            android:targetActivity="org.telegram.ui.LaunchActivity"
+            android:icon="@mipmap/icon_18_launcher"
+            android:roundIcon="@mipmap/icon_18_launcher_round"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
+            </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
+        </activity-alias>
+
         <activity-alias
             android:enabled="false"
             android:name="org.telegram.messenger.VintageIcon"

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AmberGram v0.9.11 — آیکون لانچر برند «سمت تاریک» — لایهٔ monochrome -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- سیلوئت خط‌وطی ستارهٔ مرگ -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="3"
+        android:pathData="M54,47 m-22,0 a22,22 0 1,1 44,0 a22,22 0 1,1 -44,0 Z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M32.1,45.9 h43.8 v2.2 h-43.8 Z" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2.5"
+        android:pathData="M47,40 m-6,0 a6,6 0 1,1 12,0 a6,6 0 1,1 -12,0 Z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M47,40 m-2,0 a2,2 0 1,1 4,0 a2,2 0 1,1 -4,0 Z" />
+    <!-- شمشیر نوری -->
+    <path
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M66,58 L84,30" />
+    <!-- ستاره‌ها -->
+    <path android:fillColor="#FFFFFFFF" android:pathData="M28,22 m-1.2,0 a1.2,1.2 0 1,1 2.4,0 a1.2,1.2 0 1,1 -2.4,0 Z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M48,14 m-1.2,0 a1.2,1.2 0 1,1 2.4,0 a1.2,1.2 0 1,1 -2.4,0 Z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M86,16 m-1.2,0 a1.2,1.2 0 1,1 2.4,0 a1.2,1.2 0 1,1 -2.4,0 Z" />
+    <!-- هواپیمای کاغذی آمبرگرام -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="0.7"
+        android:strokeLineJoin="round"
+        android:pathData="M61.10,64.90 L84.10,46.50 L75.48,62.03 L78.35,70.65 L69.15,65.48 Z" />
+</vector>
