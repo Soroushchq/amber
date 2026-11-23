@@ -303,6 +303,15 @@ public class AndroidUtilities {
         if (v.getWidth() > 0) {
             v.setPivotX(v.getWidth() / 2f);
             v.setPivotY(v.getHeight());
+        } else {
+            // گرد ۱۷: تپ پیش از گذاشتن layout قبلاً از pivot مرکزی پیش‌فرض انیمیت می‌شد (لنگر اسکواش اشتباه)
+            // — بعد از اندازه‌گیری شدن، pivot پایین ست می‌شود
+            v.post(() -> {
+                if (v.getWidth() > 0) {
+                    v.setPivotX(v.getWidth() / 2f);
+                    v.setPivotY(v.getHeight());
+                }
+            });
         }
         PropertyValuesHolder sx = PropertyValuesHolder.ofKeyframe(View.SCALE_X,
                 Keyframe.ofFloat(0f, 1f),
@@ -328,6 +337,20 @@ public class AndroidUtilities {
         ObjectAnimator jump = ObjectAnimator.ofPropertyValuesHolder(v, sx, sy, ty);
         jump.setDuration(550);
         jump.setInterpolator(new AccelerateDecelerateInterpolator());
+        // گرد ۱۷: انصراف وسط پرش قبلاً scale/translation را گیر می‌انداخت — onAnimationEnd در cancel هم صدا زده
+        // می‌شود؛ روی پایان عادی مقادیر کی‌فریم آخر همان 1/1/0 است پس بازنشانی بی‌اثر و بی‌ضرر است
+        jump.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                v.setScaleX(1f);
+                v.setScaleY(1f);
+                v.setTranslationY(0f);
+                if (v.getWidth() > 0) {
+                    v.setPivotX(v.getWidth() / 2f);
+                    v.setPivotY(v.getHeight() / 2f);
+                }
+            }
+        });
         jump.start();
     }
     public static ThreadLocal<byte[]> readBufferLocal = new ThreadLocal<>();

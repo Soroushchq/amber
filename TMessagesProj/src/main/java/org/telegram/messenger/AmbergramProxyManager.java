@@ -121,6 +121,7 @@ public class AmbergramProxyManager {
 
     // گرد ۱۶: حذف SoliSpirit (بایت‌به‌بایت تکراری ALIILAPRO) و FerhatAcer (خروجی همان مولد TG-MTProxy)،
     // افزودن سه منبع تازهٔ راستی‌آزمایی‌شده: DubbleByte، Therealwh و McDaived (JSON با وردمارک server/tgLink/secret)
+    // گرد ۱۷: افزودن chelaxian — تنها کاندیدای غیرتکراری کشف‌شده (۵۶٪ سکرت یونیک، به‌روزرسانی خودکار روزی ۴ بار)
     private static final Source[] SOURCES = {
             new Source("ALIILAPRO", "https://raw.githubusercontent.com/ALIILAPRO/MTProtoProxy/main/mtproto.txt", FORMAT_LINKS),
             new Source("ALIILAPRO-Latency", "https://raw.githubusercontent.com/ALIILAPRO/MTProtoProxy/main/proxies.json", FORMAT_JSON),
@@ -133,6 +134,7 @@ public class AmbergramProxyManager {
             new Source("DubbleByte", "https://raw.githubusercontent.com/dubblebyte/free-mtproto-proxies/main/all_proxies.txt", FORMAT_LINKS),
             new Source("Therealwh", "https://raw.githubusercontent.com/Therealwh/MTPproxyLIST/main/verified/proxy_all_tme_verified.txt", FORMAT_LINKS),
             new Source("McDaived", "https://raw.githubusercontent.com/McDaived/ProxyDaiv/main/public/proxies.json", FORMAT_JSON),
+            new Source("chelaxian", "https://raw.githubusercontent.com/chelaxian/freetelemt/main/proxies.txt", FORMAT_LINKS),
     };
 
     /**
@@ -277,66 +279,72 @@ public class AmbergramProxyManager {
         failedSourceCount.set(0);
         notifyListeners(EVENT_FETCH_STARTED, 0, 0);
         Utilities.globalQueue.postRunnable(() -> {
-            LinkedHashMap<String, ProxyItem> merged = new LinkedHashMap<>();
-            synchronized (proxies) {
-                for (ProxyItem item : proxies) {
-                    merged.put(item.key(), item);
-                }
-            }
-            AtomicInteger workingSources = new AtomicInteger();
-            CountDownLatch latch = new CountDownLatch(SOURCES.length);
-            ExecutorService pool = Executors.newFixedThreadPool(Math.min(4, SOURCES.length));
-            for (Source source : SOURCES) {
-                pool.execute(() -> {
-                    try {
-                        String text;
-                        try {
-                            text = httpGet(source.url);
-                        } catch (Throwable primaryError) {
-                            // AmberGram v0.7.0: raw.githubusercontent.com is unreliable on
-                            // Iranian ISPs — automatically retry through the jsDelivr mirror.
-                            String mirror = mirrorUrl(source.url);
-                            if (TextUtils.isEmpty(mirror)) {
-                                throw primaryError;
-                            }
-                            FileLog.d(TAG + ": source " + source.name + " failed (" + primaryError.getMessage() + "), retrying via jsDelivr mirror");
-                            text = httpGet(mirror);
-                        }
-                        int parsed = parseInto(source, text, merged);
-                        if (parsed > 0) {
-                            workingSources.incrementAndGet();
-                        } else {
-                            failedSourceCount.incrementAndGet();
-                        }
-                        FileLog.d(TAG + ": source " + source.name + " parsed " + parsed + " proxies");
-                    } catch (Throwable t) {
-                        failedSourceCount.incrementAndGet();
-                        FileLog.e(t);
-                    } finally {
-                        latch.countDown();
-                    }
-                });
-            }
+            // گرد ۱۷: هر استثنایی که از بدنه فرار می‌کرد fetching را برای همیشه true جا می‌گذاشت و همهٔ چرخه‌های بعدی خاموش می‌شدند — try/finally تضمین بازنشانی
             try {
-                latch.await();
-            } catch (InterruptedException ignore) {
-                Thread.currentThread().interrupt();
-            }
-            pool.shutdown();
-
-            synchronized (proxies) {
-                proxies.clear();
-                proxies.addAll(merged.values());
-                sortProxies();
-                if (proxies.size() > MAX_PROXIES) {
-                    proxies.subList(MAX_PROXIES, proxies.size()).clear();
+                LinkedHashMap<String, ProxyItem> merged = new LinkedHashMap<>();
+                synchronized (proxies) {
+                    for (ProxyItem item : proxies) {
+                        merged.put(item.key(), item);
+                    }
                 }
+                AtomicInteger workingSources = new AtomicInteger();
+                CountDownLatch latch = new CountDownLatch(SOURCES.length);
+                ExecutorService pool = Executors.newFixedThreadPool(Math.min(4, SOURCES.length));
+                for (Source source : SOURCES) {
+                    pool.execute(() -> {
+                        try {
+                            String text;
+                            try {
+                                text = httpGet(source.url);
+                            } catch (Throwable primaryError) {
+                                // AmberGram v0.7.0: raw.githubusercontent.com is unreliable on
+                                // Iranian ISPs — automatically retry through the jsDelivr mirror.
+                                String mirror = mirrorUrl(source.url);
+                                if (TextUtils.isEmpty(mirror)) {
+                                    throw primaryError;
+                                }
+                                FileLog.d(TAG + ": source " + source.name + " failed (" + primaryError.getMessage() + "), retrying via jsDelivr mirror");
+                                text = httpGet(mirror);
+                            }
+                            int parsed = parseInto(source, text, merged);
+                            if (parsed > 0) {
+                                workingSources.incrementAndGet();
+                            } else {
+                                failedSourceCount.incrementAndGet();
+                            }
+                            FileLog.d(TAG + ": source " + source.name + " parsed " + parsed + " proxies");
+                        } catch (Throwable t) {
+                            failedSourceCount.incrementAndGet();
+                            FileLog.e(t);
+                        } finally {
+                            latch.countDown();
+                        }
+                    });
+                }
+                try {
+                    latch.await();
+                } catch (InterruptedException ignore) {
+                    Thread.currentThread().interrupt();
+                }
+                pool.shutdown();
+
+                synchronized (proxies) {
+                    proxies.clear();
+                    proxies.addAll(merged.values());
+                    sortProxies();
+                    if (proxies.size() > MAX_PROXIES) {
+                        proxies.subList(MAX_PROXIES, proxies.size()).clear();
+                    }
+                }
+                lastFetchAt = System.currentTimeMillis();
+                saveToDisk();
+                notifyListeners(EVENT_FETCH_DONE, proxies.size(), workingSources.get());
+                AndroidUtilities.runOnUIThread(this::startTesting, 500);
+            } catch (Throwable t) {
+                FileLog.e(t);
+            } finally {
+                fetching = false;
             }
-            lastFetchAt = System.currentTimeMillis();
-            saveToDisk();
-            fetching = false;
-            notifyListeners(EVENT_FETCH_DONE, proxies.size(), workingSources.get());
-            AndroidUtilities.runOnUIThread(this::startTesting, 500);
         });
     }
 
@@ -419,12 +427,16 @@ public class AmbergramProxyManager {
         return item;
     }
 
+    // گرد ۱۷: تا ۴ نخ استخر هم‌زمان از طریق parseInto به همین map می‌نویسند — بدون قفل، رقابت داده‌ای
+    // (پاک‌شدن ورودی‌ها/خرابی LinkedHashMap) ممکن بود؛ قفل روی خودِ map هر دو مسیر put و ارتقای sourcePing را می‌پوشاند
     private void addMerged(LinkedHashMap<String, ProxyItem> map, ProxyItem item) {
-        ProxyItem existing = map.get(item.key());
-        if (existing == null) {
-            map.put(item.key(), item);
-        } else if (existing.sourcePing < 0 && item.sourcePing >= 0) {
-            existing.sourcePing = item.sourcePing;
+        synchronized (map) {
+            ProxyItem existing = map.get(item.key());
+            if (existing == null) {
+                map.put(item.key(), item);
+            } else if (existing.sourcePing < 0 && item.sourcePing >= 0) {
+                existing.sourcePing = item.sourcePing;
+            }
         }
     }
 
@@ -474,10 +486,19 @@ public class AmbergramProxyManager {
             throw new Exception("HTTP " + code);
         }
         InputStream input = connection.getInputStream();
+        // گرد ۱۷: سقف دانلود ۴MB — منبع آلوده/JSON عظیم قبلاً بدون مرز حافظه می‌گرفت (~۳ برابر حجم بسته به هدرستریم)
+        final int MAX_BYTES = 4 * 1024 * 1024;
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         byte[] buffer = new byte[8192];
         int read;
+        int total = 0;
         while ((read = input.read(buffer)) > 0) {
+            total += read;
+            if (total > MAX_BYTES) {
+                input.close();
+                connection.disconnect();
+                throw new Exception("response too large (" + total + " bytes)");
+            }
             output.write(buffer, 0, read);
         }
         input.close();

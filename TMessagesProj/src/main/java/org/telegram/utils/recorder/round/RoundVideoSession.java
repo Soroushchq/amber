@@ -537,6 +537,8 @@ public final class RoundVideoSession {
     private boolean pauseAfterRecordingStarts;
     private boolean cameraStopPending;
     private boolean cleanupStarted;
+    /** گرد ۱۷ (پورت آپستریم 13.2.2): میزبان در حالت FINISHING رها کرده؛ منابع بعد از اتمام خروجی آزاد می‌شوند */
+    private boolean releaseAfterCompletion;
     private volatile boolean cancelRequested;
     private long recordedDurationMs;
     private long recordingStartedAtRealtimeMs;
@@ -814,12 +816,26 @@ public final class RoundVideoSession {
         return true;
     }
 
-    /** Releases UI, camera and playback resources. Active recordings are cancelled. */
+    /**
+     * Releases UI, camera and playback resources. Active recordings are cancelled. A release
+     * while the final output is being produced keeps finishing detached from the host, so the
+     * completed output is still delivered, and releases the session right after that.
+     */
     @MainThread
     public void release() {
         requireMainThread();
         if (state == State.RELEASED) {
             if (!cleanupStarted) finishCancellation();
+            return;
+        }
+        if (state == State.FINISHING) {
+            // گرد ۱۷ (پورت آپستریم 13.2.2): خروجی نهایی هنوز تولید می‌شود — سشن جداشده کارش را تمام
+            // می‌کند و خروجی کامل هنوز تحویل داده می‌شود؛ بعد از آن session خودش را رها می‌کند
+            if (releaseAfterCompletion) return;
+            releaseAfterCompletion = true;
+            diagnostics.log("release deferred: output is still finishing");
+            disableCameraEffects();
+            releasePlayer();
             return;
         }
         if (state != State.COMPLETED) {
@@ -1318,6 +1334,7 @@ public final class RoundVideoSession {
                         hasAudio,
                         activeFrameRate == null ? FrameRate.FPS_30 : activeFrameRate
                 ));
+                if (releaseAfterCompletion) release();
             });
         });
     }

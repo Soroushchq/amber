@@ -3356,6 +3356,10 @@ public class ChatActivity extends BaseFragment implements
         if (chatAttachAlert != null) {
             chatAttachAlert.dismissInternal();
         }
+        if (instantCameraView != null) {
+            // گرد ۱۷ (پورت آپستریم 13.2.2): بستن چت وسط ضبط یا قبل از پایان انیمیشن ارسال نباید دوربین را نگه دارد
+            instantCameraView.destroy(true);
+        }
         ContentPreviewViewer.getInstance().clearDelegate(contentPreviewViewerDelegate);
         getNotificationCenter().onAnimationFinish(transitionAnimationIndex);
         NotificationCenter.getGlobalInstance().onAnimationFinish(transitionAnimationGlobalIndex);

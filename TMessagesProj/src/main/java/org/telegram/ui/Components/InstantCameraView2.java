@@ -97,6 +97,8 @@ public final class InstantCameraView2 extends InstantCameraViewBase {
     private VideoEditedInfo videoEditedInfo;
     private SendOptions pendingSend;
     private boolean finishRequested;
+    /** گرد ۱۷ (پورت آپستریم 13.2.2): میزبان نما را در حین اتمام ارسال نابود کرده؛ سشن جداشده خودش را تمام می‌کند */
+    private boolean sendDetached;
     private AnimatorSet visibilityAnimator;
     private ValueAnimator zoomResetAnimator;
     private ValueAnimator cameraFlipAnimator;
@@ -330,11 +332,16 @@ public final class InstantCameraView2 extends InstantCameraViewBase {
         setRecordingUiFrameClockActive(false);
         cancelCameraFlipAnimation();
         if (zoomResetAnimator != null) zoomResetAnimator.cancel();
-        if (session != null) {
+        if (session != null && isSendFinishing()) {
+            // گرد ۱۷ (پورت آپستریم 13.2.2): خروجی هنوز در حال تولید است — سشن خودش را تمام می‌کند و
+            // پیام از onCompleted ارسال می‌شود؛ نه سشن می‌رود نه آپلود
+            sendDetached = true;
+            session.release();
+        } else if (session != null) {
             session.release();
             session = null;
         }
-        if (upload != null) {
+        if (upload != null && !sendDetached) {
             upload.release(!sent);
             upload = null;
         }
@@ -529,6 +536,13 @@ public final class InstantCameraView2 extends InstantCameraViewBase {
         finishPendingSend();
     }
 
+    private boolean isSendFinishing() {
+        return pendingSend != null
+                && finishRequested
+                && session != null
+                && session.getStateInfo().getState() == RoundVideoSession.State.FINISHING;
+    }
+
     /** Finishes a requested send once the session can finish: PAUSING and RESUMING defer it. */
     private void finishPendingSend() {
         if (pendingSend == null || finishRequested || session == null || stateInfo == null) return;
@@ -543,6 +557,8 @@ public final class InstantCameraView2 extends InstantCameraViewBase {
 
     @Override
     public void cancel(boolean byGesture) {
+        // گرد ۱۷ (پورت آپستریم 13.2.2): ارسالی که در حال اتمام است با بک‌زودهنگام یا ژست لغو نمی‌شود
+        if (isSendFinishing()) return;
         // Refused once the result was delivered: the recording is being sent.
         if (session == null || !session.cancel()) return;
         pendingSend = null;
@@ -822,6 +838,12 @@ public final class InstantCameraView2 extends InstantCameraViewBase {
             FileLog.e(error);
             if (upload != null) upload.release(true);
             upload = null;
+            if (sendDetached) {
+                // گرد ۱۷: سشن در خطا خودش آزاد می‌شود؛ دیگر چیزی برای میزبان نمانده
+                sendDetached = false;
+                session = null;
+                return;
+            }
             MediaController.getInstance().requestRecordAudioFocus(false);
             if (startedNotificationSent) {
                 postRecordStopped(6);
@@ -929,6 +951,11 @@ public final class InstantCameraView2 extends InstantCameraViewBase {
         if (upload != null) upload.release(false);
         upload = null;
         MediaController.getInstance().requestRecordAudioFocus(false);
+        if (sendDetached) {
+            // گرد ۱۷: سشن خودش بلافاصله بعد از این کال‌بک آزاد می‌شود
+            sendDetached = false;
+            session = null;
+        }
     }
 
     private VideoEditedInfo createVideoEditedInfo(

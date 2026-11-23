@@ -10714,6 +10714,26 @@ public class Theme {
             if (accent.parentTheme.getKey().equals("Mario Day") && accent.id == 0) {
                 return true;
             }
+            // گرد ۱۷: شش خانوادهٔ برند از گرد ۱۵–۱۶ در این سفیدبوم جا مانده بودند و اکسنت پیش‌فرض (id==0)
+            // آن‌ها هرگز isDefault=true نمی‌گرفت — همان قرارداد سه‌بذریِ کهربا برای همهٔ خانواده‌ها
+            if (accent.parentTheme.getKey().equals("Harmony") && accent.id == 0) {
+                return true;
+            }
+            if (accent.parentTheme.getKey().equals("Harmony Day") && accent.id == 0) {
+                return true;
+            }
+            if (accent.parentTheme.getKey().equals("Dark Side") && accent.id == 0) {
+                return true;
+            }
+            if (accent.parentTheme.getKey().equals("Light Side") && accent.id == 0) {
+                return true;
+            }
+            if (accent.parentTheme.getKey().equals("Night Raid") && accent.id == 0) {
+                return true;
+            }
+            if (accent.parentTheme.getKey().equals("Slingshot") && accent.id == 0) {
+                return true;
+            }
             if (accent.parentTheme.getKey().equals("Day") && accent.id == 9) {
                 return true;
             }

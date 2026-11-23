@@ -299,8 +299,9 @@ public class BlurredBackgroundProviderImpl {
     public static BlurredBackgroundProvider topPanelChatActivitySearchListBg(Theme.ResourcesProvider resourcesProvider) {
         return new BlurredBackgroundProviderBuilder(resourcesProvider)
                 .setBackgroundColor((r, isDark) -> {
-                    // روی SDK < 31 بلور واقعی وجود ندارد — مات 0.94 (گرد ۱۴)
-                    final float alpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) && Build.VERSION.SDK_INT >= 31 ? 0.7f : 0.94f;
+                    // گرد ۱۷: این سایت قاعدهٔ واحد را درونی‌سازی کرده بود و شاخهٔ بلورش به 0.7 رانده بود
+                    // (قاعدهٔ گرد ۱۴: بلور واقعی 0.85) — حالا همان readableGlassAlpha را می‌خواند تا از قاعده جدا نشود
+                    final float alpha = readableGlassAlpha();
                     final int colorBg = Theme.getColor(Theme.key_windowBackgroundWhite, r);
                     return Theme.multAlpha(colorBg, alpha);
                 })

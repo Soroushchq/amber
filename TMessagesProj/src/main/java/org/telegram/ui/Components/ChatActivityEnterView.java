@@ -6269,7 +6269,13 @@ public class ChatActivityEnterView extends FrameLayout implements
         if (audioVideoSendButton != null) {
             audioVideoSendButton.setState(ChatActivityEnterViewAnimatedIconView.State.VOICE, false);
         }
+        // گرد ۱۷ (پورت آپستریم 13.2.2): نمای تازه recordAudioVideoRunnable را اجرا نکرده —
+        // بدون این‌ها دکمهٔ ضبط به تپِ ارسال بی‌اعتنا می‌ماند
+        calledRecordRunnable = true;
         recordingAudioVideo = true;
+        if (delegate != null) {
+            delegate.needStartRecordAudio(1);
+        }
         updateRecordInterface(RECORD_STATE_ENTER, true);
         if (once) {
             voiceOnce = true;
