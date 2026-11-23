@@ -122,6 +122,7 @@ public class AmbergramProxyManager {
     // گرد ۱۶: حذف SoliSpirit (بایت‌به‌بایت تکراری ALIILAPRO) و FerhatAcer (خروجی همان مولد TG-MTProxy)،
     // افزودن سه منبع تازهٔ راستی‌آزمایی‌شده: DubbleByte، Therealwh و McDaived (JSON با وردمارک server/tgLink/secret)
     // گرد ۱۷: افزودن chelaxian — تنها کاندیدای غیرتکراری کشف‌شده (۵۶٪ سکرت یونیک، به‌روزرسانی خودکار روزی ۴ بار)
+    // گرد ۱۸: افزودن hero81 (۱۳۸ پروکسی، ۸٪ همپوشانی سکرت؛ لینک‌های tg:// جاسازی‌شده در JSON — FORMAT_LINKS) و rjsxrd (۷۸ پروکسی، ۱۰٪ همپوشانی؛ مزرعهٔ RU با سکرت‌های dd…)
     private static final Source[] SOURCES = {
             new Source("ALIILAPRO", "https://raw.githubusercontent.com/ALIILAPRO/MTProtoProxy/main/mtproto.txt", FORMAT_LINKS),
             new Source("ALIILAPRO-Latency", "https://raw.githubusercontent.com/ALIILAPRO/MTProtoProxy/main/proxies.json", FORMAT_JSON),
@@ -135,6 +136,8 @@ public class AmbergramProxyManager {
             new Source("Therealwh", "https://raw.githubusercontent.com/Therealwh/MTPproxyLIST/main/verified/proxy_all_tme_verified.txt", FORMAT_LINKS),
             new Source("McDaived", "https://raw.githubusercontent.com/McDaived/ProxyDaiv/main/public/proxies.json", FORMAT_JSON),
             new Source("chelaxian", "https://raw.githubusercontent.com/chelaxian/freetelemt/main/proxies.txt", FORMAT_LINKS),
+            new Source("hero81", "https://raw.githubusercontent.com/hero81/TG_proxy/main/proxies.json", FORMAT_LINKS),
+            new Source("rjsxrd", "https://raw.githubusercontent.com/whoahaow/rjsxrd/main/source/config/tg_proxies.txt", FORMAT_LINKS),
     };
 
     /**

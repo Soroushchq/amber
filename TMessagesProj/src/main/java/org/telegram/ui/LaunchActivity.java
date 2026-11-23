@@ -264,6 +264,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.Collections;
 import java.util.HashSet;
 
 public class LaunchActivity extends BasePermissionsActivity implements INavigationLayout.INavigationLayoutDelegate, NotificationCenter.NotificationCenterDelegate, DialogsActivity.DialogsActivityDelegate {
@@ -8267,7 +8268,14 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             });
             localeDialog = showAlertDialog(builder);
             SharedPreferences preferences = MessagesController.getGlobalMainSettings();
-            preferences.edit().putString("language_showed2", systemLang).commit();
+            // remember every suggested language already offered, not only the last one
+            HashSet<String> shownLangs = new HashSet<>(preferences.getStringSet(LANGUAGE_SHOWED_SET_KEY, new HashSet<>()));
+            String previousShowedLang = preferences.getString("language_showed2", "");
+            if (!TextUtils.isEmpty(previousShowedLang)) {
+                shownLangs.add(previousShowedLang);
+            }
+            shownLangs.add(systemLang);
+            preferences.edit().putString("language_showed2", systemLang).putStringSet(LANGUAGE_SHOWED_SET_KEY, shownLangs).commit();
         } catch (Exception e) {
             FileLog.e(e);
         }
@@ -8292,6 +8300,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         canvas.restore();
     }
 
+    private static final String LANGUAGE_SHOWED_SET_KEY = "na_language_showed_set";
+
     private void showLanguageAlert(boolean force) {
         if (!UserConfig.getInstance(currentAccount).isClientActivated()) {
             return;
@@ -8308,6 +8318,20 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     FileLog.d("alert already showed for " + showedLang);
                 }
                 return;
+            }
+
+            // the server suggests a language by IP, so switching a proxy on and off flips the suggestion
+            // and the alert came back every time. Offer each suggestion once, and never over a language
+            // the user picked themselves or a custom language pack.
+            if (!force) {
+                if (preferences.getStringSet(LANGUAGE_SHOWED_SET_KEY, Collections.emptySet()).contains(systemLang)) {
+                    return;
+                }
+                final LocaleController.LocaleInfo currentInfo = LocaleController.getInstance().getCurrentLocaleInfo();
+                if (preferences.getString("language", null) != null
+                        || currentInfo != null && (currentInfo.isUnofficial() || currentInfo.isLocal())) {
+                    return;
+                }
             }
 
             final LocaleController.LocaleInfo[] infos = new LocaleController.LocaleInfo[2];

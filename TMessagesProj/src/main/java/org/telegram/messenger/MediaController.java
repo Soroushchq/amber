@@ -58,6 +58,7 @@ import android.os.PowerManager;
 import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -2691,7 +2692,22 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         }
         if (stopService) {
             CastSync.stop();
+            stopMediaSessionPlayback();
         }
+    }
+
+    private void stopMediaSessionPlayback() {
+        if (playingMessageObject != null) {
+            return;
+        }
+        TelegramMediaSession mediaSession = TelegramMediaSession.peekInstance();
+        if (mediaSession == null) {
+            return;
+        }
+        mediaSession.publishPlaybackState(new PlaybackStateCompat.Builder()
+                .setState(PlaybackStateCompat.STATE_STOPPED, 0, 0f)
+                .setActions(mediaSession.getAvailableActions())
+                .build());
     }
 
     public boolean isGoingToShowMessageObject(MessageObject messageObject) {
@@ -5630,6 +5646,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         private boolean finished;
         private int copiedFiles;
         private CountDownLatch waitingForFile;
+        private File downloadedFile;
         private MessagesStorage.IntCallback onFinishRunnable;
         private boolean isMusic;
 
@@ -5705,7 +5722,11 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                             if (cancelled) {
                                 break;
                             }
-                            if (!sourceFile.exists()) {
+                            File justDownloadedFile = downloadedFile;
+                            downloadedFile = null;
+                            if (justDownloadedFile != null && justDownloadedFile.exists()) {
+                                sourceFile = justDownloadedFile;
+                            } else if (!sourceFile.exists()) {
                                 sourceFile = FileLoader.getInstance(currentAccount.getCurrentAccount()).getPathToAttach(message.messageOwner, true);
                                 FileLog.d("saving file: correcting path from " + path + " to " + (sourceFile == null ? null : sourceFile.getAbsolutePath()));
                             }
@@ -6028,6 +6049,9 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             if (id == NotificationCenter.fileLoaded || id == NotificationCenter.fileLoadFailed) {
                 String fileName = (String) args[0];
                 if (loadingMessageObjects.remove(fileName) != null) {
+                    if (id == NotificationCenter.fileLoaded && args.length > 1 && args[1] instanceof File) {
+                        downloadedFile = (File) args[1];
+                    }
                     waitingForFile.countDown();
                 }
             } else if (id == NotificationCenter.fileLoadProgressChanged) {

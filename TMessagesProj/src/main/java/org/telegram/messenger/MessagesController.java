@@ -7551,6 +7551,7 @@ public class MessagesController extends BaseController implements NotificationCe
                     }
                 }
             }
+            return null;
         }
         return array.get(uid);
     }
@@ -7568,6 +7569,7 @@ public class MessagesController extends BaseController implements NotificationCe
                     }
                 }
             }
+            return false;
         }
         final TLRPC.ChannelParticipant participant = array.get(uid);
         return participant instanceof TLRPC.TL_channelParticipantAdmin || participant instanceof TLRPC.TL_channelParticipantCreator;
@@ -7588,6 +7590,7 @@ public class MessagesController extends BaseController implements NotificationCe
                     }
                 }
             }
+            return false;
         }
         final TLRPC.ChannelParticipant participant = array.get(uid);
         return participant instanceof TLRPC.TL_channelParticipantCreator;
@@ -12613,6 +12616,10 @@ public class MessagesController extends BaseController implements NotificationCe
                     if (onEmptyCallback != null && dialogsRes.dialogs.isEmpty()) {
                         AndroidUtilities.runOnUIThread(onEmptyCallback);
                     }
+                } else {
+                    // Without this the folder stays "loading" and is never requested again until restart.
+                    // Not posting dialogsNeedReload: it would retry at once, the next scroll or update retries.
+                    AndroidUtilities.runOnUIThread(() -> loadingDialogs.put(folderId, false));
                 }
             });
         }
@@ -19822,6 +19829,14 @@ public class MessagesController extends BaseController implements NotificationCe
                     updatesOnMainThread = new ArrayList<>();
                 }
                 updatesOnMainThread.add(baseUpdate);
+            } else if (baseUpdate instanceof TL_update.TL_updatePhoneCallSignalingData) {
+                // Handed to the call here, not batched for the UI thread: every signaling leg of a call waits for
+                // this delivery, and the UI thread is busiest while a call starts. VoIPService keeps data that
+                // arrives before the call's native instance exists.
+                VoIPService svc = VoIPService.getSharedInstance();
+                if (svc != null) {
+                    svc.onSignalingData((TL_update.TL_updatePhoneCallSignalingData) baseUpdate);
+                }
 //            } else if (
 //                baseUpdate instanceof TLRPC.TL_updateStickerSets ||
 //                baseUpdate instanceof TLRPC.TL_updateStickerSetsOrder ||
@@ -20549,12 +20564,6 @@ public class MessagesController extends BaseController implements NotificationCe
                     } else if (baseUpdate instanceof TL_update.TL_updateEditForumTopic) {
                         TL_update.TL_updateEditForumTopic update = (TL_update.TL_updateEditForumTopic) baseUpdate;
                         getTopicsController().onTopicEditedServerSide(DialogObject.getPeerDialogId(update.peer), update);
-                    } else if (baseUpdate instanceof TL_update.TL_updatePhoneCallSignalingData) {
-                        TL_update.TL_updatePhoneCallSignalingData data = (TL_update.TL_updatePhoneCallSignalingData) baseUpdate;
-                        VoIPService svc = VoIPService.getSharedInstance();
-                        if (svc != null) {
-                            svc.onSignalingData(data);
-                        }
                     } else if (baseUpdate instanceof TL_update.TL_updateGroupCallParticipants) {
                         TL_update.TL_updateGroupCallParticipants update = (TL_update.TL_updateGroupCallParticipants) baseUpdate;
                         ChatObject.Call call = groupCalls.get(update.call.id);

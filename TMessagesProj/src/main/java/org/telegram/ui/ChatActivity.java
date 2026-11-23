@@ -18046,7 +18046,8 @@ public class ChatActivity extends BaseFragment implements
         private void drawListImpl(Canvas blurCanvas, RectF position) {
             final long drawingTime = SystemClock.uptimeMillis();
 
-            if (chatListView.hasActiveEdgeEffects()) {
+            // with OVER_SCROLL_NEVER capture() only queues cells and they get drawn again in the next frame
+            if (chatListView.hasActiveEdgeEffects() && chatListView.getOverScrollMode() != View.OVER_SCROLL_NEVER) {
                 chatListView.capture(blurCanvas, position);
             } else {
                 chatListView.drawChatBackgroundElements(blurCanvas, position);
