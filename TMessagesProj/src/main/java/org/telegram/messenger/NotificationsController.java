@@ -1187,6 +1187,16 @@ public class NotificationsController extends BaseController implements Notificat
                 int mid = messageObject.getId();
                 long randomId = messageObject.isFcmMessage() ? messageObject.messageOwner.random_id : 0;
                 long dialogId = messageObject.getDialogId();
+                // AmberGram round 19 (extras): hidden/locked chats — single choke point
+                // for every notification path (connection updates and FCM, private and
+                // channel/group alike): locked dialogs never reach pushMessages, popups
+                // or the posted notification.
+                if (AmberExtras.isDialogLocked(dialogId)) {
+                    if (BuildVars.LOGS_ENABLED) {
+                        FileLog.d("AmberGram: skipping notification, dialog is locked did=" + dialogId);
+                    }
+                    continue;
+                }
                 boolean isChannel;
                 if (messageObject.isFcmMessage()) {
                     isChannel = messageObject.localChannel;

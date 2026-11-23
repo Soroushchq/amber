@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- امبرگرم راند ۱۹ — بستهٔ حریم خصوصی (الهام‌گرفته از Mercurygram). -->
+<resources>
+    <string name="AmberNoLinkPreviews">بدون لو دادن لینک‌پرویو</string>
+    <string name="AmberNoLinkPreviewsDesc">متنی که دارید می‌نویسید هرگز برای پیش‌نمایش لینک به سرور فرستاده نمی‌شود — پیش‌نمایش فقط بعد از ارسال پیام می‌آید.</string>
+    <string name="AmberNoGlobalSearch">بستن جست‌وجوی سراسری</string>
+    <string name="AmberNoGlobalSearchDesc">جست‌وجوی گفت‌وگو فقط نتیجهٔ محلی نشان می‌دهد؛ عبارت‌های جست‌وجوی شما به سرورهای تلگرام نمی‌رسند.</string>
+    <string name="AmberNoAiFeatures">خاموش‌کردن قابلیت‌های هوش مصنوعی</string>
+    <string name="AmberNoAiFeaturesDesc">ویرایشگر هوش مصنوعی و خلاصه‌سازی پیام خاموش می‌شود — هیچ درخواست هوش مصنوعی از دستگاه خارج نمی‌شود.</string>
+    <string name="AmberStripLinkTracking">پاک‌سازی ردیاب لینک‌ها</string>
+    <string name="AmberStripLinkTrackingDesc">پارامترهای ردیابی (utm، gclid، fbclid و …) قبل از بازشدن در مرورگر از لینک‌ها حذف می‌شوند.</string>
+</resources>

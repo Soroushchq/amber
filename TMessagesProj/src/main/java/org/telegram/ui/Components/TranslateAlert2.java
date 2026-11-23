@@ -375,6 +375,22 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
         }
 
         if (reqSum && reqPeer != null) {
+            if (org.telegram.messenger.AmberPrivacy.disableAiFeatures()) {
+                // AmberGram privacy pack (round 19, Mercurygram concept): TL_messages_summarizeText
+                // never leaves the device — mimic the async failure of the request callback
+                // (deferred so the sheet is fully shown before it dismisses with an error).
+                AndroidUtilities.runOnUIThread(() -> {
+                    if (firstTranslation) {
+                        dismiss();
+                        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.showBulletin, Bulletin.TYPE_ERROR, LocaleController.getString(R.string.TranslationFailedAlert2));
+                    } else {
+                        BulletinFactory.of((FrameLayout) containerView, resourcesProvider).createErrorBulletin(LocaleController.getString(R.string.TranslationFailedAlert2)).show();
+                        headerView.toLanguageTextView.setText(languageName(toLanguage = prevToLanguage));
+                        adapter.updateMainView(textViewContainer);
+                    }
+                });
+                return;
+            }
             TLRPC.TL_messages_summarizeText req = new TLRPC.TL_messages_summarizeText();
             req.flags |= 1;
             req.peer = reqPeer;

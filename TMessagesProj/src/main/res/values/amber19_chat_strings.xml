@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AmberGram round 19 — chat UX pack (Nagram/forkgram-style features). -->
+<resources>
+    <string name="AmberRepeat">Repeat</string>
+    <string name="AmberForwardNoQuote">Forward without quote</string>
+    <string name="AmberCopyMessageId">Copy message ID</string>
+    <string name="AmberGoToFirstMessage">Go to first message</string>
+    <string name="AmberDoubleTap">Double-tap action</string>
+    <string name="AmberDoubleTapDesc">Choose what double-tapping a message does — reaction, repeat, forward without quote or copy</string>
+    <string name="AmberDoubleTapOptionReaction">Reaction</string>
+    <string name="AmberDoubleTapOptionRepeat">Repeat</string>
+    <string name="AmberDoubleTapOptionForward">Forward without quote</string>
+    <string name="AmberDoubleTapOptionCopy">Copy text</string>
+</resources>

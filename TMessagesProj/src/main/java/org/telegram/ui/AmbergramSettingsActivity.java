@@ -1,6 +1,7 @@
 package org.telegram.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
@@ -14,8 +15,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.telegram.messenger.AmberAntiAds;
+import org.telegram.messenger.AmberBackup;
+import org.telegram.messenger.AmberChatTweaks;
+import org.telegram.messenger.AmberExtras;
 import org.telegram.messenger.AmberGhost;
 import org.telegram.messenger.AmberMorphe;
+import org.telegram.messenger.AmberPrivacy;
 import org.telegram.messenger.AmbergramProxyManager;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.DownloadQueueController;
@@ -44,6 +49,8 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
     private TextView queueValueView;
     private TextView proxyValueView;
     private TextView ghostValueView;
+    private TextView doubleTapValueView;
+    private TextView lockedValueView;
     private final HashMap<Integer, TextView> toggleValueViews = new HashMap<>();
     private final HashMap<Integer, AmberToggle> toggles = new HashMap<>();
     private boolean updateScheduled;
@@ -127,7 +134,13 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
                 {R.drawable.msg_download, R.string.AmberNoAutoUpdate, R.string.AmberNoAutoUpdateDesc},
                 {R.drawable.msg_block2, R.string.AmberNoChannelSwitch, R.string.AmberNoChannelSwitchDesc},
                 {R.drawable.msg_mute, R.string.AmberHideStoriesRead, R.string.AmberHideStoriesReadDesc},
-                {R.drawable.msg_secret, R.string.AmberBypassTranslation, R.string.AmberBypassTranslationDesc}
+                {R.drawable.msg_secret, R.string.AmberBypassTranslation, R.string.AmberBypassTranslationDesc},
+                {R.drawable.msg_link2, R.string.AmberNoLinkPreviews, R.string.AmberNoLinkPreviewsDesc},
+                {R.drawable.msg_search, R.string.AmberNoGlobalSearch, R.string.AmberNoGlobalSearchDesc},
+                {R.drawable.input_ai, R.string.AmberNoAiFeatures, R.string.AmberNoAiFeaturesDesc},
+                {R.drawable.msg_link, R.string.AmberStripLinkTracking, R.string.AmberStripLinkTrackingDesc},
+                {R.drawable.msg_speed_fast, R.string.AmberTurboUpload, R.string.AmberTurboUploadDesc},
+                {R.drawable.msg_secret, R.string.AmberProxyAutoOffVpn, R.string.AmberProxyAutoOffVpnDesc}
         };
         for (int[] spec : toggleSpecs) {
             View divider = new View(context);
@@ -136,6 +149,29 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
             LinearLayout toggleRow = makeToggleRow(context, spec[0], spec[1], spec[2]);
             card.addView(toggleRow, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         }
+
+        View doubleTapDivider = new View(context);
+        doubleTapDivider.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundGray));
+        card.addView(doubleTapDivider, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1));
+        LinearLayout doubleTapRow = makeDoubleTapRow(context);
+        card.addView(doubleTapRow, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        View lockedDivider = new View(context);
+        lockedDivider.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundGray));
+        card.addView(lockedDivider, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1));
+        LinearLayout lockedRow = makeLockedChatsRow(context);
+        card.addView(lockedRow, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        View backupDivider = new View(context);
+        backupDivider.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundGray));
+        card.addView(backupDivider, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1));
+        LinearLayout backupExportRow = makeBackupRow(context, R.drawable.msg_copy, R.string.AmberBackupExport, true);
+        card.addView(backupExportRow, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        View backupInnerDivider = new View(context);
+        backupInnerDivider.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundGray));
+        card.addView(backupInnerDivider, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1));
+        LinearLayout backupImportRow = makeBackupRow(context, R.drawable.msg_download, R.string.AmberBackupImport, false);
+        card.addView(backupImportRow, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         TextInfoPrivacyCell footerCell = new TextInfoPrivacyCell(context, 24, null);
         footerCell.setText(LocaleController.getString(R.string.AmbergramQueueComingSoon));
@@ -380,6 +416,18 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
             return AmberMorphe.hideStoriesRead();
         } else if (titleRes == R.string.AmberBypassTranslation) {
             return AmberMorphe.bypassTranslation();
+        } else if (titleRes == R.string.AmberNoLinkPreviews) {
+            return AmberPrivacy.disableLinkPreviews();
+        } else if (titleRes == R.string.AmberNoGlobalSearch) {
+            return AmberPrivacy.disableGlobalSearch();
+        } else if (titleRes == R.string.AmberNoAiFeatures) {
+            return AmberPrivacy.disableAiFeatures();
+        } else if (titleRes == R.string.AmberStripLinkTracking) {
+            return AmberPrivacy.stripLinkTracking();
+        } else if (titleRes == R.string.AmberTurboUpload) {
+            return AmberExtras.turboUpload();
+        } else if (titleRes == R.string.AmberProxyAutoOffVpn) {
+            return AmbergramProxyManager.proxyAutoOffVpn();
         }
         return false;
     }
@@ -409,7 +457,180 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
             AmberMorphe.setHideStoriesRead(value);
         } else if (titleRes == R.string.AmberBypassTranslation) {
             AmberMorphe.setBypassTranslation(value);
+        } else if (titleRes == R.string.AmberNoLinkPreviews) {
+            AmberPrivacy.setDisableLinkPreviews(value);
+        } else if (titleRes == R.string.AmberNoGlobalSearch) {
+            AmberPrivacy.setDisableGlobalSearch(value);
+        } else if (titleRes == R.string.AmberNoAiFeatures) {
+            AmberPrivacy.setDisableAiFeatures(value);
+        } else if (titleRes == R.string.AmberStripLinkTracking) {
+            AmberPrivacy.setStripLinkTracking(value);
+        } else if (titleRes == R.string.AmberTurboUpload) {
+            AmberExtras.setTurboUpload(value);
+        } else if (titleRes == R.string.AmberProxyAutoOffVpn) {
+            AmbergramProxyManager.setProxyAutoOffVpn(value);
         }
+    }
+
+    // ردیف اکشن دابل‌تپ — چرخهٔ چهار گزینه روی هر دو جهت (ورودی/خروجی)
+    private LinearLayout makeDoubleTapRow(Context context) {
+        LinearLayout row = new LinearLayout(context);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(10), AndroidUtilities.dp(16), AndroidUtilities.dp(10));
+        row.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector)));
+        row.setOnClickListener(v -> {
+            int next = (AmberChatTweaks.doubleTapIncoming() + 1) % 4;
+            AmberChatTweaks.setDoubleTapIncoming(next);
+            AmberChatTweaks.setDoubleTapOutgoing(next);
+            refreshDoubleTapValue();
+            if (getParentActivity() != null) {
+                Toast.makeText(getParentActivity(), LocaleController.getString(R.string.AmberDoubleTapDesc), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        row.addView(makeIconTile(context, R.drawable.msg_copy), LayoutHelper.createLinear(42, 42, 0, Gravity.CENTER_VERTICAL, 0, 0, 12, 0));
+
+        LinearLayout textCol = new LinearLayout(context);
+        textCol.setOrientation(LinearLayout.VERTICAL);
+        row.addView(textCol, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
+
+        TextView titleView = new TextView(context);
+        titleView.setTypeface(AndroidUtilities.bold());
+        titleView.setTextSize(16);
+        ThemeBind.textColor(titleView, Theme.key_windowBackgroundWhiteBlackText, null);
+        titleView.setText(LocaleController.getString(R.string.AmberDoubleTap));
+        titleView.setSingleLine(true);
+        textCol.addView(titleView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+
+        doubleTapValueView = new TextView(context);
+        doubleTapValueView.setTypeface(AndroidUtilities.bold());
+        doubleTapValueView.setTextSize(13);
+        doubleTapValueView.setSingleLine(true);
+        textCol.addView(doubleTapValueView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+
+        refreshDoubleTapValue();
+        return row;
+    }
+
+    // ردیف گفت‌وگوهای قفل‌شده — صفحهٔ مدیریت با شمارش زنده
+    private LinearLayout makeLockedChatsRow(Context context) {
+        LinearLayout row = new LinearLayout(context);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(10), AndroidUtilities.dp(16), AndroidUtilities.dp(10));
+        row.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector)));
+        row.setOnClickListener(v -> {
+            if (getParentActivity() != null) {
+                presentFragment(new AmberLockedChatsActivity());
+            }
+        });
+
+        row.addView(makeIconTile(context, R.drawable.ic_lock_header), LayoutHelper.createLinear(42, 42, 0, Gravity.CENTER_VERTICAL, 0, 0, 12, 0));
+
+        LinearLayout textCol = new LinearLayout(context);
+        textCol.setOrientation(LinearLayout.VERTICAL);
+        row.addView(textCol, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
+
+        TextView titleView = new TextView(context);
+        titleView.setTypeface(AndroidUtilities.bold());
+        titleView.setTextSize(16);
+        ThemeBind.textColor(titleView, Theme.key_windowBackgroundWhiteBlackText, null);
+        titleView.setText(LocaleController.getString(R.string.AmberLockedChats));
+        titleView.setSingleLine(true);
+        textCol.addView(titleView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+
+        lockedValueView = new TextView(context);
+        lockedValueView.setTypeface(AndroidUtilities.bold());
+        lockedValueView.setTextSize(13);
+        lockedValueView.setSingleLine(true);
+        textCol.addView(lockedValueView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+
+        refreshLockedValue();
+        return row;
+    }
+
+    // ردیف پشتیبان‌گیری تنظیمات — خروجی/درون‌ریزی JSON
+    private LinearLayout makeBackupRow(Context context, int iconRes, int titleRes, boolean export) {
+        LinearLayout row = new LinearLayout(context);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(10), AndroidUtilities.dp(16), AndroidUtilities.dp(10));
+        row.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector)));
+        row.setOnClickListener(v -> {
+            if (getParentActivity() == null) {
+                return;
+            }
+            if (export) {
+                AmberBackup.exportSettings(this);
+            } else {
+                AmberBackup.importSettings(this);
+            }
+        });
+
+        row.addView(makeIconTile(context, iconRes), LayoutHelper.createLinear(42, 42, 0, Gravity.CENTER_VERTICAL, 0, 0, 12, 0));
+
+        LinearLayout textCol = new LinearLayout(context);
+        textCol.setOrientation(LinearLayout.VERTICAL);
+        row.addView(textCol, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
+
+        TextView titleView = new TextView(context);
+        titleView.setTypeface(AndroidUtilities.bold());
+        titleView.setTextSize(16);
+        ThemeBind.textColor(titleView, Theme.key_windowBackgroundWhiteBlackText, null);
+        titleView.setText(LocaleController.getString(titleRes));
+        titleView.setSingleLine(true);
+        textCol.addView(titleView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+
+        return row;
+    }
+
+    private void refreshDoubleTapValue() {
+        if (doubleTapValueView == null || getContext() == null) {
+            return;
+        }
+        int action = AmberChatTweaks.doubleTapIncoming();
+        int res;
+        if (action == AmberChatTweaks.DOUBLE_TAP_REPEAT) {
+            res = R.string.AmberDoubleTapOptionRepeat;
+        } else if (action == AmberChatTweaks.DOUBLE_TAP_FORWARD_NO_QUOTE) {
+            res = R.string.AmberDoubleTapOptionForward;
+        } else if (action == AmberChatTweaks.DOUBLE_TAP_COPY) {
+            res = R.string.AmberDoubleTapOptionCopy;
+        } else {
+            res = R.string.AmberDoubleTapOptionReaction;
+        }
+        doubleTapValueView.setText(LocaleController.getString(res));
+        doubleTapValueView.setTextColor(BRAND_ORANGE);
+    }
+
+    private void refreshLockedValue() {
+        if (lockedValueView == null || getContext() == null) {
+            return;
+        }
+        int count = AmberExtras.lockedDialogsCount();
+        if (count > 0) {
+            lockedValueView.setText(LocaleController.formatString(R.string.AmberLockedChatsCount, String.valueOf(count)));
+            lockedValueView.setTextColor(BRAND_ORANGE);
+        } else {
+            lockedValueView.setText(LocaleController.getString(R.string.AmberGhostOff));
+            lockedValueView.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteGrayText2));
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refreshDoubleTapValue();
+        refreshLockedValue();
+    }
+
+    @Override
+    public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
+        if (AmberBackup.handleActivityResult(requestCode, resultCode, data)) {
+            return;
+        }
+        super.onActivityResultFragment(requestCode, resultCode, data);
     }
 
     private void refreshAllToggles() {

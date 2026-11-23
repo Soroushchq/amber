@@ -1609,6 +1609,12 @@ public class AndroidUtilities {
             String url = link.url;
             if (url != null) {
                 url = url.replaceAll("∕|⁄|%E2%81%84|%E2%88%95", "/");
+                if (AmberPrivacy.stripLinkTracking()) {
+                    // AmberGram privacy pack (round 19, MgUrlCleaner-style / Mercurygram):
+                    // strip utm_*/gclid/fbclid/… before the URL lands in a URLSpan, so
+                    // opening the link carries no tracking parameters.
+                    url = AmberPrivacy.cleanTrackingParams(url);
+                }
             }
             if (Browser.isTonsitePunycode(url)) continue;
             text.setSpan(new URLSpan(url), link.start, link.end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -3689,7 +3695,13 @@ public class AndroidUtilities {
                     if (onLinkClick != null) {
                         onLinkClick.run();
                     }
-                    Browser.openUrl(ApplicationLoader.applicationContext, url);
+                    String amberOpenUrl = url;
+                    if (AmberPrivacy.stripLinkTracking()) {
+                        // AmberGram privacy pack (MgUrlCleaner-style): strip tracking
+                        // parameters before the browser is invoked.
+                        amberOpenUrl = AmberPrivacy.cleanTrackingParams(url);
+                    }
+                    Browser.openUrl(ApplicationLoader.applicationContext, amberOpenUrl);
                 }
                 @Override
                 public void updateDrawState(@NonNull TextPaint ds) {

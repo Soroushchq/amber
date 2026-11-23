@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AmberGram round 19 — chat UX pack (Nagram/forkgram-style features). -->
+<resources>
+    <string name="AmberRepeat">تکرار</string>
+    <string name="AmberForwardNoQuote">فوروارد بدون نقل</string>
+    <string name="AmberCopyMessageId">کپی شناسهٔ پیام</string>
+    <string name="AmberGoToFirstMessage">رفتن به اولین پیام</string>
+    <string name="AmberDoubleTap">اکشن دابل‌تپ</string>
+    <string name="AmberDoubleTapDesc">انتخاب کنید که دابل‌تپ روی پیام چه کاری بکند — ری‌اکشن، تکرار، فوروارد بدون نقل یا کپی متن</string>
+    <string name="AmberDoubleTapOptionReaction">ری‌اکشن</string>
+    <string name="AmberDoubleTapOptionRepeat">تکرار</string>
+    <string name="AmberDoubleTapOptionForward">فوروارد بدون نقل</string>
+    <string name="AmberDoubleTapOptionCopy">کپی متن</string>
+</resources>

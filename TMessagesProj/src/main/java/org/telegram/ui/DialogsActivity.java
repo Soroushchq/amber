@@ -98,6 +98,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import org.telegram.messenger.AccountInstance;
+import org.telegram.messenger.AmberExtras;
 import org.telegram.messenger.AmberTokens;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.AnimationNotificationsLocker;
@@ -594,6 +595,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private ActionBarMenuSubItem readItem;
     @Nullable
     private ActionBarMenuSubItem blockItem;
+    // AmberGram round 19 (extras): hidden/locked chats
+    private ActionBarMenuSubItem amberLockChatItem;
 
     private float additionalFloatingTranslation;
     private float floatingButtonPanOffset;
@@ -715,6 +718,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private final static int add_to_folder = 109;
     private final static int remove_from_folder = 110;
     private final static int community_ungroup = 111;
+    // AmberGram round 19 (extras): hidden/locked chats
+    private final static int amber_lock_chat = 190;
 
     private final static int ARCHIVE_ITEM_STATE_PINNED = 0;
     private final static int ARCHIVE_ITEM_STATE_SHOWED = 1;
@@ -3945,7 +3950,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         undoView.showWithAction(did, UndoView.ACTION_REMOVED_FROM_FOLDER, neverShow.size(), filter, null, null);
                     }
                     hideActionMode(false);
-                } else if (id == pin || id == read || id == delete || id == clear || id == mute || id == archive || id == block || id == archive2 || id == pin2) {
+                } else if (id == pin || id == read || id == delete || id == clear || id == mute || id == archive || id == block || id == archive2 || id == pin2 || id == amber_lock_chat) {
                     performSelectedDialogsAction(selectedDialogs, id, true, false);
                 }
             }
@@ -6696,6 +6701,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         readItem = otherItem.addSubItem(read, R.drawable.msg_markread, LocaleController.getString(R.string.MarkAsRead));
         clearItem = otherItem.addSubItem(clear, R.drawable.msg_clear, LocaleController.getString(R.string.ClearHistory));
         blockItem = otherItem.addSubItem(block, R.drawable.msg_block, LocaleController.getString(R.string.BlockUser));
+        amberLockChatItem = otherItem.addSubItem(amber_lock_chat, R.drawable.msg_mini_lock2, LocaleController.getString(R.string.AmberLockChat));
 
         muteItem.setOnLongClickListener(e -> {
             performSelectedDialogsAction(selectedDialogs, mute, true, true);
@@ -9147,6 +9153,23 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
             hideActionMode(false);
             return;
+        } else if (action == amber_lock_chat) {
+            // AmberGram round 19 (extras): hidden/locked chats — toggle the lock for
+            // every selected dialog, then rebuild the lists so locked rows vanish
+            // (or reappear) immediately.
+            for (int a = 0; a < count; a++) {
+                long selectedDialog = selectedDialogs.get(a);
+                AmberExtras.setDialogLocked(selectedDialog, !AmberExtras.isDialogLocked(selectedDialog));
+            }
+            hideActionMode(false);
+            if (viewPages != null) {
+                for (int a = 0; a < viewPages.length; a++) {
+                    if (viewPages[a] != null && viewPages[a].dialogsAdapter != null) {
+                        viewPages[a].dialogsAdapter.notifyDataSetChanged();
+                    }
+                }
+            }
+            return;
         } else if ((action == pin || action == pin2) && canPinCount != 0) {
             int pinnedCount = 0;
             int pinnedSecretCount = 0;
@@ -9938,6 +9961,22 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 pinItem.setIcon(R.drawable.msg_unpin);
                 pinItem.setContentDescription(LocaleController.getString(R.string.UnpinFromTop));
                 pin2Item.setText(LocaleController.getString(R.string.DialogUnpin));
+            }
+        }
+        if (amberLockChatItem != null) {
+            // AmberGram round 19: lock/unlock label flips per selection — the item is
+            // visible whenever anything is selected (locked chats are accepted too).
+            boolean allLocked = !selectedDialogs.isEmpty();
+            for (int a = 0; a < selectedDialogs.size(); a++) {
+                if (!AmberExtras.isDialogLocked(selectedDialogs.get(a))) {
+                    allLocked = false;
+                    break;
+                }
+            }
+            if (allLocked) {
+                amberLockChatItem.setTextAndIcon(LocaleController.getString(R.string.AmberUnlockChat), R.drawable.menu_unlock);
+            } else {
+                amberLockChatItem.setTextAndIcon(LocaleController.getString(R.string.AmberLockChat), R.drawable.msg_mini_lock2);
             }
         }
     }
@@ -10946,6 +10985,25 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     private ArrayList<TLRPC.Dialog> botShareDialogs;
 
+    // AmberGram round 19 (extras): hidden/locked chats — locked dialogs never appear
+    // in the chat list (main list, archive tab and folder-filter tabs share this
+    // assembly point). When nothing is locked the original list object is returned
+    // untouched, so the common case keeps the exact live-list semantics.
+    private ArrayList<TLRPC.Dialog> filterLockedDialogs(ArrayList<TLRPC.Dialog> dialogs) {
+        if (dialogs == null || AmberExtras.lockedDialogsCount() == 0) {
+            return dialogs;
+        }
+        ArrayList<TLRPC.Dialog> filtered = new ArrayList<>(dialogs.size());
+        for (int a = 0; a < dialogs.size(); a++) {
+            TLRPC.Dialog dialog = dialogs.get(a);
+            if (dialog != null && !(dialog instanceof TLRPC.TL_dialogFolder) && AmberExtras.isDialogLocked(dialog.id)) {
+                continue;
+            }
+            filtered.add(dialog);
+        }
+        return filtered;
+    }
+
     @NonNull
     public ArrayList<TLRPC.Dialog> getDialogsArray(int currentAccount, int dialogsType, int folderId, boolean frozen) {
         if (frozen && frozenDialogsList != null) {
@@ -10953,7 +11011,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
         MessagesController messagesController = AccountInstance.getInstance(currentAccount).getMessagesController();
         if (dialogsType == DIALOGS_TYPE_DEFAULT) {
-            return messagesController.getDialogs(folderId);
+            return filterLockedDialogs(messagesController.getDialogs(folderId));
         } else if (dialogsType == DIALOGS_TYPE_WIDGET || dialogsType == DIALOGS_TYPE_IMPORT_HISTORY) {
             return messagesController.dialogsServerOnly;
         } else if (dialogsType == DIALOGS_TYPE_ADD_USERS_TO) {
@@ -10993,12 +11051,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         } else if (dialogsType == 7 || dialogsType == 8) {
             MessagesController.DialogFilter dialogFilter = messagesController.selectedDialogFilter[dialogsType == 7 ? 0 : 1];
             if (dialogFilter == null) {
-                return messagesController.getDialogs(folderId);
+                return filterLockedDialogs(messagesController.getDialogs(folderId));
             } else {
                 if (initialDialogsType == DIALOGS_TYPE_FORWARD) {
-                    return dialogFilter.dialogsForward;
+                    return filterLockedDialogs(dialogFilter.dialogsForward);
                 }
-                return dialogFilter.dialogs;
+                return filterLockedDialogs(dialogFilter.dialogs);
             }
         } else if (dialogsType == DIALOGS_TYPE_BLOCK) {
             return messagesController.dialogsForBlock;

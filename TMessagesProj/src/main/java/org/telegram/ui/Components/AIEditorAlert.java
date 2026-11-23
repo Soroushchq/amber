@@ -156,7 +156,10 @@ public class AIEditorAlert extends BottomSheetWithRecyclerListView implements No
         super(context, null, true, false, false, false, ActionBarType.SLIDING, resourcesProvider);
 
         tonesController = MessagesController.getInstance(currentAccount).getTonesController();
-        tonesController.load();
+        if (!org.telegram.messenger.AmberPrivacy.disableAiFeatures()) {
+            // AmberGram privacy pack: aicompose.getTones is an AI RPC — skip it entirely.
+            tonesController.load();
+        }
         tonesController.open = true;
 
         closeView = new ImageView(context);
@@ -1103,6 +1106,13 @@ public class AIEditorAlert extends BottomSheetWithRecyclerListView implements No
 
     @Override
     public void show() {
+        if (org.telegram.messenger.AmberPrivacy.disableAiFeatures()) {
+            // AmberGram privacy pack (round 19, Mercurygram concept): AI features are
+            // disabled — the sheet would only ever fail, so it is never presented.
+            // (Entry buttons live in ChatActivityEnterView / ChatAttachAlert / Caption
+            // PhotoViewer, which are owned by other agents, so the alert no-ops itself.)
+            return;
+        }
         super.show();
         if (actionBar != null) {
             actionBar.setTitle(getTitle());
@@ -1235,6 +1245,15 @@ public class AIEditorAlert extends BottomSheetWithRecyclerListView implements No
     private TLRPC.TL_messages_composeMessageWithAI[] lastRequest = new TLRPC.TL_messages_composeMessageWithAI[3];
     private TLRPC.TL_messages_composeRichMessageWithAI[] lastRequestRich = new TLRPC.TL_messages_composeRichMessageWithAI[3];
     private void request() {
+        if (org.telegram.messenger.AmberPrivacy.disableAiFeatures()) {
+            // AmberGram privacy pack: TL_messages_composeMessageWithAI (and the rich
+            // variant) never leave the device — reuse the existing error state the
+            // response handler renders on failure.
+            loading = false;
+            errored = true;
+            updateButton();
+            return;
+        }
         if (isRich()) {
             requestRich();
             return;
@@ -1369,6 +1388,14 @@ public class AIEditorAlert extends BottomSheetWithRecyclerListView implements No
         adapter.update(true);
     }
     private void requestRich() {
+        if (org.telegram.messenger.AmberPrivacy.disableAiFeatures()) {
+            // AmberGram privacy pack: TL_messages_composeRichMessageWithAI never leaves
+            // the device — reuse the existing error state.
+            loading = false;
+            errored = true;
+            updateButton();
+            return;
+        }
         final int tab = tabs.getSelectedTab();
 
         final TLRPC.TL_messages_composeRichMessageWithAI req = new TLRPC.TL_messages_composeRichMessageWithAI();

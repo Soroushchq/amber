@@ -697,7 +697,7 @@ public class FilteredSearchView extends FrameLayout implements Theme.Colorable, 
             ArrayList<Object> finalResultArray = resultArray;
             final ArrayList<FiltersView.DateData> dateData = new ArrayList<>();
             FiltersView.fillTipDates(lastMessagesSearchString, dateData);
-            ConnectionsManager.getInstance(currentAccount).sendRequestTyped(request, (response, error) -> {
+            org.telegram.Utilities.Callback2<TLRPC.messages_Messages, TLRPC.TL_error> amberSearchCallback = (response, error) -> {
                 ArrayList<MessageObject> messageObjects = new ArrayList<>();
                 if (error == null) {
                     TLRPC.messages_Messages res = response;
@@ -916,7 +916,15 @@ public class FilteredSearchView extends FrameLayout implements Theme.Colorable, 
                     }
                     adapter.notifyDataSetChanged();
                 });
-            });
+            };
+            if (request instanceof TLRPC.TL_messages_searchGlobal && org.telegram.messenger.AmberPrivacy.disableGlobalSearch()) {
+                // AmberGram privacy pack (round 19, Mercurygram "global search disabled"):
+                // messages.searchGlobal never reaches the server — the same handler runs
+                // with an empty response so local tip chats / sections still render.
+                amberSearchCallback.run(new TLRPC.TL_messages_messages(), null);
+            } else {
+                ConnectionsManager.getInstance(currentAccount).sendRequestTyped(request, amberSearchCallback);
+            }
         }, (filterAndQueryIsSame && !messages.isEmpty()) ? 0 : 350);
 
         if (currentSearchFilter == null) {

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AmberGram round 19 — extras pack (turbo upload, proxy auto-off on VPN,
+     hidden/locked chats, settings backup). -->
+<resources>
+    <string name="AmberTurboUpload">Faster uploads</string>
+    <string name="AmberTurboUploadDesc">Upload chunk sizes are doubled — large files and videos upload noticeably faster on good networks.</string>
+    <string name="AmberProxyAutoOffVpn">Auto-off proxy with VPN</string>
+    <string name="AmberProxyAutoOffVpnDesc">When a VPN is active the MTProto proxy is disabled automatically so both tunnels do not fight each other.</string>
+    <string name="AmberLockedChats">Locked chats</string>
+    <string name="AmberLockedChatsDesc">Locked chats are hidden from the chat list and never raise notifications until you unlock them here.</string>
+    <string name="AmberLockedChatsEmpty">No locked chats yet — long-press a chat in the list and choose «Lock chat».</string>
+    <string name="AmberUnlockChat">Unlock</string>
+    <string name="AmberLockChat">Lock chat</string>
+    <string name="AmberBackupExport">Export AmberGram settings</string>
+    <string name="AmberBackupImport">Import AmberGram settings</string>
+    <string name="AmberBackupDone">Settings applied — restart the app to be safe.</string>
+    <string name="AmberBackupFailed">Import failed — the file is not a valid AmberGram backup.</string>
+    <string name="AmberLockedChatsCount">%1$s locked</string>
+</resources>

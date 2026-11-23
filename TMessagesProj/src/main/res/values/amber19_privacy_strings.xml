@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AmberGram round 19 — privacy pack (Mercurygram-style features). -->
+<resources>
+    <string name="AmberNoLinkPreviews">No link preview leak</string>
+    <string name="AmberNoLinkPreviewsDesc">The text you are writing is never sent to the server for a link preview — previews appear only after the message is sent.</string>
+    <string name="AmberNoGlobalSearch">Disable global search</string>
+    <string name="AmberNoGlobalSearchDesc">Chat search shows local results only; your queries never reach Telegram\'s servers.</string>
+    <string name="AmberNoAiFeatures">Disable AI features</string>
+    <string name="AmberNoAiFeaturesDesc">The AI text editor and message summaries are turned off — no AI requests ever leave the device.</string>
+    <string name="AmberStripLinkTracking">Strip link tracking</string>
+    <string name="AmberStripLinkTrackingDesc">Tracking parameters (utm, gclid, fbclid, …) are removed from links before they are opened in the browser.</string>
+</resources>

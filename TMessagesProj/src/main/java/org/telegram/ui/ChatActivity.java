@@ -179,8 +179,10 @@ import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.MessagePreviewParams;
 import org.telegram.messenger.MessageSuggestionParams;
 import org.telegram.messenger.AmberAntiAds;
+import org.telegram.messenger.AmberChatTweaks;
 import org.telegram.messenger.AmberGhost;
 import org.telegram.messenger.AmberMorphe;
+import org.telegram.messenger.AmberPrivacy;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.MessagesStorage;
 import org.telegram.messenger.NotificationCenter;
@@ -834,6 +836,8 @@ public class ChatActivity extends BaseFragment implements
     private CharSequence formwardingNameText;
     private MessageObject forwardingMessage;
     private MessageObject.GroupedMessages forwardingMessageGroup;
+    // AmberGram round 19: "Forward without quote" marks its DialogsActivity picker with the
+    // "amber_no_quote" argument, so only that picker's selection is sent with drop_author.
     private MessageObject.GroupedMessages replyingQuoteGroup;
     public MessageObject replyingTopMessage;
     private ReplyQuote replyingQuote;
@@ -1299,6 +1303,11 @@ public class ChatActivity extends BaseFragment implements
     public final static int OPTION_WELCOME_REVERT = 116;
     public final static int OPTION_SEND_MONEY = 117;
 
+    // AmberGram round 19 — chat UX pack (per-message context menu actions).
+    public final static int OPTION_AMBER_REPEAT = 118;
+    public final static int OPTION_AMBER_FORWARD_NO_QUOTE = 119;
+    public final static int OPTION_AMBER_COPY_MESSAGE_ID = 120;
+
     private final static int[] allowedNotificationsDuringChatListAnimations = new int[]{
             NotificationCenter.messagesRead,
             NotificationCenter.threadMessagesRead,
@@ -1691,6 +1700,7 @@ public class ChatActivity extends BaseFragment implements
     private final static int add_shortcut = 24;
     private final static int save_to = 25;
     private final static int amber_queue = 500;
+    private final static int amber_goto_first = 501;
     private final static int auto_delete_timer = 26;
     private final static int change_colors = 27;
     private final static int tag_message = 28;
@@ -1967,6 +1977,22 @@ public class ChatActivity extends BaseFragment implements
             if (isQuickRepliesOrWelcomeMessagesMode()) return false;
             // A double tap over a widget is the widget's (dblclick, docs/sdk-v1.md §5.5): the reaction is outside it.
             if (view instanceof ChatMessageCell && ((ChatMessageCell) view).isWidgetPress()) return false;
+            MessageObject amberMessageObject;
+            if (view instanceof ChatMessageCell) {
+                amberMessageObject = ((ChatMessageCell) view).getPrimaryMessageObject();
+            } else if (view instanceof ChatActionCell) {
+                amberMessageObject = ((ChatActionCell) view).getMessageObject();
+            } else {
+                return false;
+            }
+            // AmberGram round 19: an alternative double-tap action is configured for this message,
+            // so the double tap must be dispatched even when the stock reaction is unavailable.
+            if (amberMessageObject != null && !amberMessageObject.isDateObject && !amberMessageObject.isSending() && !amberMessageObject.isEditing() && !amberMessageObject.isSecret() && !actionBar.isActionModeShowed() && !isSecretChat() && !isInScheduleMode() && !isInPreviewMode() && !amberMessageObject.isSponsored()) {
+                final int amberAction = amberMessageObject.isOutOwner() ? AmberChatTweaks.doubleTapOutgoing() : AmberChatTweaks.doubleTapIncoming();
+                if (amberAction != AmberChatTweaks.DOUBLE_TAP_REACTION && amberCanHandleDoubleTapAction(amberMessageObject, amberAction)) {
+                    return true;
+                }
+            }
             String reactionStringSetting = getMediaDataController().getDoubleTapReaction();
             TLRPC.TL_availableReaction reaction = getMediaDataController().getReactionsMap().get(reactionStringSetting);
             if (reaction == null && (reactionStringSetting == null || !reactionStringSetting.startsWith("animated_"))) {
@@ -2006,6 +2032,13 @@ public class ChatActivity extends BaseFragment implements
             } else {
                 return;
             }
+            // AmberGram round 19: perform the configured alternative double-tap action
+            // (repeat / forward without quote / copy) instead of the stock reaction;
+            // when the action is not applicable for this message, fall through to the stock reaction.
+            final int amberAction = messageObject.isOutOwner() ? AmberChatTweaks.doubleTapOutgoing() : AmberChatTweaks.doubleTapIncoming();
+            if (amberAction != AmberChatTweaks.DOUBLE_TAP_REACTION && !messageObject.isExpiredStory() && amberHandleDoubleTapAction(messageObject, amberAction)) {
+                return;
+            }
             if (messageObject.isSecret() || !messageObject.canSetReaction() || messageObject.isExpiredStory() || messageObject.type == MessageObject.TYPE_JOINED_CHANNEL) {
                 return;
             }
@@ -2040,6 +2073,142 @@ public class ChatActivity extends BaseFragment implements
             }
         }
     };
+
+    // ==================== AmberGram round 19 — chat UX pack ====================
+
+    // Feature A: is the configured alternative double-tap action applicable to this message?
+    private boolean amberCanHandleDoubleTapAction(MessageObject messageObject, int action) {
+        if (getParentActivity() == null || isSecretChat() || isInScheduleMode() || isInPreviewMode() || isQuickRepliesOrWelcomeMessagesMode()) {
+            return false;
+        }
+        if (action == AmberChatTweaks.DOUBLE_TAP_COPY) {
+            return !TextUtils.isEmpty(amberGetCopyableText(messageObject));
+        }
+        if (action == AmberChatTweaks.DOUBLE_TAP_REPEAT || action == AmberChatTweaks.DOUBLE_TAP_FORWARD_NO_QUOTE) {
+            return amberCanResendAsOwn(messageObject);
+        }
+        return false;
+    }
+
+    // Feature A: performs the alternative double-tap action; returns false so the caller
+    // falls through to the stock reaction when the action does not apply to the message.
+    private boolean amberHandleDoubleTapAction(MessageObject messageObject, int action) {
+        if (messageObject == null || getParentActivity() == null) {
+            return false;
+        }
+        if (action == AmberChatTweaks.DOUBLE_TAP_COPY) {
+            CharSequence text = amberGetCopyableText(messageObject);
+            if (TextUtils.isEmpty(text)) {
+                return false;
+            }
+            AndroidUtilities.addToClipboard(text);
+            createUndoView();
+            if (undoView != null) {
+                undoView.showWithAction(0, UndoView.ACTION_MESSAGE_COPIED, null);
+            }
+            return true;
+        }
+        if (action == AmberChatTweaks.DOUBLE_TAP_REPEAT || action == AmberChatTweaks.DOUBLE_TAP_FORWARD_NO_QUOTE) {
+            if (!amberCanResendAsOwn(messageObject)) {
+                return false;
+            }
+            amberResendAsOwn(messageObject);
+            return true;
+        }
+        return false;
+    }
+
+    // Feature A: message text (or caption) used by the "copy text" double-tap action;
+    // null means the message has nothing copyable (media-only) and the reaction wins.
+    private CharSequence amberGetCopyableText(MessageObject messageObject) {
+        if (messageObject == null || messageObject.isDateObject) {
+            return null;
+        }
+        if (messageObject.isDice()) {
+            return messageObject.getDiceEmoji();
+        }
+        CharSequence caption = getMessageCaption(messageObject, null);
+        if (caption != null) {
+            return caption;
+        }
+        if (messageObject.type == MessageObject.TYPE_TEXT || messageObject.type == MessageObject.TYPE_ARTICLE) {
+            return getMessageContent(messageObject, 0, false);
+        }
+        return null;
+    }
+
+    // Features A/B/C: may the message be re-sent as the user's own message to the current dialog?
+    private boolean amberCanResendAsOwn(MessageObject messageObject) {
+        if (messageObject == null || getParentActivity() == null || dialog_id == 0) {
+            return false;
+        }
+        if (messageObject.scheduled || messageObject.isEphemeral() || messageObject.isEditing() || messageObject.isSending() || messageObject.isSponsored() || messageObject.isExpiredStory()) {
+            return false;
+        }
+        if (messageObject.getId() <= 0 || messageObject.needDrawBluredPreview() || messageObject.isLiveLocation() || messageObject.type == MessageObject.TYPE_PAID_MEDIA) {
+            return false;
+        }
+        if (messageObject.messageOwner.action != null && !(messageObject.messageOwner.action instanceof TLRPC.TL_messageActionEmpty)) {
+            return false;
+        }
+        if (messageObject.type == MessageObject.TYPE_DATE || messageObject.type == MessageObject.TYPE_JOINED_CHANNEL || messageObject.type == MessageObject.TYPE_STORY_MENTION || messageObject.isWallpaperAction()) {
+            return false;
+        }
+        if (currentEncryptedChat != null) {
+            return false;
+        }
+        if (isPeerNoForwards() || messageObject.messageOwner.noforwards || getDialogId() == UserObject.VERIFY) {
+            return false;
+        }
+        if (currentChat != null) {
+            if (ChatObject.isNotInChat(currentChat) && !ChatObject.isMonoForum(currentChat)) {
+                return false;
+            }
+            if (!ChatObject.canSendMessages(currentChat) || ChatObject.isChannel(currentChat) && !ChatObject.canPost(currentChat) && !currentChat.megagroup) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Features A/B/C: re-sends the message content as the user's own message to the current dialog.
+    // Uses the stock forward pipeline with forwardFromMyName=true (server-side drop_author),
+    // so text and media are re-sent without the "Forwarded from" header and media is re-uploaded.
+    private void amberResendAsOwn(MessageObject messageObject) {
+        if (getMessagesController().isFrozen()) {
+            AccountFrozenAlert.show(currentAccount);
+            return;
+        }
+        ArrayList<MessageObject> messages = new ArrayList<>();
+        messages.add(messageObject);
+        int result = getSendMessagesHelper().sendMessage(messages, getDialogId(), true, false, true, 0, 0, getThreadMessage(), -1, 0, getSendMonoForumPeerId(), getSendMessageSuggestionParams());
+        if (result != 0) {
+            AlertsCreator.showSendMediaAlert(result, this, themeDelegate);
+        }
+    }
+
+    // Feature F: scrolls the chat to the oldest message currently loaded in the adapter
+    // (no server loads are triggered; a no-op when nothing older is loaded).
+    private void amberGoToFirstMessage() {
+        if (messages.isEmpty() || getParentActivity() == null) {
+            return;
+        }
+        int minId = Integer.MAX_VALUE;
+        boolean found = false;
+        for (int a = 0, N = messages.size(); a < N; a++) {
+            MessageObject messageObject = messages.get(a);
+            int id = messageObject != null ? messageObject.getId() : 0;
+            if (id > 0 && id < minId) {
+                minId = id;
+                found = true;
+            }
+        }
+        if (found) {
+            scrollToMessageId(minId, 0, true, 0, true, 0);
+        }
+    }
+
+    // ==================== end of AmberGram round 19 chat UX pack ====================
 
     private class ChatActivityEnterViewDelegate implements ChatActivityEnterView.ChatActivityEnterViewDelegate {
 
@@ -3789,6 +3958,8 @@ public class ChatActivity extends BaseFragment implements
                 } else if (id == open_direct) {
                     if (currentChat == null) return;
                     presentFragment(ChatActivity.of(-currentChat.linked_monoforum_id));
+                } else if (id == amber_goto_first) {
+                    amberGoToFirstMessage();
                 } else if (id == charge_fee ) {
                     long user_id = dialog_id;
                     long parent_id = 0;
@@ -4432,6 +4603,10 @@ public class ChatActivity extends BaseFragment implements
 
             if (searchItem != null) {
                 headerItem.lazilyAddSubItem(search, R.drawable.msg_search, LocaleController.getString(R.string.Search));
+            }
+            // AmberGram round 19 — jump to the oldest loaded message in this chat (forkgram).
+            if (chatMode == 0 && !messages.isEmpty()) {
+                headerItem.lazilyAddSubItem(amber_goto_first, R.drawable.iv_align_vert_top, LocaleController.getString(R.string.AmberGoToFirstMessage));
             }
             if (ChatObject.isBoostSupported(currentChat) && (getUserConfig().isPremium() || ChatObject.isBoosted(chatInfo) || ChatObject.hasAdminRights(currentChat))) {
                 RLottieDrawable drawable = new RLottieDrawable(R.raw.boosts, dp(24), dp(24));
@@ -14910,6 +15085,13 @@ public class ChatActivity extends BaseFragment implements
     private HashMap<String, TLRPC.WebPage> lastLinkPreviewResults;
 
     private void requestLinkPreviewCached(TL_account.getWebPagePreview req, Utilities.Callback2<Boolean, TLRPC.WebPage> done) {
+        // AmberGram round 19: when link previews are disabled, the composed text is never
+        // sent to the server for a preview — report "no preview" so the UI degrades
+        // gracefully (the field panel falls back without showing a web page preview).
+        if (AmberPrivacy.disableLinkPreviews()) {
+            done.run(false, null);
+            return;
+        }
         if (lastLinkPreviewResults == null) {
             lastLinkPreviewResults = new HashMap<>();
         }
@@ -31939,6 +32121,7 @@ public class ChatActivity extends BaseFragment implements
                         case OPTION_SAVE_TO_DOWNLOADS_OR_MUSIC:
                         case OPTION_SHARE:
                         case OPTION_FORWARD:
+                        case OPTION_AMBER_FORWARD_NO_QUOTE:
                         case OPTION_REPLY:
                             options.remove(i);
                             items.remove(i);
@@ -34365,6 +34548,67 @@ public class ChatActivity extends BaseFragment implements
                 presentFragment(fragment);
                 break;
             }
+            // AmberGram round 19: forward to a picked dialog WITHOUT the "Forwarded from"
+            // header — same picker as the stock forward, but drop_author is set on send
+            // (see didSelectDialogs, "amber_no_quote" argument).
+            case OPTION_AMBER_FORWARD_NO_QUOTE: {
+                if (getMessagesController().isFrozen()) {
+                    AccountFrozenAlert.show(currentAccount);
+                    selectedObject = null;
+                    selectedObjectToEditCaption = null;
+                    selectedObjectGroup = null;
+                    return;
+                }
+                forwardingMessage = selectedObject;
+                forwardingMessageGroup = selectedObjectGroup;
+                Bundle argsNoQuote = new Bundle();
+                argsNoQuote.putBoolean("onlySelect", true);
+                argsNoQuote.putBoolean("amber_no_quote", true);
+                argsNoQuote.putInt("dialogsType", DialogsActivity.DIALOGS_TYPE_FORWARD);
+                argsNoQuote.putInt("messagesCount", 1);
+                argsNoQuote.putInt("hasPoll", forwardingMessage.isTodo() ? 3 : forwardingMessage.isPoll() ? (forwardingMessage.isPublicPoll() ? 2 : 1) : 0);
+                if (ChatObject.isMonoForum(currentChat) && ChatObject.canManageMonoForum(currentAccount, currentChat) && currentChat.linked_monoforum_id != 0) {
+                    argsNoQuote.putLong("forward_into_channel", -currentChat.linked_monoforum_id);
+                }
+                argsNoQuote.putBoolean("hasInvoice", forwardingMessage.isInvoice());
+                argsNoQuote.putBoolean("canSelectTopics", true);
+                DialogsActivity fragmentNoQuote = new DialogsActivity(argsNoQuote);
+                fragmentNoQuote.setDelegate(this);
+                presentFragment(fragmentNoQuote);
+                break;
+            }
+            // AmberGram round 19: repeat — re-send the message content as the user's own
+            // message to the current chat.
+            case OPTION_AMBER_REPEAT: {
+                if (getParentActivity() == null || selectedObject == null) {
+                    return;
+                }
+                amberResendAsOwn(selectedObject);
+                selectedObject = null;
+                selectedObjectToEditCaption = null;
+                selectedObjectGroup = null;
+                break;
+            }
+            // AmberGram round 19: copy the raw message id / dialog id pair to the clipboard.
+            case OPTION_AMBER_COPY_MESSAGE_ID: {
+                if (getParentActivity() == null || selectedObject == null) {
+                    return;
+                }
+                StringBuilder idBuilder = new StringBuilder("msgId:").append(selectedObject.getId()).append(" dialogId:").append(getDialogId());
+                TLRPC.Chat chatForId = currentChat != null && ChatObject.isChannelAndNotMegaGroup(currentChat) ? currentChat : null;
+                if (chatForId != null && chatForId.id != 0) {
+                    idBuilder.append(" channelId:").append(chatForId.id);
+                }
+                AndroidUtilities.addToClipboard(idBuilder.toString());
+                createUndoView();
+                if (undoView != null) {
+                    undoView.showWithAction(0, UndoView.ACTION_MESSAGE_COPIED, null);
+                }
+                selectedObject = null;
+                selectedObjectToEditCaption = null;
+                selectedObjectGroup = null;
+                break;
+            }
             case OPTION_COPY: {
                 final TL_iv.RichMessage copyRichMessage = selectedObject.messageOwner != null ? selectedObject.messageOwner.rich_message : null;
                 if (selectedObject.isDice()) {
@@ -35379,6 +35623,10 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public boolean didSelectDialogs(DialogsActivity fragment, ArrayList<MessagesStorage.TopicKey> dids, CharSequence message, boolean param, boolean notify, int scheduleDate, int scheduleRepeatPeriod, TopicsFragment topicsFragment) {
+        // AmberGram round 19: "Forward without quote" opened this picker (its bundle carries
+        // "amber_no_quote") — the selected dialogs are sent with drop_author, i.e. without
+        // the "Forwarded from" header.
+        final boolean amberNoQuote = fragment.getArguments() != null && fragment.getArguments().getBoolean("amber_no_quote", false);
         if ((messagePreviewParams == null && (!fragment.isQuote || replyingMessageObject == null) || fragment.isQuote && replyingMessageObject == null) && forwardingMessage == null && selectedMessagesIds[0].size() == 0 && selectedMessagesIds[1].size() == 0) {
             return false;
         }
@@ -35418,7 +35666,9 @@ public class ChatActivity extends BaseFragment implements
             }
         }
 
-        if (!fragment.isQuote && (dids.size() > 1 || dids.get(0).dialogId == getUserConfig().getClientUserId() || message != null || scheduleDate != 0 || !notify)) {
+        // AmberGram round 19: with "forward without quote" the send is immediate (no forward
+        // preview panel) and uses forwardFromMyName=true (drop_author), like the multi-dialog path.
+        if (!fragment.isQuote && (amberNoQuote || dids.size() > 1 || dids.get(0).dialogId == getUserConfig().getClientUserId() || message != null || scheduleDate != 0 || !notify)) {
             return !AlertsCreator.ensurePaidMessagesMultiConfirmationTopicKeys(currentAccount, dids, fmessages.size() + (TextUtils.isEmpty(message) ? 0 : 1), prices -> {
                 if (fragment.resetDelegate) {
                     fragment.setDelegate(null);
@@ -35453,7 +35703,7 @@ public class ChatActivity extends BaseFragment implements
                         params.suggestionParams = messageSuggestionParams;
                         getSendMessagesHelper().sendMessage(params);
                     }
-                    getSendMessagesHelper().sendMessage(fmessages, did, false, false, notify, scheduleDate, scheduleRepeatPeriod, null, -1, price == null ? 0 : price, getSendMonoForumPeerId(), getSendMessageSuggestionParams());
+                    getSendMessagesHelper().sendMessage(fmessages, did, amberNoQuote, false, notify, scheduleDate, scheduleRepeatPeriod, null, -1, price == null ? 0 : price, getSendMonoForumPeerId(), getSendMessageSuggestionParams());
                 }
                 fragment.finishFragment();
                 createUndoView();
@@ -46928,6 +47178,26 @@ public class ChatActivity extends BaseFragment implements
                     items.add(LocaleController.getString(R.string.Forward));
                     options.add(OPTION_FORWARD);
                     icons.add(R.drawable.msg_forward);
+                }
+                // AmberGram round 19 — forward the message to a picked dialog without the
+                // "Forwarded from" header (drop_author); same conditions as the stock forward.
+                if (canForward && currentEncryptedChat == null) {
+                    items.add(LocaleController.getString(R.string.AmberForwardNoQuote));
+                    options.add(OPTION_AMBER_FORWARD_NO_QUOTE);
+                    icons.add(R.drawable.msg_forward);
+                }
+                // AmberGram round 19 — repeat: re-send the message content as the user's own
+                // message to the current chat (needs send rights here).
+                if (canForward && allowChatActions && currentEncryptedChat == null && amberCanResendAsOwn(message)) {
+                    items.add(LocaleController.getString(R.string.AmberRepeat));
+                    options.add(OPTION_AMBER_REPEAT);
+                    icons.add(R.drawable.msg_retry);
+                }
+                // AmberGram round 19 — copy the raw message identifier, useful for bots and logs.
+                if (currentEncryptedChat == null && message.getId() > 0 && (message.messageOwner.action == null || message.messageOwner.action instanceof TLRPC.TL_messageActionEmpty) && !message.isSponsored() && !message.isExpiredStory() && chatMode != MODE_SCHEDULED) {
+                    items.add(LocaleController.getString(R.string.AmberCopyMessageId));
+                    options.add(OPTION_AMBER_COPY_MESSAGE_ID);
+                    icons.add(R.drawable.msg_link);
                 }
                 if (allowUnpin) {
                     items.add(LocaleController.getString(R.string.UnpinMessage));

@@ -980,6 +980,15 @@ public class TranslateController extends BaseController {
         @Nullable String language,
         Utilities.Callback<TLRPC.TL_textWithEntities> callback
     ) {
+        if (org.telegram.messenger.AmberPrivacy.disableAiFeatures()) {
+            // AmberGram privacy pack (round 19, Mercurygram concept): TL_messages_summarizeText
+            // never leaves the device — report a failed summarization (same as an error reply).
+            loadingSummarizations.remove(Objects.hash(message.getDialogId(), message.getId(), language != null ? 1 : 0));
+            if (callback != null) {
+                callback.run(null);
+            }
+            return;
+        }
         final int id = Objects.hash(message.getDialogId(), message.getId(), language != null ? 1 : 0);
         if (loadingSummarizations.contains(id)) return;
 

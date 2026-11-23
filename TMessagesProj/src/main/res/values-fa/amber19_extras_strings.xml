@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AmberGram round 19 — بستهٔ اکسترا (آپلود توربو، خاموشی خودکار پروکسی با VPN،
+     گفت‌وگوهای قفل‌شده، پشتیبان‌گیری از تنظیمات). -->
+<resources>
+    <string name="AmberTurboUpload">آپلود سریع‌تر</string>
+    <string name="AmberTurboUploadDesc">اندازهٔ بسته‌های آپلود دوبرابر می‌شود — فایل‌های بزرگ و ویدیوها روی شبکهٔ خوب به‌طور محسوس سریع‌تر بالا می‌روند.</string>
+    <string name="AmberProxyAutoOffVpn">خاموشی خودکار پروکسی با VPN</string>
+    <string name="AmberProxyAutoOffVpnDesc">وقتی VPN فعال باشد پروکسی MTProto خودکار خاموش می‌شود تا دو تونل با هم نجنگند.</string>
+    <string name="AmberLockedChats">گفت‌وگوهای قفل‌شده</string>
+    <string name="AmberLockedChatsDesc">گفت‌وگوهای قفل‌شده از فهرست مخفی می‌شوند و تا وقتی این‌جا بازشان نکنید هیچ اعلانی نمی‌دهند.</string>
+    <string name="AmberLockedChatsEmpty">هنوز گفت‌وگوی قفل‌شده‌ای ندارید — روی یک گفت‌وگو در فهرست طولانی فشار دهید و «قفل گفت‌وگو» را بزنید.</string>
+    <string name="AmberUnlockChat">بازکردن</string>
+    <string name="AmberLockChat">قفل گفت‌وگو</string>
+    <string name="AmberBackupExport">خروجی گرفتن از تنظیمات آمبرگرم</string>
+    <string name="AmberBackupImport">درون‌ریزی تنظیمات آمبرگرم</string>
+    <string name="AmberBackupDone">تنظیمات اعمال شد — برای اطمینان اپ را یک‌بار ببندید و باز کنید.</string>
+    <string name="AmberBackupFailed">درون‌ریزی ناموفق بود — این فایل یک پشتیبان معتبر آمبرگرم نیست.</string>
+    <string name="AmberLockedChatsCount">%1$s قفل‌شده</string>
+</resources>

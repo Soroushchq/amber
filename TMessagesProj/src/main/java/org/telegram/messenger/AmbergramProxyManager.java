@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.SystemClock;
@@ -69,6 +71,10 @@ public class AmbergramProxyManager {
     public static final int EVENT_TEST_PROGRESS = 2;
     public static final int EVENT_TEST_DONE = 3;
     public static final int EVENT_LIST_CLEANED = 4;
+
+    // AmberGram round 19 (extras): fired when the proxy was switched off automatically
+    // because a VPN became the default network (toggle amberProxyAutoOffVpn).
+    public static final int EVENT_PROXY_AUTO_OFF = 5;
 
     public interface Listener {
         void onProxyEvent(int event, int done, int total);
@@ -204,6 +210,127 @@ public class AmbergramProxyManager {
     private long lastTestAt;
     private boolean started;
 
+    // ---------------------------------------------------------------- proxy auto-off on VPN
+
+    private static final String PREF_PROXY_AUTO_OFF_VPN = "amberProxyAutoOffVpn";
+    private static final Object autoOffVpnLock = new Object();
+    private static Boolean proxyAutoOffVpn;
+    // AmberGram round 19: one automatic switch-off per VPN activation — if the user
+    // turns the proxy back on while the same VPN session is still running, we do not
+    // fight them; the flag resets when the VPN goes away.
+    private boolean vpnAutoOffTriggered;
+    private boolean vpnCallbackRegistered;
+
+    private static boolean loadAutoOffVpn() {
+        return MessagesController.getGlobalMainSettings().getBoolean(PREF_PROXY_AUTO_OFF_VPN, false);
+    }
+
+    public static boolean proxyAutoOffVpn() {
+        Boolean value = proxyAutoOffVpn;
+        if (value == null) {
+            synchronized (autoOffVpnLock) {
+                if (proxyAutoOffVpn == null) {
+                    proxyAutoOffVpn = loadAutoOffVpn();
+                }
+                value = proxyAutoOffVpn;
+            }
+        }
+        return value;
+    }
+
+    public static void setProxyAutoOffVpn(boolean value) {
+        synchronized (autoOffVpnLock) {
+            proxyAutoOffVpn = value;
+            MessagesController.getGlobalMainSettings().edit().putBoolean(PREF_PROXY_AUTO_OFF_VPN, value).apply();
+        }
+    }
+
+    private static boolean isVpnActive() {
+        try {
+            ConnectivityManager manager = (ConnectivityManager) ApplicationLoader.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (manager == null) {
+                return false;
+            }
+            if (Build.VERSION.SDK_INT >= 23) {
+                Network activeNetwork = manager.getActiveNetwork();
+                if (activeNetwork != null) {
+                    NetworkCapabilities capabilities = manager.getNetworkCapabilities(activeNetwork);
+                    if (capabilities != null && capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
+                        return true;
+                    }
+                }
+            }
+            // API 21-22 fallback (and a belt-and-braces second look on newer devices)
+            NetworkInfo vpnInfo = manager.getNetworkInfo(ConnectivityManager.TYPE_VPN);
+            return vpnInfo != null && vpnInfo.isConnectedOrConnecting();
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    private void checkVpnAutoOff() {
+        try {
+            if (!isVpnActive()) {
+                vpnAutoOffTriggered = false;
+                return;
+            }
+            if (vpnAutoOffTriggered || !proxyAutoOffVpn() || !SharedConfig.isProxyEnabled()) {
+                return;
+            }
+            vpnAutoOffTriggered = true;
+            FileLog.d(TAG + ": VPN is the default network — auto-disabling proxy (amberProxyAutoOffVpn)");
+            disableProxyInternal();
+        } catch (Throwable t) {
+            FileLog.e(t);
+        }
+    }
+
+    // AmberGram round 19: exact same code path the UI disable uses (ProxyListActivity
+    // toggle-off / SharedConfig.deleteProxy semantics): proxy_enabled=false in the main
+    // settings, ConnectionsManager.setProxySettings(false, ...), proxySettingsChanged,
+    // plus our own listener event so open proxy screens refresh.
+    private void disableProxyInternal() {
+        try {
+            SharedPreferences preferences = MessagesController.getGlobalMainSettings();
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean("proxy_enabled", false);
+            editor.commit();
+            ConnectionsManager.setProxySettings(false, SharedConfig.currentProxy != null ? SharedConfig.currentProxy.settings : null);
+            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.proxySettingsChanged);
+            notifyListeners(EVENT_PROXY_AUTO_OFF, 0, 0);
+        } catch (Throwable t) {
+            FileLog.e(t);
+        }
+    }
+
+    private void registerVpnWatchdog() {
+        if (Build.VERSION.SDK_INT < 24 || vpnCallbackRegistered) {
+            return;
+        }
+        try {
+            ConnectivityManager manager = (ConnectivityManager) ApplicationLoader.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (manager == null) {
+                return;
+            }
+            manager.registerDefaultNetworkCallback(new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(Network network) {
+                    AndroidUtilities.runOnUIThread(AmbergramProxyManager.this::checkVpnAutoOff);
+                }
+
+                @Override
+                public void onCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities) {
+                    if (networkCapabilities != null && networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
+                        AndroidUtilities.runOnUIThread(AmbergramProxyManager.this::checkVpnAutoOff);
+                    }
+                }
+            });
+            vpnCallbackRegistered = true;
+        } catch (Throwable t) {
+            FileLog.e(t);
+        }
+    }
+
     private final Runnable testWatchdog = () -> {
         if (!testing) {
             return;
@@ -233,6 +360,9 @@ public class AmbergramProxyManager {
         }
         started = true;
         loadFromDisk();
+        registerVpnWatchdog();
+        // immediate catch-up in case the VPN came up while the app was dead
+        AndroidUtilities.runOnUIThread(this::checkVpnAutoOff, 3000);
         AndroidUtilities.runOnUIThread(this::autoCycleIfNeeded, 15000);
         scheduleNextAlarm(UPDATE_INTERVAL);
     }
@@ -244,6 +374,9 @@ public class AmbergramProxyManager {
     }
 
     private void autoCycleIfNeeded() {
+        // AmberGram round 19: devices below API 24 have no default-network callback,
+        // the VPN check piggybacks on this existing refresh cycle instead.
+        checkVpnAutoOff();
         if (!fetching && System.currentTimeMillis() - lastFetchAt > UPDATE_INTERVAL) {
             runUpdateCycle();
         }

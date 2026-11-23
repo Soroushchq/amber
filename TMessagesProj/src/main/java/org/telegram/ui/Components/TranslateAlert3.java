@@ -386,6 +386,18 @@ public class TranslateAlert3 extends BottomSheetWithRecyclerListView {
         translatedLoading = true;
 
         if (summarized && dialogId != 0 && messageId != 0) {
+            if (org.telegram.messenger.AmberPrivacy.disableAiFeatures()) {
+                // AmberGram privacy pack (round 19, Mercurygram concept): TL_messages_summarizeText
+                // never leaves the device — reuse the exact error handling of the request callback.
+                button.setLoading(false);
+                TLRPC.TL_error amberError = new TLRPC.TL_error();
+                amberError.code = 0;
+                amberError.text = "AMBER_AI_DISABLED";
+                BulletinFactory.of(topBulletinContainer, resourcesProvider).showForError(amberError);
+                button.setText(getString(R.string.OK));
+                button.setOnClickListener(v -> dismiss());
+                return;
+            }
             final TLRPC.TL_messages_summarizeText req = new TLRPC.TL_messages_summarizeText();
 
             req.flags |= TLObject.FLAG_0;

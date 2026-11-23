@@ -11876,6 +11876,26 @@ public class MessagesController extends BaseController implements NotificationCe
                 map.put(url, arrayList);
             }
             arrayList.addAll(messages);
+            if (org.telegram.messenger.AmberPrivacy.disableLinkPreviews()) {
+                // AmberGram privacy pack (round 19, Mercurygram MgLinkPreview concept):
+                // never send the URL to account.getWebPagePreview. Degrade gracefully
+                // exactly like a server response without a preview (TL_webPageEmpty),
+                // mirroring the compose-side gate in ChatActivity.
+                map.remove(url);
+                TLRPC.TL_messages_messages messagesRes = new TLRPC.TL_messages_messages();
+                for (int a = 0; a < messages.size(); a++) {
+                    MessageObject messageObject = messages.get(a);
+                    if (messageObject.messageOwner.media != null) {
+                        messageObject.messageOwner.media.webpage = new TLRPC.TL_webPageEmpty();
+                        messagesRes.messages.add(messageObject.messageOwner);
+                    }
+                }
+                if (!messagesRes.messages.isEmpty()) {
+                    getMessagesStorage().putMessages(messagesRes, dialogId, -2, 0, false, mode, 0);
+                    getNotificationCenter().postNotificationName(NotificationCenter.replaceMessagesObjects, dialogId, messages);
+                }
+                continue;
+            }
             TL_account.getWebPagePreview req = new TL_account.getWebPagePreview();
             req.message = url;
             getConnectionsManager().sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {

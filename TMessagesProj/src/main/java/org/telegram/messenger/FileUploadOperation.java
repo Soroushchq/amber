@@ -47,6 +47,13 @@ public class FileUploadOperation {
     private static final int maxUploadingKBytes = 1024 * 8;
     private static final int maxUploadingSlowNetworkKBytes = 32;
 
+    // AmberGram round 19 (extras): turbo upload — doubles every upload chunk size so
+    // large files and videos upload noticeably faster on good networks. The premium
+    // part counts (uploadMaxFileParts/uploadMaxFilePartsPremium) are untouched.
+    private static int chunkKb(int base) {
+        return AmberExtras.turboUpload() ? base * 2 : base;
+    }
+
     private int maxRequestsCount;
     private int uploadConnectionsCount = 4;
     private final int[] uploadRequestsPerConnection = new int[ConnectionsManager.UploadConnectionsCountPremium];
@@ -329,7 +336,7 @@ public class FileUploadOperation {
                 if (AccountInstance.getInstance(currentAccount).getUserConfig().isPremium() && totalFileSize > FileLoader.DEFAULT_MAX_FILE_SIZE) {
                     maxUploadParts = MessagesController.getInstance(currentAccount).uploadMaxFilePartsPremium;
                 }
-                uploadChunkSize = (int) Math.max(slowNetwork ? minUploadChunkSlowNetworkSize : isBigFile ? minUploadChunkSizeBig : minUploadChunkSize, (totalFileSize + 1024L * maxUploadParts - 1) / (1024L * maxUploadParts));
+                uploadChunkSize = (int) Math.max(slowNetwork ? chunkKb(minUploadChunkSlowNetworkSize) : isBigFile ? chunkKb(minUploadChunkSizeBig) : chunkKb(minUploadChunkSize), (totalFileSize + 1024L * maxUploadParts - 1) / (1024L * maxUploadParts));
                 if (1024 % uploadChunkSize != 0) {
                     int chunkSize = 64;
                     while (uploadChunkSize > chunkSize) {

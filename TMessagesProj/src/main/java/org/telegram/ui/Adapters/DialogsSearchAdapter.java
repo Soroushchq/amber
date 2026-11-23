@@ -550,6 +550,19 @@ public class DialogsSearchAdapter extends RecyclerListView.SelectionAdapter {
             return;
         }
 
+        if (org.telegram.messenger.AmberPrivacy.disableGlobalSearch()) {
+            // AmberGram privacy pack (round 19, Mercurygram "global search disabled"):
+            // messages.searchGlobal is never sent to the server — local dialog results
+            // (searchAdapterHelper / recent / local message search) keep working; simulate
+            // an empty server reply so the "searching" state clears immediately.
+            waitingResponseCount--;
+            if (delegate != null) {
+                delegate.searchStateChanged(waitingResponseCount > 0, true);
+                delegate.runResultsEnterAnimation();
+            }
+            return;
+        }
+
         final TLRPC.TL_messages_searchGlobal req = new TLRPC.TL_messages_searchGlobal();
         req.broadcasts_only = (currentMessagesFilter.flags & 2) != 0;
         req.groups_only = (currentMessagesFilter.flags & 4) != 0;
