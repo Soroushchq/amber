@@ -541,7 +541,10 @@ public class SharedConfig {
             passportConfigHash = preferences.getInt("passportConfigHash", 0);
             storageCacheDir = preferences.getString("storageCacheDir", null);
             proxyRotationEnabled = preferences.getBoolean("proxyRotationEnabled", false);
-            proxyRotationTimeout = preferences.getInt("proxyRotationTimeout", ProxyRotationController.DEFAULT_TIMEOUT_INDEX);
+            // گرد ۱۶: کلامپ اندیس تایم‌اوت — مقدار pref خراب (خارج از بازهٔ ROTATION_TIMEOUTS)
+            // قبلاً در ProxyRotationController به IndexOutOfBoundsException می‌رسید
+            proxyRotationTimeout = Math.max(0, Math.min(ProxyRotationController.ROTATION_TIMEOUTS.size() - 1,
+                    preferences.getInt("proxyRotationTimeout", ProxyRotationController.DEFAULT_TIMEOUT_INDEX)));
             String authKeyString = preferences.getString("pushAuthKey", null);
             if (!TextUtils.isEmpty(authKeyString)) {
                 pushAuthKey = Base64.decode(authKeyString, Base64.DEFAULT);

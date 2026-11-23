@@ -3449,10 +3449,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 SpannableStringBuilder ssb = new SpannableStringBuilder(getString(R.string.AppName));
                 ssb.setSpan(new ImageSpan(logoDrawable, ImageSpan.ALIGN_BOTTOM), 0, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 actionBar.setTitle(ssb, statusDrawable);
-                // Amber fork: v0.9.10 — ایست‌راگ ماریو: تپ روی لوگوی هدر ← پرش قارچ (کی‌فریم اسکواش-استرچ)
-                if (Theme.currentThemeIsMario()) {
-                    actionBar.getTitleTextView().setOnClickListener(v -> AndroidUtilities.playMarioJump(v));
-                }
+                // گرد ۱۶: بررسی تم داخل lambda — اگر تم بدون بازسازی فرگمنت عوض شود شنوندهٔ قدیمی
+                // باقی نمی‌ماند؛ حالا هر بار تپ در لحظه ارزیابی می‌شود و فقط در تم ماریو واکنش می‌دهد
+                actionBar.getTitleTextView().setOnClickListener(v -> {
+                    if (Theme.currentThemeIsMario()) {
+                        AndroidUtilities.playMarioJump(v);
+                    }
+                });
                 updateStatus(UserConfig.getInstance(currentAccount).getCurrentUser(), false);
             }
             if (folderId == 0) {

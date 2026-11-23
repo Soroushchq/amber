@@ -119,17 +119,20 @@ public class AmbergramProxyManager {
     private static final Pattern LINK_PATTERN = Pattern.compile(
             "(?:(?:https?://)?t\\.me/proxy\\?|tg://proxy\\?)server=([^&\\s\"']+)&port=(\\d{1,5})&secret=([^&\\s\"']+)");
 
+    // گرد ۱۶: حذف SoliSpirit (بایت‌به‌بایت تکراری ALIILAPRO) و FerhatAcer (خروجی همان مولد TG-MTProxy)،
+    // افزودن سه منبع تازهٔ راستی‌آزمایی‌شده: DubbleByte، Therealwh و McDaived (JSON با وردمارک server/tgLink/secret)
     private static final Source[] SOURCES = {
             new Source("ALIILAPRO", "https://raw.githubusercontent.com/ALIILAPRO/MTProtoProxy/main/mtproto.txt", FORMAT_LINKS),
             new Source("ALIILAPRO-Latency", "https://raw.githubusercontent.com/ALIILAPRO/MTProtoProxy/main/proxies.json", FORMAT_JSON),
-            new Source("SoliSpirit", "https://raw.githubusercontent.com/SoliSpirit/mtproto/master/all_proxies.txt", FORMAT_LINKS),
             new Source("TG-MTProxy", "https://raw.githubusercontent.com/tgmtproxy/telegram-mtproto-proxy-list/main/proxies.txt", FORMAT_LINKS),
             new Source("Argh94", "https://raw.githubusercontent.com/Argh94/Proxy-List/main/MTProto.txt", FORMAT_LINKS),
             new Source("0xRadikal", "https://raw.githubusercontent.com/0xRadikal/Free-Telegram-Proxy/main/all/tg.txt", FORMAT_LINKS),
             new Source("Iliya3ProX", "https://raw.githubusercontent.com/Iliya3ProX/good_proxies/main/proxies.txt", FORMAT_LINKS),
-            new Source("FerhatAcer", "https://raw.githubusercontent.com/ferhatacer90/mtproxy-list/main/proxies.txt", FORMAT_LINKS),
             new Source("TGProxyPink", "https://raw.githubusercontent.com/tgproxypink/telegram-proxy-list/main/proxies.txt", FORMAT_LINKS),
             new Source("SuryaDev", "https://raw.githubusercontent.com/suryadev-sm/free-mtproto-proxy-list/main/proxies.txt", FORMAT_LINKS),
+            new Source("DubbleByte", "https://raw.githubusercontent.com/dubblebyte/free-mtproto-proxies/main/all_proxies.txt", FORMAT_LINKS),
+            new Source("Therealwh", "https://raw.githubusercontent.com/Therealwh/MTPproxyLIST/main/verified/proxy_all_tme_verified.txt", FORMAT_LINKS),
+            new Source("McDaived", "https://raw.githubusercontent.com/McDaived/ProxyDaiv/main/public/proxies.json", FORMAT_JSON),
     };
 
     /**
@@ -186,7 +189,8 @@ public class AmbergramProxyManager {
     private volatile boolean testing;
     private volatile int processedCount;
     private volatile int testTotal;
-    private volatile int failedSourceCount;
+    // گرد ۱۶: AtomicInteger — این شمارنده از چند نخ استخر هم‌زمان افزایش می‌یابد و ++ روی volatile اتمیک نیست
+    private final AtomicInteger failedSourceCount = new AtomicInteger();
     private volatile int cycleTestedCount;
     private volatile int cycleSuccessCount;
     private volatile int lastRemovedCount;
@@ -270,7 +274,7 @@ public class AmbergramProxyManager {
             return;
         }
         fetching = true;
-        failedSourceCount = 0;
+        failedSourceCount.set(0);
         notifyListeners(EVENT_FETCH_STARTED, 0, 0);
         Utilities.globalQueue.postRunnable(() -> {
             LinkedHashMap<String, ProxyItem> merged = new LinkedHashMap<>();
@@ -302,11 +306,11 @@ public class AmbergramProxyManager {
                         if (parsed > 0) {
                             workingSources.incrementAndGet();
                         } else {
-                            failedSourceCount++;
+                            failedSourceCount.incrementAndGet();
                         }
                         FileLog.d(TAG + ": source " + source.name + " parsed " + parsed + " proxies");
                     } catch (Throwable t) {
-                        failedSourceCount++;
+                        failedSourceCount.incrementAndGet();
                         FileLog.e(t);
                     } finally {
                         latch.countDown();
@@ -370,13 +374,25 @@ public class AmbergramProxyManager {
                 if (object == null) {
                     continue;
                 }
+                // گرد ۱۶: پشتیبانی از وردمارک‌های متنوع JSON — برخی منابع به‌جای host/connect_url
+                // از server/tgLink و فیلد secret خام استفاده می‌کنند (مثل McDaived/ProxyDaiv)
                 String host = object.optString("host", "");
+                if (TextUtils.isEmpty(host)) {
+                    host = object.optString("server", "");
+                }
                 int port = object.optInt("port", 0);
-                String connectUrl = object.optString("connect_url", "").replace("&amp;", "&");
+                String connectUrl = object.optString("connect_url", "");
+                if (TextUtils.isEmpty(connectUrl)) {
+                    connectUrl = object.optString("tgLink", "");
+                }
+                connectUrl = connectUrl.replace("&amp;", "&");
                 String secret = null;
                 Matcher matcher = LINK_PATTERN.matcher(connectUrl);
                 if (matcher.find()) {
                     secret = decodeSecret(matcher.group(3));
+                }
+                if (TextUtils.isEmpty(secret)) {
+                    secret = decodeSecret(object.optString("secret", ""));
                 }
                 int latency = object.optInt("latency", -1);
                 if (!validProxy(host, port, secret)) {
@@ -756,7 +772,7 @@ public class AmbergramProxyManager {
     }
 
     public int getFailedSourceCount() {
-        return failedSourceCount;
+        return failedSourceCount.get();
     }
 
     public int getLastRemovedCount() {
@@ -825,7 +841,7 @@ public class AmbergramProxyManager {
                     .putString("data", array.toString())
                     .putLong("last_fetch", lastFetchAt)
                     .putLong("last_test", lastTestAt)
-                    .putInt("failed_sources", failedSourceCount)
+                    .putInt("failed_sources", failedSourceCount.get())
                     .putInt("last_removed", lastRemovedCount)
                     .apply();
         } catch (Throwable t) {
@@ -837,7 +853,7 @@ public class AmbergramProxyManager {
         try {
             lastFetchAt = prefs().getLong("last_fetch", 0);
             lastTestAt = prefs().getLong("last_test", 0);
-            failedSourceCount = prefs().getInt("failed_sources", 0);
+            failedSourceCount.set(prefs().getInt("failed_sources", 0));
             lastRemovedCount = prefs().getInt("last_removed", 0);
             String raw = prefs().getString("data", null);
             if (raw == null) {
