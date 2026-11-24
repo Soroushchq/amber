@@ -1,5 +1,5 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- AmberGram UI 2.0 (قدم ۱۰): اسپلش سرد-استارت — شب گرم (توقف‌های وایپرپ شب) -->
+    <!-- AmberGram UI 2.0 (قدم ۱۱ / گرد ۲۰): اسپلش برنددار — شب گرم + هواپیما + واژه‌نگار -->
     <item>
         <shape android:shape="rectangle">
             <gradient
@@ -14,4 +14,10 @@
         android:height="150dp"
         android:gravity="center"
         android:drawable="@drawable/splash_plane"/>
+    <item
+        android:width="180dp"
+        android:height="41dp"
+        android:gravity="center_horizontal|bottom"
+        android:bottom="96dp"
+        android:drawable="@drawable/splash_wordmark"/>
 </layer-list>

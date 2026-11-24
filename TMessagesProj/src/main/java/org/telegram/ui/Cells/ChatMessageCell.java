@@ -21336,6 +21336,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         if ((!drawTime || groupPhotoInvisible) && shouldDrawTimeOnMedia() || timeLayout == null || (currentMessageObject.deleted && currentPosition != null) || currentMessageObject.type == MessageObject.TYPE_PHONE_CALL) {
             return;
         }
+        // Amber گرد ۲۰ — مخفی‌کردن زمان و تیک خوانده‌شده روی استیکرها و ایموجی انیمیشنی بزرگ (الهام از Morphe)
+        if (AmberChatTweaks.hideStickerTime() && (currentMessageObject.isAnyKindOfSticker() || currentMessageObject.isAnimatedEmoji())) {
+            return;
+        }
         if (currentMessageObject.type == MessageObject.TYPE_ROUND_VIDEO) {
             Theme.chat_timePaint.setColor(
                 ColorUtils.blendARGB(

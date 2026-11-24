@@ -236,6 +236,9 @@ public class ApplicationLoader extends Application {
 
         LiteMode.registerBatteryReceiver();
 
+        // Amber گرد ۲۰ — تازه‌سازی خودکار تم‌های Material You هنگام تغییر پالت سیستم
+        AmberMonet.registerReceiver(applicationContext);
+
         try {
             PowerManager pm = (PowerManager) ApplicationLoader.applicationContext.getSystemService(Context.POWER_SERVICE);
             isScreenOn = pm.isScreenOn();

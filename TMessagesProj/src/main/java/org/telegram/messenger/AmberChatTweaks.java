@@ -9,6 +9,9 @@ package org.telegram.messenger;
  *    double-tapping a message instead of the stock reaction:
  *    0 = stock reaction (default), 1 = repeat (send as own message),
  *    2 = forward without quote, 3 = copy text
+ * Round 20 (Morphe “Hide time on stickers”):
+ *  - hideStickerTime — removes the time and read-check overlay from
+ *    stickers and big animated emoji in chats.
  */
 public class AmberChatTweaks {
 
@@ -19,9 +22,11 @@ public class AmberChatTweaks {
 
     private static final String KEY_INCOMING = "amberDoubleTapIncoming";
     private static final String KEY_OUTGOING = "amberDoubleTapOutgoing";
+    private static final String KEY_HIDE_STICKER_TIME = "amberHideStickerTime";
 
     private static Integer doubleTapIncoming;
     private static Integer doubleTapOutgoing;
+    private static Boolean hideStickerTime;
 
     private static int load(String key, int defaultValue) {
         return MessagesController.getGlobalMainSettings().getInt(key, defaultValue);
@@ -59,8 +64,23 @@ public class AmberChatTweaks {
         save(KEY_OUTGOING, value);
     }
 
+    public static boolean hideStickerTime() {
+        Boolean value = hideStickerTime;
+        if (value == null) {
+            value = MessagesController.getGlobalMainSettings().getBoolean(KEY_HIDE_STICKER_TIME, false);
+            hideStickerTime = value;
+        }
+        return value;
+    }
+
+    public static void setHideStickerTime(boolean value) {
+        hideStickerTime = value;
+        MessagesController.getGlobalMainSettings().edit().putBoolean(KEY_HIDE_STICKER_TIME, value).apply();
+    }
+
     public static void resetCache() {
         doubleTapIncoming = null;
         doubleTapOutgoing = null;
+        hideStickerTime = null;
     }
 }

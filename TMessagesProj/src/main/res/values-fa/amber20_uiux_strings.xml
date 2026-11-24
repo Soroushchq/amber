@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AmberGram گرد ۲۰ — رشته‌های UI/UX (بخش‌بندی تنظیمات + قابلیت‌های جدید) -->
+<resources>
+    <string name="AmberSectionTools">ابزارها</string>
+    <string name="AmberSectionChats">گفت‌وگوها</string>
+    <string name="AmberSectionPrivacy">حریم خصوصی</string>
+    <string name="AmberSectionSpeed">سرعت و شبکه</string>
+    <string name="AmberSectionAppearance">ظاهر</string>
+    <string name="AmberSectionBackup">پشتیبان‌گیری</string>
+    <string name="AmberHideStickerTime">مخفی‌کردن زمان استیکرها</string>
+    <string name="AmberHideStickerTimeDesc">زمان و تیک خوانده‌شده روی استیکرها و ایموجی بزرگ پنهان می‌شود</string>
+    <string name="AmberDynamicThemes">تم‌های پویا (Material You)</string>
+    <string name="AmberDynamicThemesDesc">رنگ‌ها هم‌گام با پس‌زمینهٔ سیستم — در صفحهٔ تم‌ها</string>
+</resources>

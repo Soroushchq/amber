@@ -1,5 +1,7 @@
 package org.telegram.messenger;
 
+import androidx.core.graphics.ColorUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -458,10 +460,12 @@ public final class AmberPalette {
         m.put("chat_inBubbleShadow", 0x00000000);
         m.put("chat_inBubbleLocationPlaceholder", outline);
         m.put("chat_outBubble", outBubble);
+        // گرد ۲۰ — گِرادیان متحرک حباب‌های خروجی: سه توقف هم‌رنگ (روشن/پایه/تیره) + انیمیشن
+        // (هماهنگ با فایل‌های attheme تولیدشده در Tools)
         m.put("chat_outBubbleGradient", outBubble);
-        m.put("chat_outBubbleGradient2", outBubble);
-        m.put("chat_outBubbleGradient3", outBubble);
-        m.put("chat_outBubbleGradientAnimated", 0);
+        m.put("chat_outBubbleGradient2", ColorUtils.blendARGB(outBubble, 0xFFFFFFFF, d ? 0.10f : 0.13f));
+        m.put("chat_outBubbleGradient3", ColorUtils.blendARGB(outBubble, 0xFF000000, d ? 0.12f : 0.14f));
+        m.put("chat_outBubbleGradientAnimated", 1);
         m.put("chat_outBubbleSelected", selOut);
         m.put("chat_outBubbleSelectedOverlay", AmberTokens.alpha(0xFF000000, d ? 0.06f : 0.10f));
         m.put("chat_outBubbleGradientSelectedOverlay", AmberTokens.alpha(0xFF000000, d ? 0.06f : 0.10f));

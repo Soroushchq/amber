@@ -76,6 +76,7 @@ import androidx.core.math.MathUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.telegram.messenger.AmberMonet;
 import org.telegram.messenger.AmberTokens;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -1673,13 +1674,17 @@ public class Theme {
             return defaultAccentCount != 0;
         }
 
+        public boolean isMonet() {
+            return "Monet Dark".equals(name) || "Monet Light".equals(name) || "Monet AMOLED".equals(name);
+        }
+
         public boolean isDark() {
             if (isDark != UNKNOWN) {
                 return isDark == DARK;
             }
-            if ("Dark Blue".equals(name) || "Night".equals(name) || "Amber".equals(name) || "Aurora".equals(name) || "Premiere".equals(name) || "Mario".equals(name) || "Harmony".equals(name) || "Dark Side".equals(name) || "Night Raid".equals(name)) {
+            if ("Dark Blue".equals(name) || "Night".equals(name) || "Amber".equals(name) || "Aurora".equals(name) || "Premiere".equals(name) || "Mario".equals(name) || "Harmony".equals(name) || "Dark Side".equals(name) || "Night Raid".equals(name) || "Monet Dark".equals(name) || "Monet AMOLED".equals(name)) {
                 isDark = DARK;
-            } else if ("Blue".equals(name) || "Arctic Blue".equals(name) || "Day".equals(name) || "Amber Day".equals(name) || "Aurora Day".equals(name) || "Premiere Day".equals(name) || "Mario Day".equals(name) || "Harmony Day".equals(name) || "Light Side".equals(name) || "Slingshot".equals(name)) {
+            } else if ("Blue".equals(name) || "Arctic Blue".equals(name) || "Day".equals(name) || "Amber Day".equals(name) || "Aurora Day".equals(name) || "Premiere Day".equals(name) || "Mario Day".equals(name) || "Harmony Day".equals(name) || "Light Side".equals(name) || "Slingshot".equals(name) || "Monet Light".equals(name)) {
                 isDark = LIGHT;
             }
             if (isDark == UNKNOWN) {
@@ -2173,6 +2178,10 @@ public class Theme {
             // used only in PeerColorActivity
             // support in other implementations to use
             return Theme.isCurrentThemeDark();
+        }
+
+        default boolean isMonet() {
+            return Theme.isCurrentThemeMonet();
         }
 
         default void applyServiceShaderMatrix(int w, int h, float translationX, float translationY) {
@@ -4530,6 +4539,39 @@ public class Theme {
         themes.add(themeInfo);
         themesDict.put("Day", themeInfo);
 
+        // Amber گرد ۲۰ — تم‌های پویای Material You (رنگ زندهٔ سیستم اندروید ۱۲+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            themeInfo = new ThemeInfo();
+            themeInfo.name = "Monet Light";
+            themeInfo.assetName = "monet_light.attheme";
+            themeInfo.previewBackgroundColor = AmberMonet.getColor("n1_50");
+            themeInfo.previewInColor = AmberMonet.getColor("a2_50");
+            themeInfo.previewOutColor = AmberMonet.getColor("a1_600");
+            themeInfo.sortIndex = 19;
+            themes.add(themeInfo);
+            themesDict.put("Monet Light", themeInfo);
+
+            themeInfo = new ThemeInfo();
+            themeInfo.name = "Monet Dark";
+            themeInfo.assetName = "monet_dark.attheme";
+            themeInfo.previewBackgroundColor = AmberMonet.getColor("n1_900");
+            themeInfo.previewInColor = AmberMonet.getColor("n2_800");
+            themeInfo.previewOutColor = AmberMonet.getColor("a1_100");
+            themeInfo.sortIndex = 20;
+            themes.add(themeInfo);
+            themesDict.put("Monet Dark", themeInfo);
+
+            themeInfo = new ThemeInfo();
+            themeInfo.name = "Monet AMOLED";
+            themeInfo.assetName = "monet_dark.attheme";
+            themeInfo.previewBackgroundColor = AmberMonet.getColor("n1_1000");
+            themeInfo.previewInColor = AmberMonet.getColor("n2_800");
+            themeInfo.previewOutColor = AmberMonet.getColor("a1_100");
+            themeInfo.sortIndex = 21;
+            themes.add(themeInfo);
+            themesDict.put("Monet AMOLED", themeInfo);
+        }
+
         themeInfo = new ThemeInfo();
         themeInfo.name = "Night";
         themeInfo.assetName = "night.attheme";
@@ -6201,7 +6243,7 @@ public class Theme {
                 }
                 String[] wallpaperLink = new String[1];
                 if (themeInfo.assetName != null) {
-                    currentColorsNoAccent = getThemeFileValues(null, themeInfo.assetName, null);
+                    currentColorsNoAccent = getThemeFileValues(null, themeInfo.assetName, null, "Monet AMOLED".equals(themeInfo.name));
                 } else {
                     currentColorsNoAccent = getThemeFileValues(new File(themeInfo.pathToFile), null, wallpaperLink);
                 }
@@ -7000,6 +7042,25 @@ public class Theme {
 
     public static boolean isCurrentThemeDark() {
         return currentTheme.isDark();
+    }
+
+    public static boolean isCurrentThemeMonet() {
+        return currentTheme.isMonet();
+    }
+
+    public static boolean isCurrentThemeMonet(ResourcesProvider resourcesProvider) {
+        return resourcesProvider != null ? resourcesProvider.isMonet() : isCurrentThemeMonet();
+    }
+
+    public static void applyThemeMonetColor(android.widget.ImageView view, ResourcesProvider resourcesProvider, boolean white) {
+        if (view == null) {
+            return;
+        }
+        if (isCurrentThemeMonet(resourcesProvider)) {
+            view.setColorFilter(new PorterDuffColorFilter(getColor(key_chats_actionIcon, resourcesProvider), PorterDuff.Mode.SRC_IN));
+        } else if (white) {
+            view.setColorFilter(new PorterDuffColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN));
+        }
     }
 
     public static ThemeInfo getActiveTheme() {
@@ -8127,6 +8188,10 @@ public class Theme {
     }
 
     public static SparseIntArray getThemeFileValues(File file, String assetName, String[] wallpaperLink) {
+        return getThemeFileValues(file, assetName, wallpaperLink, false);
+    }
+
+    public static SparseIntArray getThemeFileValues(File file, String assetName, String[] wallpaperLink, boolean monetAmoled) {
         FileInputStream stream = null;
         SparseIntArray stringMap = new SparseIntArray();
         try {
@@ -8166,6 +8231,8 @@ public class Theme {
                                     } catch (Exception ignore) {
                                         value = Utilities.parseInt(param);
                                     }
+                                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && (param.startsWith("a") || param.startsWith("n") || param.startsWith("monet"))) {
+                                    value = AmberMonet.getColor(param, monetAmoled);
                                 } else {
                                     value = Utilities.parseInt(param);
                                 }
