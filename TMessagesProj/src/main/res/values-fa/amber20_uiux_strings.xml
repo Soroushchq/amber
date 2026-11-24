@@ -11,4 +11,6 @@
     <string name="AmberHideStickerTimeDesc">زمان و تیک خوانده‌شده روی استیکرها و ایموجی بزرگ پنهان می‌شود</string>
     <string name="AmberDynamicThemes">تم‌های پویا (Material You)</string>
     <string name="AmberDynamicThemesDesc">رنگ‌ها هم‌گام با پس‌زمینهٔ سیستم — در صفحهٔ تم‌ها</string>
+    <string name="AmberThemeFX">انیمیشن امضای تم‌ها</string>
+    <string name="AmberThemeFXDesc">صحنهٔ زندهٔ خانوادهٔ تم فعال در پایین صفحهٔ اصلی — برای اجرا لمسش کنید</string>
 </resources>

@@ -191,6 +191,7 @@ import org.telegram.ui.Components.ColoredImageSpan;
 import org.telegram.ui.Components.DialogsActivityStatusLayout;
 import org.telegram.ui.Components.DialogsActivityTopBubblesFadeView;
 import org.telegram.ui.Components.DialogsActivityTopPanelLayout;
+import org.telegram.ui.Components.AmberMascotView;
 import org.telegram.ui.Components.FragmentFloatingButton;
 import org.telegram.ui.Components.FragmentSearchField;
 import org.telegram.ui.Components.IconBackgroundColors;
@@ -515,6 +516,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private ProxyDrawable proxyDrawable;
     private ActionBarMenuSubItem proxyMenuSubItem;
     private HintView2 storyHint;
+
+    // گرد ۲۱ — انیمیشن امضای هر تم: نوار زندهٔ پایین صفحهٔ اصلی
+    private AmberMascotView themeFxMascotView;
     private HintView2 storyPremiumHint;
     private boolean canShowStoryHint;
     private boolean storyHintShown;
@@ -2994,6 +2998,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @Override
     public void onFragmentDestroy() {
         super.onFragmentDestroy();
+        if (themeFxMascotView != null) {
+            themeFxMascotView.stopWatching();
+            themeFxMascotView = null;
+        }
         if (observersGroup != null) {
             observersGroup.removeAllObservers();
             observersGroup = null;
@@ -4700,6 +4708,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 openWriteContacts();
             }
         });
+
+        // گرد ۲۱ — انیمیشن امضای هر تم: صحنهٔ اختصاصی خانوادهٔ تم فعال در پایین صفحهٔ اصلی
+        // (ماریو راه می‌رود و می‌پرد؛ آورورا شفق؛ پریمیر نورافکن؛ سینگ تیرکمان؛ سوی شمشیر نور؛ هارمونی موج؛ آمبر اخگر)
+        if (!isArchive() && initialDialogsType == DIALOGS_TYPE_DEFAULT && !onlySelect && folderId == 0 && communityId == 0 && TextUtils.isEmpty(searchString)) {
+            themeFxMascotView = new AmberMascotView(context);
+            contentView.addView(themeFxMascotView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 96, Gravity.BOTTOM));
+            themeFxMascotView.startWatching();
+        }
 
         if (!isArchive() && initialDialogsType == DIALOGS_TYPE_DEFAULT) {
             if (MessagesController.getInstance(currentAccount).getMainSettings().getBoolean("storyhint", true)) {
@@ -6982,6 +6998,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             blurredView.setVisibility(View.GONE);
             blurredView.setBackground(null);
         }
+        if (themeFxMascotView != null) {
+            themeFxMascotView.startWatching();
+        }
         if (viewPages != null) {
             for (int a = 0; a < viewPages.length; a++) {
                 viewPages[a].dialogsAdapter.notifyDataSetChanged();
@@ -7192,6 +7211,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @Override
     public void onPause() {
         super.onPause();
+        if (themeFxMascotView != null) {
+            themeFxMascotView.stopWatching();
+        }
         if (storiesBulletin != null) {
             storiesBulletin.hide();
             storiesBulletin = null;

@@ -11,4 +11,6 @@
     <string name="AmberHideStickerTimeDesc">Time and read-checks are hidden on stickers and big animated emoji</string>
     <string name="AmberDynamicThemes">Dynamic themes (Material You)</string>
     <string name="AmberDynamicThemesDesc">Colors follow your system wallpaper — see Themes</string>
+    <string name="AmberThemeFX">Theme signature animations</string>
+    <string name="AmberThemeFXDesc">A live mascot scene for the active theme family at the bottom of the main screen - tap it to play</string>
 </resources>

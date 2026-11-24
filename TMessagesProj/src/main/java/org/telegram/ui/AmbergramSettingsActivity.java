@@ -21,6 +21,7 @@ import org.telegram.messenger.AmberExtras;
 import org.telegram.messenger.AmberGhost;
 import org.telegram.messenger.AmberMorphe;
 import org.telegram.messenger.AmberPrivacy;
+import org.telegram.messenger.AmberThemeFX;
 import org.telegram.messenger.AmbergramProxyManager;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.DownloadQueueController;
@@ -159,6 +160,12 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
 
         // ── ظاهر و برندینگ ──
         LinearLayout appearanceCard = addSectionCard(context, contentWrapper, R.string.AmberSectionAppearance);
+        // گرد ۲۱ — انیمیشن امضای هر تم
+        int[][] themeFxSpecs = {
+                {R.drawable.msg_palette, R.string.AmberThemeFX, R.string.AmberThemeFXDesc}
+        };
+        addToggleSection(context, appearanceCard, themeFxSpecs);
+        appearanceCard.addView(makeDivider(context), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1));
         LinearLayout monetRow = makeMonetRow(context);
         appearanceCard.addView(monetRow, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         appearanceCard.addView(makeDivider(context), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1));
@@ -503,6 +510,8 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
             return AmberExtras.turboUpload();
         } else if (titleRes == R.string.AmberProxyAutoOffVpn) {
             return AmbergramProxyManager.proxyAutoOffVpn();
+        } else if (titleRes == R.string.AmberThemeFX) {
+            return AmberThemeFX.enabled();
         }
         return false;
     }
@@ -546,6 +555,8 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
             AmberExtras.setTurboUpload(value);
         } else if (titleRes == R.string.AmberProxyAutoOffVpn) {
             AmbergramProxyManager.setProxyAutoOffVpn(value);
+        } else if (titleRes == R.string.AmberThemeFX) {
+            AmberThemeFX.setEnabled(value);
         }
     }
 
