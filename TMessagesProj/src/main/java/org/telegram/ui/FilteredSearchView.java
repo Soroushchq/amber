@@ -697,7 +697,7 @@ public class FilteredSearchView extends FrameLayout implements Theme.Colorable, 
             ArrayList<Object> finalResultArray = resultArray;
             final ArrayList<FiltersView.DateData> dateData = new ArrayList<>();
             FiltersView.fillTipDates(lastMessagesSearchString, dateData);
-            org.telegram.Utilities.Callback2<TLRPC.messages_Messages, TLRPC.TL_error> amberSearchCallback = (response, error) -> {
+            org.telegram.messenger.Utilities.Callback2<TLRPC.messages_Messages, TLRPC.TL_error> amberSearchCallback = (response, error) -> {
                 ArrayList<MessageObject> messageObjects = new ArrayList<>();
                 if (error == null) {
                     TLRPC.messages_Messages res = response;
