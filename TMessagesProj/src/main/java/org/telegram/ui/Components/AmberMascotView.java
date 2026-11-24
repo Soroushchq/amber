@@ -592,7 +592,7 @@ public class AmberMascotView extends View {
                 if (now >= marioStateUntil || walkProgress >= 1f) {
                     marioX = walkToX;
                     marioState = M_IDLE;
-                    nextWalkAt = now + 6500L + random.nextInt(5000L);
+                    nextWalkAt = now + 6500L + random.nextInt(5000);
                 }
                 break;
             }
@@ -621,7 +621,7 @@ public class AmberMascotView extends View {
                 sprite = SPRITE_JUMP;
                 if (jumpT >= 1f) {
                     marioState = M_IDLE;
-                    nextWalkAt = now + 5000L + random.nextInt(5000L);
+                    nextWalkAt = now + 5000L + random.nextInt(5000);
                 }
                 break;
             }
@@ -706,7 +706,7 @@ public class AmberMascotView extends View {
             canvas.drawLine(px - 26f * dp, py - 15f * dp, px - 52f * dp, py - 30f * dp, paint);
             if (shootingT >= 1f) {
                 shootingT = -1f;
-                nextShootingAt = now + 5500L + random.nextInt(5000L);
+                nextShootingAt = now + 5500L + random.nextInt(5000);
             }
         }
 
@@ -805,7 +805,7 @@ public class AmberMascotView extends View {
         // جرقه‌های نورافکن
         long now = System.currentTimeMillis();
         if (now >= nextReelSparkAt) {
-            nextReelSparkAt = now + 500L + random.nextInt(900L);
+            nextReelSparkAt = now + 500L + random.nextInt(900);
             spawnSpark(cx + (random.nextFloat() - 0.5f) * 90f * dp, h * 0.3f + random.nextFloat() * 20f * dp, accent, 0.5f);
         }
 
@@ -885,7 +885,7 @@ public class AmberMascotView extends View {
             canvas.drawCircle(birdX, birdY, 9f * dp, paint);
             if (birdY > h + 10f * dp || birdX < -20f * dp || birdX > w + 20f * dp) {
                 slingState = S_IDLE;
-                nextShotAt = now + 2600L + random.nextInt(3400L);
+                nextShotAt = now + 2600L + random.nextInt(3400);
             }
             ballX = birdX;
             ballY = birdY;
@@ -1073,7 +1073,7 @@ public class AmberMascotView extends View {
 
         // حباب‌های شناور
         if (now >= nextBubbleAt) {
-            nextBubbleAt = now + 700L + random.nextInt(700L);
+            nextBubbleAt = now + 700L + random.nextInt(700);
             Particle p = new Particle();
             p.x = random.nextFloat() * w;
             p.y = h - groundH;
@@ -1129,7 +1129,7 @@ public class AmberMascotView extends View {
 
         // اخگرهای بالارونده
         if (now >= nextEmberAt) {
-            nextEmberAt = now + 300L + random.nextInt(260L);
+            nextEmberAt = now + 300L + random.nextInt(260);
             Particle p = new Particle();
             p.x = gx + (random.nextFloat() - 0.5f) * 44f * dp;
             p.y = groundY - 2f * dp;
