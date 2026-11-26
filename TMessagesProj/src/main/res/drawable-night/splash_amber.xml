@@ -1,5 +1,5 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- AmberGram UI 2.0 (قدم ۱۱ / گرد ۲۰): اسپلش برنددار — شب گرم + هواپیما + واژه‌نگار -->
+    <!-- AmberGram UI 3.0 "Solstice": اسپلش برنددار — گم کهربایی — شب گرم + هواپیما + واژه‌نگار -->
     <item>
         <shape android:shape="rectangle">
             <gradient
@@ -13,7 +13,7 @@
         android:width="150dp"
         android:height="150dp"
         android:gravity="center"
-        android:drawable="@drawable/splash_plane"/>
+        android:drawable="@drawable/amber_gem"/>
     <item
         android:width="180dp"
         android:height="41dp"
