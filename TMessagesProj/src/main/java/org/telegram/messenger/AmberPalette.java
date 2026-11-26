@@ -168,6 +168,9 @@ public final class AmberPalette {
         final int inText = au ? (d ? AmberTokens.AURORA_DAY_IN_TEXT : AmberTokens.AURORA_NIGHT_IN_TEXT) : pr ? (d ? AmberTokens.PREMIERE_DAY_IN_TEXT : AmberTokens.PREMIERE_NIGHT_IN_TEXT) : ma ? (d ? AmberTokens.MARIO_DAY_IN_TEXT : AmberTokens.MARIO_NIGHT_IN_TEXT) : ha ? (d ? AmberTokens.HARMONY_DAY_IN_TEXT : AmberTokens.HARMONY_NIGHT_IN_TEXT) : sw ? (d ? AmberTokens.SW_DAY_IN_TEXT : AmberTokens.SW_NIGHT_IN_TEXT) : sl ? (d ? AmberTokens.SLING_DAY_IN_TEXT : AmberTokens.SLING_NIGHT_IN_TEXT) : (d ? AmberTokens.DAY_IN_TEXT : AmberTokens.NIGHT_IN_TEXT);
         final int outBubble = au ? (d ? AmberTokens.AURORA_DAY_OUT_BUBBLE : AmberTokens.AURORA_NIGHT_OUT_BUBBLE) : pr ? (d ? AmberTokens.PREMIERE_DAY_OUT_BUBBLE : AmberTokens.PREMIERE_NIGHT_OUT_BUBBLE) : ma ? (d ? AmberTokens.MARIO_DAY_OUT_BUBBLE : AmberTokens.MARIO_NIGHT_OUT_BUBBLE) : ha ? (d ? AmberTokens.HARMONY_DAY_OUT_BUBBLE : AmberTokens.HARMONY_NIGHT_OUT_BUBBLE) : sw ? (d ? AmberTokens.SW_DAY_OUT_BUBBLE : AmberTokens.SW_NIGHT_OUT_BUBBLE) : sl ? (d ? AmberTokens.SLING_DAY_OUT_BUBBLE : AmberTokens.SLING_NIGHT_OUT_BUBBLE) : (d ? AmberTokens.DAY_OUT_BUBBLE : AmberTokens.NIGHT_OUT_BUBBLE);
         final int outText = au ? (d ? AmberTokens.AURORA_DAY_OUT_TEXT : AmberTokens.AURORA_NIGHT_OUT_TEXT) : pr ? (d ? AmberTokens.PREMIERE_DAY_OUT_TEXT : AmberTokens.PREMIERE_NIGHT_OUT_TEXT) : ma ? (d ? AmberTokens.MARIO_DAY_OUT_TEXT : AmberTokens.MARIO_NIGHT_OUT_TEXT) : ha ? (d ? AmberTokens.HARMONY_DAY_OUT_TEXT : AmberTokens.HARMONY_NIGHT_OUT_TEXT) : sw ? (d ? AmberTokens.SW_DAY_OUT_TEXT : AmberTokens.SW_NIGHT_OUT_TEXT) : sl ? (d ? AmberTokens.SLING_DAY_OUT_TEXT : AmberTokens.SLING_NIGHT_OUT_TEXT) : (d ? AmberTokens.DAY_OUT_TEXT : AmberTokens.NIGHT_OUT_TEXT);
+        // Solstice: اکسنتِ روی حباب خروجی — برند پیش‌فرض شب، حباب طلایی است؛
+        // اکسنت روشن روی طلایی دیده نمی‌شود ← کهربای عمیق ۸A5C06 (الگوی premiere)
+        final int outAccent = au ? accent : pr ? accent : ma ? accent : ha ? accent : sw ? accent : sl ? accent : (d ? AmberTokens.DAY_ACCENT : 0xFF8A5C06);
         final int badgeText = au ? (d ? AmberTokens.AURORA_DAY_BADGE_TEXT : AmberTokens.AURORA_NIGHT_BADGE_TEXT) : pr ? (d ? AmberTokens.PREMIERE_DAY_BADGE_TEXT : AmberTokens.PREMIERE_NIGHT_BADGE_TEXT) : ma ? (d ? AmberTokens.MARIO_DAY_BADGE_TEXT : AmberTokens.MARIO_NIGHT_BADGE_TEXT) : ha ? (d ? AmberTokens.HARMONY_DAY_BADGE_TEXT : AmberTokens.HARMONY_NIGHT_BADGE_TEXT) : sw ? (d ? AmberTokens.SW_DAY_BADGE_TEXT : AmberTokens.SW_NIGHT_BADGE_TEXT) : sl ? (d ? AmberTokens.SLING_DAY_BADGE_TEXT : AmberTokens.SLING_NIGHT_BADGE_TEXT) : (d ? AmberTokens.DAY_BADGE_TEXT : AmberTokens.NIGHT_BADGE_TEXT);
         final int fieldBg = au ? (d ? AmberTokens.AURORA_DAY_FIELD_BG : AmberTokens.AURORA_NIGHT_FIELD_BG) : pr ? (d ? AmberTokens.PREMIERE_DAY_FIELD_BG : AmberTokens.PREMIERE_NIGHT_FIELD_BG) : ma ? (d ? AmberTokens.MARIO_DAY_FIELD_BG : AmberTokens.MARIO_NIGHT_FIELD_BG) : ha ? (d ? AmberTokens.HARMONY_DAY_FIELD_BG : AmberTokens.HARMONY_NIGHT_FIELD_BG) : sw ? (d ? AmberTokens.SW_DAY_FIELD_BG : AmberTokens.SW_NIGHT_FIELD_BG) : sl ? (d ? AmberTokens.SLING_DAY_FIELD_BG : AmberTokens.SLING_NIGHT_FIELD_BG) : (d ? AmberTokens.DAY_FIELD_BG : AmberTokens.NIGHT_FIELD_BG);
         final int fieldBorder = au ? (d ? AmberTokens.AURORA_DAY_FIELD_BORDER : AmberTokens.AURORA_NIGHT_FIELD_BORDER) : pr ? (d ? AmberTokens.PREMIERE_DAY_FIELD_BORDER : AmberTokens.PREMIERE_NIGHT_FIELD_BORDER) : ma ? (d ? AmberTokens.MARIO_DAY_FIELD_BORDER : AmberTokens.MARIO_NIGHT_FIELD_BORDER) : ha ? (d ? AmberTokens.HARMONY_DAY_FIELD_BORDER : AmberTokens.HARMONY_NIGHT_FIELD_BORDER) : sw ? (d ? AmberTokens.SW_DAY_FIELD_BORDER : AmberTokens.SW_NIGHT_FIELD_BORDER) : sl ? (d ? AmberTokens.SLING_DAY_FIELD_BORDER : AmberTokens.SLING_NIGHT_FIELD_BORDER) : (d ? AmberTokens.DAY_FIELD_BORDER : AmberTokens.NIGHT_FIELD_BORDER);
@@ -187,10 +190,10 @@ public final class AmberPalette {
         final int goDown = AmberTokens.alpha(au ? (d ? AmberTokens.AURORA_DAY_WALLPAPER_TOP : AmberTokens.AURORA_NIGHT_SURFACE) : pr ? (d ? AmberTokens.PREMIERE_DAY_WALLPAPER_TOP : AmberTokens.PREMIERE_NIGHT_SURFACE) : ma ? (d ? AmberTokens.MARIO_DAY_WALLPAPER_TOP : AmberTokens.MARIO_NIGHT_SURFACE) : ha ? (d ? AmberTokens.HARMONY_DAY_WALLPAPER_TOP : AmberTokens.HARMONY_NIGHT_SURFACE) : sw ? (d ? AmberTokens.SW_DAY_WALLPAPER_TOP : AmberTokens.SW_NIGHT_SURFACE) : sl ? (d ? AmberTokens.SLING_DAY_WALLPAPER_TOP : AmberTokens.SLING_NIGHT_SURFACE) : (d ? AmberTokens.DAY_WALLPAPER_TOP : AmberTokens.NIGHT_SURFACE), d ? 0.90f : 0.80f);
         final int deepFile = au ? (d ? 0xFFE9EEF6 : 0xFF1B2430) : pr ? (d ? 0xFFFFF0D2 : 0xFF241C36) : ma ? (d ? 0xFFE3EEFF : 0xFF1A2344) : ha ? (d ? 0xFFE9EBFA : 0xFF1D1F38) : sw ? (d ? 0xFFF2EEDA : 0xFF141C30) : sl ? (d ? 0xFFE2F1FC : 0xFF12303E) : (d ? 0xFFF7E3C8 : 0xFF2E2618);
         final int outDim = AmberTokens.alpha(outText, 0.65f);
-        final int outTime = au ? (d ? 0xFF0E7260 : 0xFF7FE8D0) : pr ? (d ? 0xFF7A5A08 : 0xFF5C3D02) : ma ? (d ? 0xFF6E5605 : 0xFF123A1A) : ha ? (d ? 0xFFD8DBFA : 0xFFBFC4FA) : sw ? (d ? 0xFFF2D8DC : 0xFFF2D8DC) : sl ? (d ? 0xFF6E4A08 : 0xFFF6C6BE) : (d ? 0xFFA8701E : 0xFFD9BC7A);
+        final int outTime = au ? (d ? 0xFF0E7260 : 0xFF7FE8D0) : pr ? (d ? 0xFF7A5A08 : 0xFF5C3D02) : ma ? (d ? 0xFF6E5605 : 0xFF123A1A) : ha ? (d ? 0xFFD8DBFA : 0xFFBFC4FA) : sw ? (d ? 0xFFF2D8DC : 0xFFF2D8DC) : sl ? (d ? 0xFF6E4A08 : 0xFFF6C6BE) : (d ? 0xFFA8701E : 0xFF6B4A10);
         // قدم ۲۱ — تیک خوانده‌شدهٔ حباب خروجی: روز accentBright (E8871E) روی حباب FFDDB8 فقط ۲٫۰۶:۱ بود
         // ← «کهربای برشته» 9C5200 (۴٫۵۰:۱؛ از تیک ارسال اکسنت C25E00 عمیق‌تر و متمایز)؛ شب accentBright سالم است (۵٫۵۸)
-        final int sentCheckRead = au ? (d ? 0xFF06503F : AmberTokens.AURORA_NIGHT_ACCENT_BRIGHT) : pr ? (d ? 0xFF8A5C06 : 0xFF4A3202) : ma ? (d ? 0xFF7A5E06 : 0xFF0F3A1E) : ha ? (d ? 0xFF273098 : 0xFFBFC4FA) : sw ? (d ? 0xFF7A1420 : 0xFFFF9BA3) : sl ? (d ? 0xFF6E4A08 : 0xFFF6C6BE) : (d ? 0xFF9C5200 : AmberTokens.NIGHT_ACCENT_BRIGHT);
+        final int sentCheckRead = au ? (d ? 0xFF06503F : AmberTokens.AURORA_NIGHT_ACCENT_BRIGHT) : pr ? (d ? 0xFF8A5C06 : 0xFF4A3202) : ma ? (d ? 0xFF7A5E06 : 0xFF0F3A1E) : ha ? (d ? 0xFF273098 : 0xFFBFC4FA) : sw ? (d ? 0xFF7A1420 : 0xFFFF9BA3) : sl ? (d ? 0xFF6E4A08 : 0xFFF6C6BE) : (d ? 0xFF9C5200 : 0xFF6B4A00);
         final int red = d ? 0xFFB4382C : 0xFFFF6E54;
         // قدم ۲۸ — قرمزِ سمت حباب خروجی (هم‌الگوی تفکیک time/outTime): حباب خروجی شب روشن‌تر است
         // (5C4000) و FF6E54 روی تینت خودش فقط ۲٫۹۶ می‌شد ← سالمون روشن‌تر FF8E78 (۳٫۶۶ روی چیپ)
@@ -417,14 +420,14 @@ public final class AmberPalette {
         // ساعت/بازدیدهای خروجی: هم‌صدای chat_outTimeText (روی بستر کم‌حجم ۳٫۵۴/۷٫۳۲)
         m.put("chat_compact_outTimeText", outTime);
         // تیک ارسال: هم‌صدای chat_outSentCheck = اکسنت (۳٫۶۲/۶٫۶۴ روی بستر)
-        m.put("chat_compact_outCheck", accent);
+        m.put("chat_compact_outCheck", outAccent);
         // ریپلای خروجی: بسترهٔ تینت اکسنت×۱۰٪ + خط و متن هم‌صدای عادی (متن روی بستر+tint ~۱۳/۱۰)
         m.put("chat_compact_outReplyBackground", AmberTokens.alpha(accent, 0.10f));
-        m.put("chat_compact_outReplyLine", accent);
+        m.put("chat_compact_outReplyLine", outAccent);
         m.put("chat_compact_outReplyText", outText);
         // اکسنت خروجی (نام فوروارد/از طریق بات/سایت/منو/کوت/ادمین) و پرکننده (لودر/سیکبار صدا): اکسنت
-        m.put("chat_compact_outAccent", accent);
-        m.put("chat_compact_outAccentFill", accent);
+        m.put("chat_compact_outAccent", outAccent);
+        m.put("chat_compact_outAccentFill", outAccent);
         // آیکون روی پرکنندهٔ اکسنت (دایرهٔ پیشرفت فایل/تماس): onAccent — هم‌الگوی قدم ۱۵/۱۷ (۴٫۲۹/۷٫۲۳)
         m.put("chat_compact_outAccentIcon", onAccent);
         // متن ثانویهٔ خروجی (حجم فایل/مدت صدا): هم‌صدای outTime (۳٫۳۸/۷٫۳۲ — آپستریم 808384 حدود ۲٫۸ بود)
@@ -585,43 +588,43 @@ public final class AmberPalette {
         m.put("chat_messageTextOut", outText);
         m.put("chat_outTimeText", outTime);
         m.put("chat_outTimeSelectedText", outText);
-        m.put("chat_outInstant", accent);
-        m.put("chat_outInstantSelected", accent);
-        m.put("chat_outReplyLine", accent);
-        m.put("chat_outReplyLine2", accent);
-        m.put("chat_outReplyNameText", accent);
+        m.put("chat_outInstant", outAccent);
+        m.put("chat_outInstantSelected", outAccent);
+        m.put("chat_outReplyLine", outAccent);
+        m.put("chat_outReplyLine2", outAccent);
+        m.put("chat_outReplyNameText", outAccent);
         m.put("chat_outReplyMessageText", outText);
         m.put("chat_outReplyMediaMessageText", outText);
         m.put("chat_outReplyMediaMessageSelectedText", outText);
-        m.put("chat_outForwardedNameText", accent);
-        m.put("chat_outViaBotNameText", accent);
-        m.put("chat_outSiteNameText", accent);
-        m.put("chat_outPsaNameText", accent);
+        m.put("chat_outForwardedNameText", outAccent);
+        m.put("chat_outViaBotNameText", outAccent);
+        m.put("chat_outSiteNameText", outAccent);
+        m.put("chat_outPsaNameText", outAccent);
         m.put("chat_outPreviewLine", AmberTokens.alpha(outText, 0.40f));
-        m.put("chat_outPreviewInstantText", accent);
-        m.put("chat_outLoader", accent);
-        m.put("chat_outLoaderSelected", accent);
+        m.put("chat_outPreviewInstantText", outAccent);
+        m.put("chat_outLoader", outAccent);
+        m.put("chat_outLoaderSelected", outAccent);
         m.put("chat_outMediaIcon", outTime);
         m.put("chat_outMediaIconSelected", outTime);
         m.put("chat_outMenu", outTime);
         m.put("chat_outMenuSelected", outTime);
-        m.put("chat_outFileNameText", accent);
+        m.put("chat_outFileNameText", outAccent);
         m.put("chat_outFileInfoText", outDim);
         m.put("chat_outFileInfoSelectedText", outDim);
-        m.put("chat_outFileProgress", accent);
-        m.put("chat_outFileProgressSelected", accent);
-        m.put("chat_outFileBackground", au ? (d ? 0xFFBEEBDF : 0xFF17544A) : pr ? (d ? 0xFFE0B25A : 0xFFC7891B) : ma ? (d ? 0xFFF2C94C : 0xFF2E7D32) : ha ? (d ? 0xFF8F97F5 : 0xFF373C82) : sw ? (d ? 0xFFE88A94 : 0xFF6E1520) : sl ? (d ? 0xFFF2917F : 0xFF8C1E14) : (d ? 0xFFFBCE8F : 0xFF6E5200));
+        m.put("chat_outFileProgress", outAccent);
+        m.put("chat_outFileProgressSelected", outAccent);
+        m.put("chat_outFileBackground", au ? (d ? 0xFFBEEBDF : 0xFF17544A) : pr ? (d ? 0xFFE0B25A : 0xFFC7891B) : ma ? (d ? 0xFFF2C94C : 0xFF2E7D32) : ha ? (d ? 0xFF8F97F5 : 0xFF373C82) : sw ? (d ? 0xFFE88A94 : 0xFF6E1520) : sl ? (d ? 0xFFF2917F : 0xFF8C1E14) : (d ? 0xFFFBCE8F : 0xFFC78512));
         m.put("chat_outFileBackgroundSelected", AmberTokens.over(accent, outBubble, d ? 0.08f : 0.10f));
         m.put("chat_outAudioTitleText", outText);
-        m.put("chat_outAudioPerfomerText", accent);
-        m.put("chat_outAudioPerfomerSelectedText", accent);
+        m.put("chat_outAudioPerfomerText", outAccent);
+        m.put("chat_outAudioPerfomerSelectedText", outAccent);
         m.put("chat_outAudioDurationText", outDim);
         m.put("chat_outAudioDurationSelectedText", outDim);
-        m.put("chat_outAudioProgress", accent);
-        m.put("chat_outAudioSelectedProgress", accent);
+        m.put("chat_outAudioProgress", outAccent);
+        m.put("chat_outAudioSelectedProgress", outAccent);
         m.put("chat_outAudioSeekbar", AmberTokens.alpha(outText, 0.30f));
-        m.put("chat_outAudioSeekbarFill", accent);
-        m.put("chat_outAudioSeekbarSelected", accent);
+        m.put("chat_outAudioSeekbarFill", outAccent);
+        m.put("chat_outAudioSeekbarSelected", outAccent);
         // قدم ۲۸ — تماس سبز خروجی + خانوادهٔ msgIvButton سمت خروجی (هم‌زبانهٔ ورودی؛ چیپ روی بستر حباب خروجی)
         m.put("chat_outGreenCall", green);
         m.put("chat_msgIvButtonDefaultOut", AmberTokens.over(outText, outBubble, 0.12f));
@@ -641,16 +644,16 @@ public final class AmberPalette {
         m.put("chat_msgIvButtonSuccessOutText", green);
         m.put("chat_outAudioCacheSeekbar", AmberTokens.alpha(outText, 0.15f));
         m.put("chat_outVoiceSeekbar", AmberTokens.alpha(outText, 0.30f));
-        m.put("chat_outVoiceSeekbarFill", accent);
-        m.put("chat_outVoiceSeekbarSelected", accent);
+        m.put("chat_outVoiceSeekbarFill", outAccent);
+        m.put("chat_outVoiceSeekbarSelected", outAccent);
         m.put("chat_outVenueInfoText", outText);
         m.put("chat_outVenueInfoSelectedText", outText);
-        m.put("chat_outContactBackground", au ? (d ? 0xFFBEEBDF : 0xFF17544A) : pr ? (d ? 0xFFE0B25A : 0xFFC7891B) : ma ? (d ? 0xFFF2C94C : 0xFF2E7D32) : ha ? (d ? 0xFF8F97F5 : 0xFF373C82) : sw ? (d ? 0xFFE88A94 : 0xFF6E1520) : sl ? (d ? 0xFFF2917F : 0xFF8C1E14) : (d ? 0xFFFBCE8F : 0xFF6E5200));
+        m.put("chat_outContactBackground", au ? (d ? 0xFFBEEBDF : 0xFF17544A) : pr ? (d ? 0xFFE0B25A : 0xFFC7891B) : ma ? (d ? 0xFFF2C94C : 0xFF2E7D32) : ha ? (d ? 0xFF8F97F5 : 0xFF373C82) : sw ? (d ? 0xFFE88A94 : 0xFF6E1520) : sl ? (d ? 0xFFF2917F : 0xFF8C1E14) : (d ? 0xFFFBCE8F : 0xFFC78512));
         m.put("chat_outContactNameText", outText);
         m.put("chat_outContactPhoneText", outDim);
         m.put("chat_outContactPhoneSelectedText", outDim);
-        m.put("chat_outContactIcon", accent);
-        m.put("chat_outLocationIcon", accent);
+        m.put("chat_outContactIcon", outAccent);
+        m.put("chat_outLocationIcon", outAccent);
         m.put("chat_outTableBackground", au ? (d ? 0xFFC4EFE4 : 0xFF17544A) : pr ? (d ? 0xFFEDC468 : 0xFFD0911F) : ma ? (d ? 0xFFF7D45E : 0xFF2E7D32) : ha ? (d ? 0xFF9AA1F7 : 0xFF393E8C) : sw ? (d ? 0xFFEA8F98 : 0xFF65141E) : sl ? (d ? 0xFFF39A88 : 0xFF872013) : (d ? 0xFFFBF1DD : 0xFF6E5200));
         m.put("chat_outTableBorder", AmberTokens.alpha(outText, 0.30f));
         m.put("chat_outCodeBackground", au ? (d ? 0xFFB8E9DC : 0xFF12463E) : pr ? (d ? 0xFFE8BE55 : 0xFFC28218) : ma ? (d ? 0xFFEFC63E : 0xFF29702C) : ha ? (d ? 0xFF7F87F0 : 0xFF31366F) : sw ? (d ? 0xFFE07780 : 0xFF5E111B) : sl ? (d ? 0xFFEE7A66 : 0xFF7A1A12) : (d ? 0xFFF6E3C2 : 0xFF524000));
@@ -665,8 +668,8 @@ public final class AmberPalette {
         // مصرف‌کننده‌ها خودشان آلفا می‌سازند (چیپ غیرانتخاب‌شده ×۰٫۱۵۶ در ReactionsLayoutInBubble، تاپیک آلفا۳۸ در
         // MessageTopicButton، blend رنگ اصلی transcribe در ChatMessageAudio، اوورلی ReactionsEffectOverlay) —
         // مقدار قبلی (اکسنت×۱۰٪) بعد از ضرب ۰٫۱۵۶ چیپ را ~۱٪ می‌کرد ← اکسنت جامد (هم‌الگوی chat_inReactionButtonBackground قدم ۲۰)
-        m.put("chat_outReactionButtonBackground", accent);
-        m.put("chat_outReactionButtonText", accent);
+        m.put("chat_outReactionButtonBackground", outAccent);
+        m.put("chat_outReactionButtonText", outAccent);
         // متن چیپ انتخاب‌شده روی قرص اکسنت جامد از اکسنت بود (روی اکسنت نامرئی!) ← onAccent (۴٫۲۹/۷٫۲۳)
         m.put("chat_outReactionButtonTextSelected", onAccent);
         // قدم ۲۴ — دو کلید سرویس ری‌اکشن (چیپ ری‌اکشن انتخاب‌شدهٔ روی چیپ سرویس/تاریخ — ChatActionCell) در پالت نبودند:
@@ -677,10 +680,10 @@ public final class AmberPalette {
         m.put("chat_outQuote", AmberTokens.alpha(outText, 0.12f));
         m.put("chat_outViews", outDim);
         m.put("chat_outViewsSelected", outDim);
-        m.put("chat_outSentCheck", accent);
+        m.put("chat_outSentCheck", outAccent);
         // قدم ۲۱ — روز از accentBright (روی حباب FFDDB8 فقط ۲٫۰۶:۱) به sentCheckRead؛ شب همان accentBright (۵٫۵۸)
         m.put("chat_outSentCheckRead", sentCheckRead);
-        m.put("chat_outSentCheckSelected", accent);
+        m.put("chat_outSentCheckSelected", outAccent);
         m.put("chat_outSentCheckReadSelected", sentCheckRead);
         m.put("chat_outSentClock", AmberTokens.alpha(outText, 0.60f));
         m.put("chat_outSentClockSelected", AmberTokens.alpha(outText, 0.60f));
@@ -689,9 +692,9 @@ public final class AmberPalette {
         // قدم ۲۱ — لینک داخل حباب خروجی: آپستریم آبی 2678b6 خارج‌ازتوکن بود و اصلاً در پالت نبود ← اکسنت
         m.put("chat_messageLinkOut", accent);
         m.put("chat_outLinkSelectBackground", AmberTokens.alpha(accent, 0.25f));
-        m.put("chat_outTextSelectionCursor", accent);
+        m.put("chat_outTextSelectionCursor", outAccent);
         m.put("chat_outTextSelectionHighlight", AmberTokens.alpha(accent, 0.30f));
-        m.put("chat_outUpCall", accent);
+        m.put("chat_outUpCall", outAccent);
         m.put("chat_outDivider", outline);
 
         // ── قدم ۲۶ — خانوادهٔ انتخاب پیام (اکشن‌مود انتخاب) ─────────────────

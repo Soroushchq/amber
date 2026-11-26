@@ -67,30 +67,31 @@ public final class AmberTokens {
     // شب — تونال گرم M3؛ بدون مشکی خالص، سطوح پله‌ای
     // ─────────────────────────────────────────────────────────────────────────
 
-    public static final int NIGHT_BG = 0xFF17130E;
-    public static final int NIGHT_WALLPAPER_TOP = 0xFF1C1710;
-    public static final int NIGHT_WALLPAPER_MID = 0xFF17130E;
-    public static final int NIGHT_WALLPAPER_BOTTOM = 0xFF12100B;
-    public static final int NIGHT_HEADER = 0xFF1F1912;
-    public static final int NIGHT_HEADER_BORDER = 0xFF332818;
-    public static final int NIGHT_SURFACE = 0xFF241D14;
-    public static final int NIGHT_OUTLINE = 0xFF382C1C;
-    public static final int NIGHT_TEXT = 0xFFF5EFE4;
-    public static final int NIGHT_TEXT_DIM = 0xFFA99C8B;
-    public static final int NIGHT_TIME = 0xFF8B7F6F;
+    public static final int NIGHT_BG = 0xFF131009;
+    public static final int NIGHT_WALLPAPER_TOP = 0xFF181410;
+    public static final int NIGHT_WALLPAPER_MID = 0xFF131009;
+    public static final int NIGHT_WALLPAPER_BOTTOM = 0xFF0F0D08;
+    public static final int NIGHT_HEADER = 0xFF1B1610;
+    public static final int NIGHT_HEADER_BORDER = 0xFF302515;
+    public static final int NIGHT_SURFACE = 0xFF211B12;
+    public static final int NIGHT_OUTLINE = 0xFF372C1A;
+    public static final int NIGHT_TEXT = 0xFFF8F2E8;
+    public static final int NIGHT_TEXT_DIM = 0xFFB0A292;
+    public static final int NIGHT_TIME = 0xFF93877A;
     public static final int NIGHT_ACCENT = 0xFFF5A623;
     public static final int NIGHT_ACCENT_BRIGHT = 0xFFFFB84D;
     public static final int NIGHT_ON_ACCENT = 0xFF3A2400;
-    public static final int NIGHT_IN_BUBBLE = 0xFF262017;
-    public static final int NIGHT_IN_TEXT = 0xFFF5EFE4;
-    public static final int NIGHT_OUT_BUBBLE = 0xFF5C4000;
-    public static final int NIGHT_OUT_TEXT = 0xFFFFDDB8;
+    public static final int NIGHT_IN_BUBBLE = 0xFF2A2318;
+    public static final int NIGHT_IN_TEXT = 0xFFF8F2E8;
+    /** Solstice: حباب خروجی = بدنهٔ گم کهربایی با متن کهوهٔ تیره (کنتراست ۸:۱) */
+    public static final int NIGHT_OUT_BUBBLE = 0xFFF0A521;
+    public static final int NIGHT_OUT_TEXT = 0xFF2E1C00;
     public static final int NIGHT_BADGE_BG = 0xFFF5A623;
     public static final int NIGHT_BADGE_TEXT = 0xFF3A2400;
-    public static final int NIGHT_FIELD_BG = 0xFF241D14;
-    public static final int NIGHT_FIELD_BORDER = 0xFF382C1C;
-    /** پیل فعال ناوبری شناور شب = primary-container تیره */
-    public static final int NIGHT_NAV_PILL = 0xFF5C4000;
+    public static final int NIGHT_FIELD_BG = 0xFF1D1812;
+    public static final int NIGHT_FIELD_BORDER = 0xFF362B1B;
+    /** پیل فعال ناوبری شناور شب = کهربای عمیق گرم‌تر از قبل */
+    public static final int NIGHT_NAV_PILL = 0xFF7A5708;
     public static final int NIGHT_SHADOW_TINT = 0xFF000000;
     public static final float NIGHT_SHADOW_ALPHA = 0.45f;
 

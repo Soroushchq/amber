@@ -46,6 +46,17 @@ def f_alpha(color, a):
     a8 = jround(a * 255.0) & 0xFF
     return mask32((a8 << 24) | (int(color) & 0xFFFFFF))
 
+def f_blend(c1, c2, ratio):
+    """androidx ColorUtils.blendARGB — ratio سهم رنگ دوم."""
+    r = float(ratio)
+    a1, a2 = (int(c1) >> 24) & 0xFF, (int(c2) >> 24) & 0xFF
+    ch1 = [(int(c1) >> 16) & 0xFF, (int(c1) >> 8) & 0xFF, int(c1) & 0xFF]
+    ch2 = [(int(c2) >> 16) & 0xFF, (int(c2) >> 8) & 0xFF, int(c2) & 0xFF]
+    out = [jround(x2 * r + x1 * (1 - r)) for x1, x2 in zip(ch1, ch2)]
+    aa = jround(a2 * r + a1 * (1 - r))
+    return mask32((aa << 24) | (out[0] << 16) | (out[1] << 8) | out[2])
+
+
 def f_over(fg, bg, a):
     fa = float(a)
     fr, fgc, fb = (int(fg) >> 16) & 0xFF, (int(fg) >> 8) & 0xFF, int(fg) & 0xFF
@@ -111,6 +122,7 @@ def translate_ternaries(s):
 def java_to_py(expr):
     s = translate_ternaries(expr.strip())
     s = s.replace("AmberTokens.alpha(", "f_alpha(")
+    s = s.replace("ColorUtils.blendARGB(", "f_blend(")
     s = s.replace("AmberTokens.over(", "f_over(")
     s = s.replace("AmberTokens.", "")
     s = re.sub(r"(\d+\.\d+)f", r"\1", s)  # پسوند float
@@ -121,6 +133,7 @@ def eval_palette(d_value, au_value, pr_value, ma_value, sl_value, sw_value, ha_v
     ns = dict(tokens)
     ns["f_alpha"] = f_alpha
     ns["f_over"] = f_over
+    ns["f_blend"] = f_blend
     ns["d"] = d_value
     ns["au"] = au_value
     ns["pr"] = pr_value
