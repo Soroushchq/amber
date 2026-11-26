@@ -2,9 +2,16 @@
 
 **Amber** is an unofficial, open-source fork of [Telegram for Android](https://github.com/DrKLO/Telegram),
 maintained by [Soroushchq](https://github.com/Soroushchq) and licensed under **GPLv2**.
-It ships an OLED-black + amber UI and a sequential background download queue
-(select multiple files in a chat and let them download in order, even while the
-phone is locked).
+It ships a sequential background download queue (select multiple files in a chat
+and let them download in order, even while the phone is locked), plus a full
+custom identity — the **Solstice** UI:
+
+- **Gem mark** — a mathematically constructed faceted amber crystal (no paper
+  plane!), used across the launcher icon, adaptive/themed icons, splash and app
+- **Solstice theme** — deep warm OLED night base with *golden gem* outgoing
+  bubbles and dark-coffee text; warm-paper day mode
+- **Settings hub 3.0** — hero header, live status chips, sectioned cards and
+  real animated switches for all 20+ fork toggles
 
 > Not affiliated with Telegram Messenger Inc. "Telegram" is a trademark of its
 > respective owner and is not used by this project's branding. See [NOTICE.md](NOTICE.md).
