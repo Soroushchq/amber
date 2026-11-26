@@ -13,4 +13,10 @@
     <string name="AmberDynamicThemesDesc">Colors follow your system wallpaper — see Themes</string>
     <string name="AmberThemeFX">Theme signature animations</string>
     <string name="AmberThemeFXDesc">A live mascot scene for the active theme family at the bottom of the main screen - tap it to play</string>
+    <string name="AmberChipQueue">Queue</string>
+    <string name="AmberChipGhost">Ghost</string>
+    <string name="AmberChipProxy">Proxy</string>
+    <string name="AmberSettingsTagline">The golden Telegram experience</string>
+    <string name="AmberVersionFormat" translatable="false">Solstice %1$s</string>
+    <string name="AmberFooterCrafted">Crafted with fire</string>
 </resources>

@@ -13,4 +13,9 @@
     <string name="AmberDynamicThemesDesc">رنگ‌ها هم‌گام با پس‌زمینهٔ سیستم — در صفحهٔ تم‌ها</string>
     <string name="AmberThemeFX">انیمیشن امضای تم‌ها</string>
     <string name="AmberThemeFXDesc">صحنهٔ زندهٔ خانوادهٔ تم فعال در پایین صفحهٔ اصلی — برای اجرا لمسش کنید</string>
+    <string name="AmberChipQueue">صف دانلود</string>
+    <string name="AmberChipGhost">شبح</string>
+    <string name="AmberChipProxy">پروکسی</string>
+    <string name="AmberSettingsTagline">تجربهٔ طلایی تلگرام</string>
+    <string name="AmberFooterCrafted">ساخته‌شده با آتش</string>
 </resources>

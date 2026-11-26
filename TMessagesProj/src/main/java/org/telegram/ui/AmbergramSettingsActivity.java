@@ -2,17 +2,12 @@ package org.telegram.ui;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.GradientDrawable;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import org.telegram.messenger.AmberAntiAds;
 import org.telegram.messenger.AmberBackup;
@@ -24,6 +19,7 @@ import org.telegram.messenger.AmberPrivacy;
 import org.telegram.messenger.AmberThemeFX;
 import org.telegram.messenger.AmbergramProxyManager;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.browser.Browser;
 import org.telegram.messenger.DownloadQueueController;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
@@ -32,28 +28,33 @@ import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ActionBar.ThemeBind;
 import org.telegram.ui.Cells.AppIconsSelectorCell;
-import org.telegram.ui.Cells.HeaderCell;
-import org.telegram.ui.Cells.TextInfoPrivacyCell;
+import org.telegram.ui.Components.AmberSettingsUI;
+import org.telegram.ui.Components.AmberSettingsUI.SettingRow;
+import org.telegram.ui.Components.AmberSettingsUI.StatusChip;
 import org.telegram.ui.Components.LayoutHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * AmberGram fork: settings hub for AmberGram features.
- * The sequential download queue lives on its own page (AmbergramQueueActivity)
- * so this hub stays clean and has room for upcoming features.
+ * AmberGram UI 3.0 "Solstice" — هاب تنظیمات.
+ *
+ * معماری جدید: هدر قهرمان (گم کهربایی + هالهٔ گرم)، چیپ‌های وضعیت زنده
+ * (صف/شبح/پروکسی)، کارت‌های بخش‌بندی‌شده با گوشه گرد و ردیف‌های سوییچ‌دار واقعی.
+ * همهٔ اجزا از تم جاری رنگ می‌گیرند (ThemeBind)؛ منطق شبکه/صف/پروکسی دست‌نخورده.
  */
 public class AmbergramSettingsActivity extends BaseFragment implements DownloadQueueController.QueueListener, AmbergramProxyManager.Listener {
 
-    private static final int BRAND_ORANGE = 0xFFF97316;
+    private AmberSettingsUI.StatusChip queueChip;
+    private AmberSettingsUI.StatusChip ghostChip;
+    private AmberSettingsUI.StatusChip proxyChip;
 
-    private TextView queueValueView;
-    private TextView proxyValueView;
-    private TextView ghostValueView;
-    private TextView doubleTapValueView;
-    private TextView lockedValueView;
-    private final HashMap<Integer, TextView> toggleValueViews = new HashMap<>();
+    private SettingRow queueRow;
+    private SettingRow proxyRow;
+    private SettingRow ghostRow;
+    private SettingRow doubleTapRow;
+    private SettingRow lockedRow;
+    private final HashMap<Integer, SettingRow> toggleRows = new HashMap<>();
     private final HashMap<Integer, AmberToggle> toggles = new HashMap<>();
     private boolean updateScheduled;
     private boolean proxyUpdateScheduled;
@@ -98,43 +99,68 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
         scrollView.setFillViewport(true);
         ((FrameLayout) fragmentView).addView(scrollView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
 
-        LinearLayout contentWrapper = new LinearLayout(context);
-        contentWrapper.setOrientation(LinearLayout.VERTICAL);
-        scrollView.addView(contentWrapper, new ScrollView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        LinearLayout content = new LinearLayout(context);
+        content.setOrientation(LinearLayout.VERTICAL);
+        scrollView.addView(content, new ScrollView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        // Amber گرد ۲۰ — صفحهٔ تنظیمات بخش‌بندی‌شده (کارت جدا برای هر بخش، الهام از صفحات تنظیمات رقبا)
+        // ── هدر قهرمان: گم کهربایی + هالهٔ گرم + چیپ نسخهٔ Solstice ──
+        content.addView(new AmberSettingsUI.HeroView(context, getResourceProvider()),
+                LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+
+        // ── چیپ‌های وضعیت زنده ──
+        HorizontalScrollView chipsScroll = new HorizontalScrollView(context);
+        chipsScroll.setHorizontalScrollBarEnabled(false);
+        chipsScroll.setVerticalScrollBarEnabled(false);
+        content.addView(chipsScroll, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 12, 0, 0));
+
+        LinearLayout chipsRow = new LinearLayout(context);
+        chipsRow.setOrientation(LinearLayout.HORIZONTAL);
+        chipsRow.setPadding(AndroidUtilities.dp(14), 0, AndroidUtilities.dp(14), 0);
+        chipsScroll.addView(chipsRow, new HorizontalScrollView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        queueChip = new StatusChip(context, R.drawable.msg_download, LocaleController.getString(R.string.AmberChipQueue), getResourceProvider());
+        chipsRow.addView(queueChip, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, 0, 0, 8, 0));
+        ghostChip = new StatusChip(context, R.drawable.ghost, LocaleController.getString(R.string.AmberChipGhost), getResourceProvider());
+        chipsRow.addView(ghostChip, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, 0, 0, 8, 0));
+        proxyChip = new StatusChip(context, R.drawable.ic_ambergram_proxy, LocaleController.getString(R.string.AmberChipProxy), getResourceProvider());
+        chipsRow.addView(proxyChip, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT));
 
         // ── ابزارها ──
-        LinearLayout toolsCard = addSectionCard(context, contentWrapper, R.string.AmberSectionTools);
-        LinearLayout queueRow = makeQueueRow(context);
-        toolsCard.addView(queueRow, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        toolsCard.addView(makeDivider(context), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1));
-        LinearLayout proxyRow = makeProxyRow(context);
-        toolsCard.addView(proxyRow, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        toolsCard.addView(makeDivider(context), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1));
-        LinearLayout ghostRow = makeGhostRow(context);
-        toolsCard.addView(ghostRow, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        AmberSettingsUI.SectionCard toolsCard = new AmberSettingsUI.SectionCard(context, content, R.string.AmberSectionTools, getResourceProvider());
+        queueRow = toolsCard.addActionRow(context, R.drawable.msg_download, R.string.AmbergramQueueSection, 0,
+                v -> presentFragment(new AmbergramQueueActivity()), getResourceProvider());
+        proxyRow = toolsCard.addActionRow(context, R.drawable.ic_ambergram_proxy, R.string.AmbergramProxySection, 0,
+                v -> presentFragment(new AmbergramProxyActivity()), getResourceProvider());
+        registerGhostToggle();
+        ghostRow = toolsCard.addToggleRow(context, R.drawable.ghost, R.string.AmberGhostSection, R.string.AmberGhostDesc,
+                AmberGhost.isEnabled(), value -> AmberGhost.setEnabled(value), getResourceProvider());
 
         // ── گفت‌وگوها ──
-        LinearLayout chatsCard = addSectionCard(context, contentWrapper, R.string.AmberSectionChats);
-        int[][] chatsToggleSpecs = {
+        AmberSettingsUI.SectionCard chatsCard = new AmberSettingsUI.SectionCard(context, content, R.string.AmberSectionChats, getResourceProvider());
+        addToggleSection(context, chatsCard, new int[][]{
                 {R.drawable.msg_block, R.string.AmberNoSponsored, R.string.AmberNoSponsoredDesc},
                 {R.drawable.msg_channel, R.string.AmberNoRecommendations, R.string.AmberNoRecommendationsDesc},
                 {R.drawable.msg_sticker, R.string.AmberNoGreetings, R.string.AmberNoGreetingsDesc},
                 {R.drawable.msg_mute, R.string.AmberHideStoriesRead, R.string.AmberHideStoriesReadDesc},
                 {R.drawable.msg_sticker, R.string.AmberHideStickerTime, R.string.AmberHideStickerTimeDesc}
-        };
-        addToggleSection(context, chatsCard, chatsToggleSpecs);
-        chatsCard.addView(makeDivider(context), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1));
-        LinearLayout doubleTapRow = makeDoubleTapRow(context);
-        chatsCard.addView(doubleTapRow, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        chatsCard.addView(makeDivider(context), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1));
-        LinearLayout lockedRow = makeLockedChatsRow(context);
-        chatsCard.addView(lockedRow, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        });
+        doubleTapRow = chatsCard.addActionRow(context, R.drawable.msg_copy, R.string.AmberDoubleTap, 0,
+                v -> {
+                    int next = (AmberChatTweaks.doubleTapIncoming() + 1) % 4;
+                    AmberChatTweaks.setDoubleTapIncoming(next);
+                    AmberChatTweaks.setDoubleTapOutgoing(next);
+                    refreshDoubleTapValue();
+                }, getResourceProvider());
+        lockedRow = chatsCard.addActionRow(context, R.drawable.ic_lock_header, R.string.AmberLockedChats, 0,
+                v -> {
+                    if (getParentActivity() != null) {
+                        presentFragment(new AmberLockedChatsActivity());
+                    }
+                }, getResourceProvider());
 
         // ── حریم خصوصی ──
-        LinearLayout privacyCard = addSectionCard(context, contentWrapper, R.string.AmberSectionPrivacy);
-        int[][] privacyToggleSpecs = {
+        AmberSettingsUI.SectionCard privacyCard = new AmberSettingsUI.SectionCard(context, content, R.string.AmberSectionPrivacy, getResourceProvider());
+        addToggleSection(context, privacyCard, new int[][]{
                 {R.drawable.msg_delete, R.string.AmberAntiDelete, R.string.AmberAntiDeleteDesc},
                 {R.drawable.msg_photo_blur, R.string.AmberAntiDisappearing, R.string.AmberAntiDisappearingDesc},
                 {R.drawable.msg_camera, R.string.AmberNoScreenshotNotify, R.string.AmberNoScreenshotNotifyDesc},
@@ -145,188 +171,102 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
                 {R.drawable.msg_search, R.string.AmberNoGlobalSearch, R.string.AmberNoGlobalSearchDesc},
                 {R.drawable.input_ai, R.string.AmberNoAiFeatures, R.string.AmberNoAiFeaturesDesc},
                 {R.drawable.msg_link, R.string.AmberStripLinkTracking, R.string.AmberStripLinkTrackingDesc}
-        };
-        addToggleSection(context, privacyCard, privacyToggleSpecs);
+        });
 
         // ── سرعت و شبکه ──
-        LinearLayout speedCard = addSectionCard(context, contentWrapper, R.string.AmberSectionSpeed);
-        int[][] speedToggleSpecs = {
+        AmberSettingsUI.SectionCard speedCard = new AmberSettingsUI.SectionCard(context, content, R.string.AmberSectionSpeed, getResourceProvider());
+        addToggleSection(context, speedCard, new int[][]{
                 {R.drawable.msg_speed, R.string.AmberTurboDownload, R.string.AmberTurboDownloadDesc},
                 {R.drawable.msg_speed_fast, R.string.AmberTurboUpload, R.string.AmberTurboUploadDesc},
                 {R.drawable.msg_download, R.string.AmberNoAutoUpdate, R.string.AmberNoAutoUpdateDesc},
                 {R.drawable.msg_secret, R.string.AmberProxyAutoOffVpn, R.string.AmberProxyAutoOffVpnDesc}
-        };
-        addToggleSection(context, speedCard, speedToggleSpecs);
+        });
 
         // ── ظاهر و برندینگ ──
-        LinearLayout appearanceCard = addSectionCard(context, contentWrapper, R.string.AmberSectionAppearance);
-        // گرد ۲۱ — انیمیشن امضای هر تم
-        int[][] themeFxSpecs = {
+        AmberSettingsUI.SectionCard appearanceCard = new AmberSettingsUI.SectionCard(context, content, R.string.AmberSectionAppearance, getResourceProvider());
+        addToggleSection(context, appearanceCard, new int[][]{
                 {R.drawable.msg_palette, R.string.AmberThemeFX, R.string.AmberThemeFXDesc}
-        };
-        addToggleSection(context, appearanceCard, themeFxSpecs);
-        appearanceCard.addView(makeDivider(context), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1));
-        LinearLayout monetRow = makeMonetRow(context);
-        appearanceCard.addView(monetRow, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        appearanceCard.addView(makeDivider(context), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1));
+        });
+        appearanceCard.addActionRow(context, R.drawable.msg_palette, R.string.AmberDynamicThemes, R.string.AmberDynamicThemesDesc,
+                v -> presentFragment(new ThemeActivity(ThemeActivity.THEME_TYPE_BASIC)), getResourceProvider());
         AppIconsSelectorCell appIconsCell = new AppIconsSelectorCell(context, this, currentAccount);
         appIconsCell.setNestedScrollingEnabled(false);
         ThemeBind.backgroundColor(appIconsCell, Theme.key_windowBackgroundWhite);
-        appearanceCard.addView(appIconsCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        appearanceCard.addCustomRow(appIconsCell);
 
         // ── پشتیبان‌گیری ──
-        LinearLayout backupCard = addSectionCard(context, contentWrapper, R.string.AmberSectionBackup);
-        LinearLayout backupExportRow = makeBackupRow(context, R.drawable.msg_copy, R.string.AmberBackupExport, true);
-        backupCard.addView(backupExportRow, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        backupCard.addView(makeDivider(context), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1));
-        LinearLayout backupImportRow = makeBackupRow(context, R.drawable.msg_download, R.string.AmberBackupImport, false);
-        backupCard.addView(backupImportRow, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        AmberSettingsUI.SectionCard backupCard = new AmberSettingsUI.SectionCard(context, content, R.string.AmberSectionBackup, getResourceProvider());
+        backupCard.addActionRow(context, R.drawable.msg_copy, R.string.AmberBackupExport, 0,
+                v -> {
+                    if (getParentActivity() != null) {
+                        AmberBackup.exportSettings(this);
+                    }
+                }, getResourceProvider());
+        backupCard.addActionRow(context, R.drawable.msg_download, R.string.AmberBackupImport, 0,
+                v -> {
+                    if (getParentActivity() != null) {
+                        AmberBackup.importSettings(this);
+                    }
+                }, getResourceProvider());
 
-        TextInfoPrivacyCell footerCell = new TextInfoPrivacyCell(context, 24, null);
-        footerCell.setText(LocaleController.getString(R.string.AmbergramQueueComingSoon));
-        contentWrapper.addView(footerCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+        // ── فوتر ──
+        content.addView(AmberSettingsUI.createFooter(context, getResourceProvider(),
+                v -> Browser.openUrl(getParentActivity(), "https://github.com/Soroushchq/amber")),
+                LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
 
         refreshQueueValue();
         refreshProxyValue();
         refreshGhostValue();
+        refreshDoubleTapValue();
+        refreshLockedValue();
         refreshAllToggles();
         return fragmentView;
     }
 
-    // گرد ۲۰ — ساخت کارت سفید جدید با سرتیترِ بخش؛ فاصلهٔ خاکستری بین کارت‌ها را هم اضافه می‌کند
-    private LinearLayout addSectionCard(Context context, LinearLayout wrapper, int titleRes) {
-        View gap = new View(context);
-        gap.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundGray));
-        wrapper.addView(gap, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 8));
-        HeaderCell header = new HeaderCell(context);
-        header.setText(LocaleController.getString(titleRes));
-        wrapper.addView(header, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        LinearLayout card = new LinearLayout(context);
-        card.setOrientation(LinearLayout.VERTICAL);
-        ThemeBind.backgroundColor(card, Theme.key_windowBackgroundWhite);
-        wrapper.addView(card, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-        return card;
-    }
-
-    private View makeDivider(Context context) {
-        View divider = new View(context);
-        divider.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundGray));
-        return divider;
-    }
-
-    private void addToggleSection(Context context, LinearLayout card, int[][] specs) {
-        for (int i = 0; i < specs.length; i++) {
-            if (i > 0) {
-                card.addView(makeDivider(context), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1));
+    private void registerGhostToggle() {
+        toggles.put(R.string.AmberGhostSection, new AmberToggle() {
+            @Override
+            public boolean get() {
+                return AmberGhost.isEnabled();
             }
-            int[] spec = specs[i];
-            LinearLayout toggleRow = makeToggleRow(context, spec[0], spec[1], spec[2]);
-            card.addView(toggleRow, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            @Override
+            public void set(boolean value) {
+                AmberGhost.setEnabled(value);
+            }
+        });
+    }
+
+    private void addToggleSection(Context context, AmberSettingsUI.SectionCard card, int[][] specs) {
+        for (int[] spec : specs) {
+            final int titleRes = spec[1];
+            AmberToggle toggle = new AmberToggle() {
+                @Override
+                public boolean get() {
+                    return getToggleValue(titleRes);
+                }
+
+                @Override
+                public void set(boolean value) {
+                    setToggleValue(titleRes, value);
+                }
+            };
+            toggles.put(titleRes, toggle);
+            SettingRow row = card.addToggleRow(context, spec[0], titleRes, spec[2], toggle.get(),
+                    value -> setToggleValue(titleRes, value), getResourceProvider());
+            toggleRows.put(titleRes, row);
         }
     }
 
-    // گرد ۲۰ — ردیف «تم‌های پویا» که صفحهٔ تم‌ها را باز می‌کند (Material You)
-    private LinearLayout makeMonetRow(Context context) {
-        LinearLayout row = new LinearLayout(context);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(10), AndroidUtilities.dp(16), AndroidUtilities.dp(10));
-        row.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector)));
-        row.setOnClickListener(v -> presentFragment(new ThemeActivity(ThemeActivity.THEME_TYPE_BASIC)));
-        row.addView(makeIconTile(context, R.drawable.msg_palette), LayoutHelper.createLinear(42, 42, 0, Gravity.CENTER_VERTICAL, 0, 0, 12, 0));
-
-        LinearLayout textCol = new LinearLayout(context);
-        textCol.setOrientation(LinearLayout.VERTICAL);
-        row.addView(textCol, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
-
-        TextView titleView = new TextView(context);
-        titleView.setTypeface(AndroidUtilities.bold());
-        titleView.setTextSize(16);
-        ThemeBind.textColor(titleView, Theme.key_windowBackgroundWhiteBlackText, null);
-        titleView.setText(LocaleController.getString(R.string.AmberDynamicThemes));
-        titleView.setSingleLine(true);
-        textCol.addView(titleView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-        TextView descView = new TextView(context);
-        descView.setTextSize(13);
-        ThemeBind.textColor(descView, Theme.key_windowBackgroundWhiteGrayText2, null);
-        descView.setText(LocaleController.getString(R.string.AmberDynamicThemesDesc));
-        descView.setSingleLine(true);
-        textCol.addView(descView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-        TextView chevronView = new TextView(context);
-        chevronView.setTypeface(AndroidUtilities.bold());
-        chevronView.setTextSize(18);
-        ThemeBind.textColor(chevronView, Theme.key_windowBackgroundWhiteGrayText2, null);
-        chevronView.setText("›");
-        row.addView(chevronView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, 0, Gravity.CENTER_VERTICAL, 8, 0, 0, 0));
-
-        return row;
-    }
-
-    // آیکون‌ها در کاشی گرد با پس‌زمینهٔ آمبر ملایم — هم‌زبانهٔ کاشی‌های SettingCell صفحهٔ تنظیمات
-    private FrameLayout makeIconTile(Context context, int iconRes) {
-        FrameLayout tile = new FrameLayout(context);
-        GradientDrawable background = new GradientDrawable();
-        background.setColor((BRAND_ORANGE & 0x00FFFFFF) | 0x20000000);
-        background.setCornerRadius(AndroidUtilities.dp(12));
-        tile.setBackground(background);
-        ImageView iconView = new ImageView(context);
-        iconView.setImageResource(iconRes);
-        iconView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        iconView.setColorFilter(BRAND_ORANGE, PorterDuff.Mode.SRC_IN);
-        tile.addView(iconView, LayoutHelper.createFrame(22, 22, Gravity.CENTER));
-        return tile;
-    }
-
-    private LinearLayout makeQueueRow(Context context) {
-        LinearLayout row = new LinearLayout(context);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(10), AndroidUtilities.dp(16), AndroidUtilities.dp(10));
-        row.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector)));
-        row.setOnClickListener(v -> presentFragment(new AmbergramQueueActivity()));
-
-        row.addView(makeIconTile(context, R.drawable.msg_download), LayoutHelper.createLinear(42, 42, 0, Gravity.CENTER_VERTICAL, 0, 0, 12, 0));
-
-        LinearLayout textCol = new LinearLayout(context);
-        textCol.setOrientation(LinearLayout.VERTICAL);
-        row.addView(textCol, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
-
-        TextView titleView = new TextView(context);
-        titleView.setTypeface(AndroidUtilities.bold());
-        titleView.setTextSize(16);
-        ThemeBind.textColor(titleView, Theme.key_windowBackgroundWhiteBlackText, null);
-        titleView.setText(LocaleController.getString(R.string.AmbergramQueueSection));
-        titleView.setSingleLine(true);
-        textCol.addView(titleView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-        queueValueView = new TextView(context);
-        queueValueView.setTypeface(AndroidUtilities.bold());
-        queueValueView.setTextSize(13);
-        ThemeBind.textColor(queueValueView, Theme.key_windowBackgroundWhiteGrayText2, null);
-        queueValueView.setSingleLine(true);
-        textCol.addView(queueValueView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-        TextView chevronView = new TextView(context);
-        chevronView.setTypeface(AndroidUtilities.bold());
-        chevronView.setTextSize(20);
-        ThemeBind.textColor(chevronView, Theme.key_windowBackgroundWhiteGrayText2, null);
-        chevronView.setText(LocaleController.isRTL ? "‹" : "›");
-        chevronView.setGravity(Gravity.CENTER);
-        row.addView(chevronView, LayoutHelper.createLinear(28, ViewGroup.LayoutParams.WRAP_CONTENT, 0, Gravity.CENTER_VERTICAL, 8, 0, 0, 0));
-
-        return row;
-    }
+    // ─────────────────────────── به‌روزرسانی زنده ───────────────────────────
 
     private void refreshQueueValue() {
-        if (queueValueView == null || getContext() == null) {
+        if (queueChip == null || queueRow == null || getContext() == null) {
             return;
         }
         ArrayList<DownloadQueueController.QueueItem> items = DownloadQueueController.getInstance(currentAccount).getQueueSnapshot();
         int waiting = 0, downloading = 0;
-        for (int a = 0; a < items.size(); a++) {
-            DownloadQueueController.QueueItem item = items.get(a);
+        for (DownloadQueueController.QueueItem item : items) {
             if (item.state == DownloadQueueController.STATE_PENDING) {
                 waiting++;
             } else if (item.state == DownloadQueueController.STATE_DOWNLOADING) {
@@ -334,142 +274,115 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
             }
         }
         if (waiting > 0 || downloading > 0) {
-            queueValueView.setText(LocaleController.formatString(R.string.AmbergramQueueSummary, String.valueOf(waiting), String.valueOf(downloading)));
-            queueValueView.setTextColor(BRAND_ORANGE);
+            CharSequence summary = LocaleController.formatString(R.string.AmbergramQueueSummary, String.valueOf(waiting), String.valueOf(downloading));
+            queueChip.update(summary, true);
+            queueRow.setValueText(summary, true);
         } else {
-            queueValueView.setText(LocaleController.getString(R.string.AmbergramQueueRowIdle));
-            queueValueView.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteGrayText2));
+            CharSequence idle = LocaleController.getString(R.string.AmbergramQueueRowIdle);
+            queueChip.update(idle, false);
+            queueRow.setValueText(idle, false);
         }
     }
 
-    private LinearLayout makeProxyRow(Context context) {
-        LinearLayout row = new LinearLayout(context);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(10), AndroidUtilities.dp(16), AndroidUtilities.dp(10));
-        row.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector)));
-        row.setOnClickListener(v -> presentFragment(new AmbergramProxyActivity()));
-
-        row.addView(makeIconTile(context, R.drawable.ic_ambergram_proxy), LayoutHelper.createLinear(42, 42, 0, Gravity.CENTER_VERTICAL, 0, 0, 12, 0));
-
-        LinearLayout textCol = new LinearLayout(context);
-        textCol.setOrientation(LinearLayout.VERTICAL);
-        row.addView(textCol, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
-
-        TextView titleView = new TextView(context);
-        titleView.setTypeface(AndroidUtilities.bold());
-        titleView.setTextSize(16);
-        ThemeBind.textColor(titleView, Theme.key_windowBackgroundWhiteBlackText, null);
-        titleView.setText(LocaleController.getString(R.string.AmbergramProxySection));
-        titleView.setSingleLine(true);
-        textCol.addView(titleView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-        proxyValueView = new TextView(context);
-        proxyValueView.setTypeface(AndroidUtilities.bold());
-        proxyValueView.setTextSize(13);
-        ThemeBind.textColor(proxyValueView, Theme.key_windowBackgroundWhiteGrayText2, null);
-        proxyValueView.setSingleLine(true);
-        textCol.addView(proxyValueView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-        TextView chevronView = new TextView(context);
-        chevronView.setTypeface(AndroidUtilities.bold());
-        chevronView.setTextSize(20);
-        ThemeBind.textColor(chevronView, Theme.key_windowBackgroundWhiteGrayText2, null);
-        chevronView.setText(LocaleController.isRTL ? "‹" : "›");
-        chevronView.setGravity(Gravity.CENTER);
-        row.addView(chevronView, LayoutHelper.createLinear(28, ViewGroup.LayoutParams.WRAP_CONTENT, 0, Gravity.CENTER_VERTICAL, 8, 0, 0, 0));
-
-        return row;
+    private void refreshGhostValue() {
+        if (ghostChip == null || ghostRow == null || getContext() == null) {
+            return;
+        }
+        boolean enabled = AmberGhost.isEnabled();
+        ghostChip.update(LocaleController.getString(enabled ? R.string.AmberGhostOn : R.string.AmberGhostOff), enabled);
+        ghostRow.setChecked(enabled);
     }
 
-    private LinearLayout makeGhostRow(Context context) {
-        LinearLayout row = new LinearLayout(context);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(10), AndroidUtilities.dp(16), AndroidUtilities.dp(10));
-        row.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector)));
-        row.setOnClickListener(v -> {
-            boolean newValue = !AmberGhost.isEnabled();
-            AmberGhost.setEnabled(newValue);
-            refreshGhostValue();
-            if (getParentActivity() != null) {
-                Toast.makeText(getParentActivity(), LocaleController.getString(R.string.AmberGhostDesc), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        row.addView(makeIconTile(context, R.drawable.ghost), LayoutHelper.createLinear(42, 42, 0, Gravity.CENTER_VERTICAL, 0, 0, 12, 0));
-
-        LinearLayout textCol = new LinearLayout(context);
-        textCol.setOrientation(LinearLayout.VERTICAL);
-        row.addView(textCol, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
-
-        TextView titleView = new TextView(context);
-        titleView.setTypeface(AndroidUtilities.bold());
-        titleView.setTextSize(16);
-        ThemeBind.textColor(titleView, Theme.key_windowBackgroundWhiteBlackText, null);
-        titleView.setText(LocaleController.getString(R.string.AmberGhostSection));
-        titleView.setSingleLine(true);
-        textCol.addView(titleView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-        ghostValueView = new TextView(context);
-        ghostValueView.setTypeface(AndroidUtilities.bold());
-        ghostValueView.setTextSize(13);
-        ghostValueView.setSingleLine(true);
-        textCol.addView(ghostValueView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-        return row;
+    private void refreshProxyValue() {
+        if (proxyChip == null || proxyRow == null || getContext() == null) {
+            return;
+        }
+        AmbergramProxyManager manager = AmbergramProxyManager.getInstance();
+        if (manager.isFetching()) {
+            CharSequence fetching = LocaleController.getString(R.string.AmbergramProxyFetching);
+            proxyChip.update(fetching, true);
+            proxyRow.setValueText(fetching, true);
+            return;
+        }
+        if (manager.isTesting()) {
+            CharSequence testing = LocaleController.formatString(R.string.AmbergramProxyTesting, String.valueOf(manager.getProcessedCount()), String.valueOf(manager.getTestTotal()));
+            proxyChip.update(testing, true);
+            proxyRow.setValueText(testing, true);
+            return;
+        }
+        int working = manager.getWorkingCount();
+        if (working > 0) {
+            CharSequence value = LocaleController.formatString(R.string.AmbergramProxySettingsValue, String.valueOf(working));
+            proxyChip.update(value, true);
+            proxyRow.setValueText(value, true);
+        } else {
+            CharSequence value = LocaleController.getString(R.string.AmbergramProxySubtitle);
+            proxyChip.update(value, false);
+            proxyRow.setValueText(value, false);
+        }
     }
 
-    private LinearLayout makeToggleRow(Context context, int iconRes, int titleRes, int descRes) {
-        toggles.put(titleRes, new AmberToggle() {
-            @Override
-            public boolean get() {
-                return getToggleValue(titleRes);
-            }
-
-            @Override
-            public void set(boolean value) {
-                setToggleValue(titleRes, value);
-            }
-        });
-        LinearLayout row = new LinearLayout(context);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(10), AndroidUtilities.dp(16), AndroidUtilities.dp(10));
-        row.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector)));
-        row.setOnClickListener(v -> {
-            AmberToggle toggle = toggles.get(titleRes);
-            boolean newValue = !toggle.get();
-            toggle.set(newValue);
-            refreshToggle(titleRes);
-            if (getParentActivity() != null) {
-                Toast.makeText(getParentActivity(), LocaleController.getString(descRes), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        row.addView(makeIconTile(context, iconRes), LayoutHelper.createLinear(42, 42, 0, Gravity.CENTER_VERTICAL, 0, 0, 12, 0));
-
-        LinearLayout textCol = new LinearLayout(context);
-        textCol.setOrientation(LinearLayout.VERTICAL);
-        row.addView(textCol, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
-
-        TextView titleView = new TextView(context);
-        titleView.setTypeface(AndroidUtilities.bold());
-        titleView.setTextSize(16);
-        ThemeBind.textColor(titleView, Theme.key_windowBackgroundWhiteBlackText, null);
-        titleView.setText(LocaleController.getString(titleRes));
-        titleView.setSingleLine(true);
-        textCol.addView(titleView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-        TextView valueView = new TextView(context);
-        valueView.setTypeface(AndroidUtilities.bold());
-        valueView.setTextSize(13);
-        valueView.setSingleLine(true);
-        toggleValueViews.put(titleRes, valueView);
-        textCol.addView(valueView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-        return row;
+    @Override
+    public void onResume() {
+        super.onResume();
+        refreshDoubleTapValue();
+        refreshLockedValue();
+        refreshQueueValue();
+        refreshGhostValue();
+        refreshProxyValue();
     }
+
+    @Override
+    public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
+        if (AmberBackup.handleActivityResult(requestCode, resultCode, data)) {
+            return;
+        }
+        super.onActivityResultFragment(requestCode, resultCode, data);
+    }
+
+    private void refreshAllToggles() {
+        for (HashMap.Entry<Integer, SettingRow> entry : toggleRows.entrySet()) {
+            AmberToggle toggle = toggles.get(entry.getKey());
+            if (toggle != null) {
+                entry.getValue().setChecked(toggle.get());
+            }
+        }
+        if (ghostRow != null) {
+            ghostRow.setChecked(AmberGhost.isEnabled());
+        }
+    }
+
+    private void refreshDoubleTapValue() {
+        if (doubleTapRow == null || getContext() == null) {
+            return;
+        }
+        int action = AmberChatTweaks.doubleTapIncoming();
+        int res;
+        if (action == AmberChatTweaks.DOUBLE_TAP_REPEAT) {
+            res = R.string.AmberDoubleTapOptionRepeat;
+        } else if (action == AmberChatTweaks.DOUBLE_TAP_FORWARD_NO_QUOTE) {
+            res = R.string.AmberDoubleTapOptionForward;
+        } else if (action == AmberChatTweaks.DOUBLE_TAP_COPY) {
+            res = R.string.AmberDoubleTapOptionCopy;
+        } else {
+            res = R.string.AmberDoubleTapOptionReaction;
+        }
+        doubleTapRow.setValueText(LocaleController.getString(res), true);
+    }
+
+    private void refreshLockedValue() {
+        if (lockedRow == null || getContext() == null) {
+            return;
+        }
+        int count = AmberExtras.lockedDialogsCount();
+        if (count > 0) {
+            lockedRow.setValueText(LocaleController.formatString(R.string.AmberLockedChatsCount, String.valueOf(count)), true);
+        } else {
+            lockedRow.setValueText(LocaleController.getString(R.string.AmberGhostOff), false);
+        }
+    }
+
+    // ─────────────────────────── نگاشت toggle ها ───────────────────────────
 
     private boolean getToggleValue(int titleRes) {
         if (titleRes == R.string.AmberNoSponsored) {
@@ -560,224 +473,7 @@ public class AmbergramSettingsActivity extends BaseFragment implements DownloadQ
         }
     }
 
-    // ردیف اکشن دابل‌تپ — چرخهٔ چهار گزینه روی هر دو جهت (ورودی/خروجی)
-    private LinearLayout makeDoubleTapRow(Context context) {
-        LinearLayout row = new LinearLayout(context);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(10), AndroidUtilities.dp(16), AndroidUtilities.dp(10));
-        row.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector)));
-        row.setOnClickListener(v -> {
-            int next = (AmberChatTweaks.doubleTapIncoming() + 1) % 4;
-            AmberChatTweaks.setDoubleTapIncoming(next);
-            AmberChatTweaks.setDoubleTapOutgoing(next);
-            refreshDoubleTapValue();
-            if (getParentActivity() != null) {
-                Toast.makeText(getParentActivity(), LocaleController.getString(R.string.AmberDoubleTapDesc), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        row.addView(makeIconTile(context, R.drawable.msg_copy), LayoutHelper.createLinear(42, 42, 0, Gravity.CENTER_VERTICAL, 0, 0, 12, 0));
-
-        LinearLayout textCol = new LinearLayout(context);
-        textCol.setOrientation(LinearLayout.VERTICAL);
-        row.addView(textCol, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
-
-        TextView titleView = new TextView(context);
-        titleView.setTypeface(AndroidUtilities.bold());
-        titleView.setTextSize(16);
-        ThemeBind.textColor(titleView, Theme.key_windowBackgroundWhiteBlackText, null);
-        titleView.setText(LocaleController.getString(R.string.AmberDoubleTap));
-        titleView.setSingleLine(true);
-        textCol.addView(titleView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-        doubleTapValueView = new TextView(context);
-        doubleTapValueView.setTypeface(AndroidUtilities.bold());
-        doubleTapValueView.setTextSize(13);
-        doubleTapValueView.setSingleLine(true);
-        textCol.addView(doubleTapValueView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-        refreshDoubleTapValue();
-        return row;
-    }
-
-    // ردیف گفت‌وگوهای قفل‌شده — صفحهٔ مدیریت با شمارش زنده
-    private LinearLayout makeLockedChatsRow(Context context) {
-        LinearLayout row = new LinearLayout(context);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(10), AndroidUtilities.dp(16), AndroidUtilities.dp(10));
-        row.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector)));
-        row.setOnClickListener(v -> {
-            if (getParentActivity() != null) {
-                presentFragment(new AmberLockedChatsActivity());
-            }
-        });
-
-        row.addView(makeIconTile(context, R.drawable.ic_lock_header), LayoutHelper.createLinear(42, 42, 0, Gravity.CENTER_VERTICAL, 0, 0, 12, 0));
-
-        LinearLayout textCol = new LinearLayout(context);
-        textCol.setOrientation(LinearLayout.VERTICAL);
-        row.addView(textCol, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
-
-        TextView titleView = new TextView(context);
-        titleView.setTypeface(AndroidUtilities.bold());
-        titleView.setTextSize(16);
-        ThemeBind.textColor(titleView, Theme.key_windowBackgroundWhiteBlackText, null);
-        titleView.setText(LocaleController.getString(R.string.AmberLockedChats));
-        titleView.setSingleLine(true);
-        textCol.addView(titleView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-        lockedValueView = new TextView(context);
-        lockedValueView.setTypeface(AndroidUtilities.bold());
-        lockedValueView.setTextSize(13);
-        lockedValueView.setSingleLine(true);
-        textCol.addView(lockedValueView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-        refreshLockedValue();
-        return row;
-    }
-
-    // ردیف پشتیبان‌گیری تنظیمات — خروجی/درون‌ریزی JSON
-    private LinearLayout makeBackupRow(Context context, int iconRes, int titleRes, boolean export) {
-        LinearLayout row = new LinearLayout(context);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(10), AndroidUtilities.dp(16), AndroidUtilities.dp(10));
-        row.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector)));
-        row.setOnClickListener(v -> {
-            if (getParentActivity() == null) {
-                return;
-            }
-            if (export) {
-                AmberBackup.exportSettings(this);
-            } else {
-                AmberBackup.importSettings(this);
-            }
-        });
-
-        row.addView(makeIconTile(context, iconRes), LayoutHelper.createLinear(42, 42, 0, Gravity.CENTER_VERTICAL, 0, 0, 12, 0));
-
-        LinearLayout textCol = new LinearLayout(context);
-        textCol.setOrientation(LinearLayout.VERTICAL);
-        row.addView(textCol, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
-
-        TextView titleView = new TextView(context);
-        titleView.setTypeface(AndroidUtilities.bold());
-        titleView.setTextSize(16);
-        ThemeBind.textColor(titleView, Theme.key_windowBackgroundWhiteBlackText, null);
-        titleView.setText(LocaleController.getString(titleRes));
-        titleView.setSingleLine(true);
-        textCol.addView(titleView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-        return row;
-    }
-
-    private void refreshDoubleTapValue() {
-        if (doubleTapValueView == null || getContext() == null) {
-            return;
-        }
-        int action = AmberChatTweaks.doubleTapIncoming();
-        int res;
-        if (action == AmberChatTweaks.DOUBLE_TAP_REPEAT) {
-            res = R.string.AmberDoubleTapOptionRepeat;
-        } else if (action == AmberChatTweaks.DOUBLE_TAP_FORWARD_NO_QUOTE) {
-            res = R.string.AmberDoubleTapOptionForward;
-        } else if (action == AmberChatTweaks.DOUBLE_TAP_COPY) {
-            res = R.string.AmberDoubleTapOptionCopy;
-        } else {
-            res = R.string.AmberDoubleTapOptionReaction;
-        }
-        doubleTapValueView.setText(LocaleController.getString(res));
-        doubleTapValueView.setTextColor(BRAND_ORANGE);
-    }
-
-    private void refreshLockedValue() {
-        if (lockedValueView == null || getContext() == null) {
-            return;
-        }
-        int count = AmberExtras.lockedDialogsCount();
-        if (count > 0) {
-            lockedValueView.setText(LocaleController.formatString(R.string.AmberLockedChatsCount, String.valueOf(count)));
-            lockedValueView.setTextColor(BRAND_ORANGE);
-        } else {
-            lockedValueView.setText(LocaleController.getString(R.string.AmberGhostOff));
-            lockedValueView.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteGrayText2));
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        refreshDoubleTapValue();
-        refreshLockedValue();
-    }
-
-    @Override
-    public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
-        if (AmberBackup.handleActivityResult(requestCode, resultCode, data)) {
-            return;
-        }
-        super.onActivityResultFragment(requestCode, resultCode, data);
-    }
-
-    private void refreshAllToggles() {
-        for (int titleRes : toggleValueViews.keySet()) {
-            refreshToggle(titleRes);
-        }
-    }
-
-    private void refreshToggle(int titleRes) {
-        TextView valueView = toggleValueViews.get(titleRes);
-        if (valueView == null || getContext() == null) {
-            return;
-        }
-        if (toggles.get(titleRes).get()) {
-            valueView.setText(LocaleController.getString(R.string.AmberGhostOn));
-            valueView.setTextColor(BRAND_ORANGE);
-        } else {
-            valueView.setText(LocaleController.getString(R.string.AmberGhostOff));
-            valueView.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteGrayText2));
-        }
-    }
-
-    private void refreshGhostValue() {
-        if (ghostValueView == null || getContext() == null) {
-            return;
-        }
-        if (AmberGhost.isEnabled()) {
-            ghostValueView.setText(LocaleController.getString(R.string.AmberGhostOn));
-            ghostValueView.setTextColor(BRAND_ORANGE);
-        } else {
-            ghostValueView.setText(LocaleController.getString(R.string.AmberGhostOff));
-            ghostValueView.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteGrayText2));
-        }
-    }
-
-    private void refreshProxyValue() {
-        if (proxyValueView == null || getContext() == null) {
-            return;
-        }
-        AmbergramProxyManager manager = AmbergramProxyManager.getInstance();
-        if (manager.isFetching()) {
-            proxyValueView.setText(LocaleController.getString(R.string.AmbergramProxyFetching));
-            proxyValueView.setTextColor(BRAND_ORANGE);
-            return;
-        }
-        if (manager.isTesting()) {
-            proxyValueView.setText(LocaleController.formatString(R.string.AmbergramProxyTesting, String.valueOf(manager.getProcessedCount()), String.valueOf(manager.getTestTotal())));
-            proxyValueView.setTextColor(BRAND_ORANGE);
-            return;
-        }
-        int working = manager.getWorkingCount();
-        if (working > 0) {
-            proxyValueView.setText(LocaleController.formatString(R.string.AmbergramProxySettingsValue, String.valueOf(working)));
-            proxyValueView.setTextColor(BRAND_ORANGE);
-        } else {
-            proxyValueView.setText(LocaleController.getString(R.string.AmbergramProxySubtitle));
-            proxyValueView.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteGrayText2));
-        }
-    }
+    // ─────────────────────────── شنونده‌های صف/پروکسی ───────────────────────────
 
     @Override
     public void onProxyEvent(int event, int done, int total) {
